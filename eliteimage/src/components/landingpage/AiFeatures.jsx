@@ -98,9 +98,10 @@ const AiFeatures = () => {
                 <Image
                   src={item.Image}
                   alt={item.title}
-                  height={200}
-                  width={100}
-                  className="h-full w-full object-cover"
+                  width={600}
+                  height={400}
+                  quality={100}
+                  className="w-full h-full object-cover"
                 />
               </div>
 
