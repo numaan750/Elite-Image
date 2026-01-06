@@ -52,8 +52,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center ">
-      <div className="w-full max-w-6xl bg-white rounded-2xl flex">
+    <div className="min-h-screen flex items-center justify-center py-10 ">
+      <div className="w-full max-w-6xl bg-white rounded-2xl flex min-h-[650px]">
         <div className="w-full md:w-1/2 p-10 flex items-center">
           <div className="w-full">
             {error && <p className="text-red-600 mb-4 text-sm">{error}</p>}
