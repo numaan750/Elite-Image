@@ -7,47 +7,47 @@ const features = [
   {
     title: "Enhance",
     desc: "Basic enhancement",
-    Image: "/LandingPage/Enhance.png",
+    Image: "/LandingPage/Enhance.webp",
   },
   {
     title: "HDR",
     desc: "Merge exposures",
-    Image: "/LandingPage/HDR.png",
+    Image: "/LandingPage/HDR.webp",
   },
   {
     title: "Grass Replacement",
     desc: "Green lawns",
-    Image: "/LandingPage/Grass.png",
+    Image: "/LandingPage/Grass.webp",
   },
   {
     title: "Object Removal",
     desc: "Remove items",
-    Image: "/LandingPage/Object-Removel.png",
+    Image: "/LandingPage/Object-Removel.webp",
   },
   {
     title: "Sky Replacement",
     desc: "Perfect skies",
-    Image: "/LandingPage/Sky.png",
+    Image: "/LandingPage/Sky.webp",
   },
   {
     title: "Virtual Staging",
     desc: "Furnish rooms",
-    Image: "/LandingPage/Virtual-Staging.png",
+    Image: "/LandingPage/Virtual-Staging.webp",
   },
   {
     title: "Day to Dusk",
     desc: "Transform twilight",
-    Image: "/LandingPage/Day-to-Dusk.png",
+    Image: "/LandingPage/Day-to-Dusk.webp",
   },
   {
     title: "Straighten",
     desc: "Fix angle",
-    Image: "/LandingPage/Straighten.png",
+    Image: "/LandingPage/Straighten.webp",
   },
   {
     title: "Watermark Remove",
     desc: "Clean branding",
-    Image: "/LandingPage/Watermark-Remove.png",
+    Image: "/LandingPage/Watermark-Remove.webp",
   },
 ];
 
