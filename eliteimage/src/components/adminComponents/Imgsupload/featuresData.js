@@ -65,13 +65,13 @@ export const FEATURES_DATA = {
   "Sky Replacement": {
     title: "Sky Replacement Options",
     options: [
-      { name: "Clear Sky", img: "/projects/SKY/Sky-Option-1.webp" },
-      { name: "Partly Cloudy Sky", img: "/projects/SKY/Sky-Option-2.webp" },
-      { name: "Overcast Sky", img: "/projects/SKY/Sky-Option-3.webp" },
-      { name: "Sunset Sky", img: "/projects/SKY/Sky-Option-4.webp" },
-      { name: "Twilight / Dusk Sky", img: "/projects/SKY/Sky-Option-4.webp" },
-      { name: "Dramatic Sky", img: "/projects/SKY/Sky-Option-5.webp" },
-      { name: "Rainy Sky", img: "/projects/SKY/Sky-Option-6.webp" },
+      { name: "Clear Sky", img: "/projects/SKY/sky-1.png" },
+      { name: "Partly Cloudy Sky", img: "/projects/SKY/sky-2.png" },
+      { name: "Overcast Sky", img: "/projects/SKY/sky-3.png" },
+      { name: "Sunset Sky", img: "/projects/SKY/sky-4.png" },
+      { name: "Twilight / Dusk Sky", img: "/projects/SKY/sky-5.png" },
+      { name: "Dramatic Sky", img: "/projects/SKY/sky-6.png" },
+      { name: "Rainy Sky", img: "/projects/SKY/sky-7.png" },
     ],
   },
   "Virtual Staging": {

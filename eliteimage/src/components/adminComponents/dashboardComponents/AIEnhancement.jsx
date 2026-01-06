@@ -7,47 +7,47 @@ const features = [
   {
     title: "Enhance",
     desc: "Basic enhancement",
-    Image: "/LandingPage/AI-Feature1.webp",
+    Image: "/LandingPage/Enhance.png",
   },
   {
     title: "HDR",
     desc: "Merge exposures",
-    Image: "/LandingPage/AI-Feature2.webp",
+    Image: "/LandingPage/HDR.png",
   },
   {
     title: "Grass Replacement",
     desc: "Green lawns",
-    Image: "/LandingPage/AI-Feature3.webp",
+    Image: "/LandingPage/Grass.png",
   },
   {
     title: "Object Removal",
     desc: "Remove items",
-    Image: "/LandingPage/AI-Feature4.webp",
+    Image: "/LandingPage/Object-Removel.png",
   },
   {
     title: "Sky Replacement",
     desc: "Perfect skies",
-    Image: "/LandingPage/AI-Feature5.webp",
+    Image: "/LandingPage/Sky.png",
   },
   {
     title: "Virtual Staging",
     desc: "Furnish rooms",
-    Image: "/LandingPage/AI-Feature6.webp",
+    Image: "/LandingPage/Virtual-Staging.png",
   },
   {
     title: "Day to Dusk",
     desc: "Transform twilight",
-    Image: "/LandingPage/AI-Feature7.webp",
+    Image: "/LandingPage/Day-to-Dusk.png",
   },
   {
     title: "Straighten",
     desc: "Fix angle",
-    Image: "/LandingPage/AI-Feature8.webp",
+    Image: "/LandingPage/Straighten.png",
   },
   {
     title: "Watermark Remove",
     desc: "Clean branding",
-    Image: "/LandingPage/AI-Feature9.webp",
+    Image: "/LandingPage/Watermark-Remove.png",
   },
 ];
 
@@ -96,6 +96,7 @@ const AIEnhancement = () => {
                   alt={item.title}
                   height={200}
                   width={400}
+                  quality={100}
                   className="h-48 sm:h-52 lg:h-56 w-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
