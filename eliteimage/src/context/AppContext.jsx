@@ -36,7 +36,7 @@ const AppProvider = ({ children }) => {
   }, []);
 
   const signupUser = async (username, email, password) => {
-    const res = await fetch("https://elite-backend-liart.vercel.app/api/loginUser", {
+    const res = await fetch("https://elite-image.vercel.app/api/loginUser", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password }),
@@ -46,7 +46,7 @@ const AppProvider = ({ children }) => {
   };
 
   const loginUser = async (email, password) => {
-    const res = await fetch("https://elite-backend-liart.vercel.app/api/loginUser/login", {
+    const res = await fetch("https://elite-image.vercel.app/api/loginUser/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

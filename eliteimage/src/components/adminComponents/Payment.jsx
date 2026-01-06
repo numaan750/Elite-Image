@@ -32,7 +32,7 @@ export default function Payment() {
     if (!stripe || !elements) return;
 
     try {
-      const res = await fetch("https://elite-backend-liart.vercel.app/api/payment", {
+      const res = await fetch("https://elite-image.vercel.app/api/payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -68,7 +68,7 @@ export default function Payment() {
       }
 
       if (confirmRes.paymentIntent.status === "succeeded") {
-        await fetch("https://elite-backend-liart.vercel.app/api/payment/confirm", {
+        await fetch("https://elite-image.vercel.app/api/payment/confirm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
