@@ -21,7 +21,7 @@ const Showcase = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2 relative w-full h-[280px] md:h-[320px] rounded-2xl overflow-hidden">
             <Image
-              src="/LandingPage/showcase1.webp"
+              src="/LandingPage/showcase/showcase1.webp"
               alt="Showcase 1"
               fill
               className="object-cover"
@@ -29,7 +29,7 @@ const Showcase = () => {
           </div>
           <div className="relative w-full h-[280px] md:h-[320px] rounded-2xl overflow-hidden">
             <Image
-              src="/LandingPage/showcase2.webp"
+              src="/LandingPage/showcase/showcase2.webp"
               alt="Showcase 2"
               fill
               className="object-cover"
@@ -38,7 +38,7 @@ const Showcase = () => {
 
           <div className="relative w-full h-[280px] md:h-[320px] rounded-2xl overflow-hidden">
             <Image
-              src="/LandingPage/showcase3.webp"
+              src="/LandingPage/showcase/showcase3.webp"
               alt="Showcase 3"
               fill
               className="object-cover"
@@ -46,7 +46,7 @@ const Showcase = () => {
           </div>
           <div className="md:col-span-2 relative w-full h-[280px] md:h-[320px] rounded-2xl overflow-hidden">
             <Image
-              src="/LandingPage/showcase4.webp"
+              src="/LandingPage/showcase/showcase4.webp"
               alt="Showcase 4"
               fill
               className="object-cover"
@@ -55,7 +55,7 @@ const Showcase = () => {
 
           <div className="md:col-span-2 relative w-full h-[280px] md:h-[320px] rounded-2xl overflow-hidden">
             <Image
-              src="/LandingPage/showcase5.webp"
+              src="/LandingPage/showcase/showcase5.webp"
               alt="Showcase 5"
               fill
               className="object-cover"
@@ -63,7 +63,7 @@ const Showcase = () => {
           </div>
           <div className="relative w-full h-[280px] md:h-[320px] rounded-2xl overflow-hidden">
             <Image
-              src="/LandingPage/showcase6.webp"
+              src="/LandingPage/showcase/showcase6.webp"
               alt="Showcase 6"
               fill
               className="object-cover"
