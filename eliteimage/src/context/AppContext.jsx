@@ -85,7 +85,7 @@ const AppProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/aiImagesmodels`, {
+      const res = await fetch(`${API_URL}/api/aiImagesmodels`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +109,7 @@ const AppProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/aiImagesmodels/${id}`, {
+      const res = await fetch(`${API_URL}/api/aiImagesmodels/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +132,7 @@ const AppProvider = ({ children }) => {
   const updateProfile = async (userId, userData) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/loginUser/${userId}`, {
+      const response = await fetch(`${API_URL}/api/loginUser/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -175,7 +175,7 @@ const AppProvider = ({ children }) => {
   const updatePassword = async (userId, passwordData) => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/loginUser/${userId}`, {
+      const response = await fetch(`${API_URL}/api/loginUser/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
