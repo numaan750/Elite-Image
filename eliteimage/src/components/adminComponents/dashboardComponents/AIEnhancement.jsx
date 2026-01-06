@@ -57,27 +57,27 @@ const AIEnhancement = () => {
       <main className="bg-white px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
           <div className="w-full lg:w-auto">
-            <h1 className="text-base sm:text-lg lg:text-xl font-semibold text-black">
+            <h1 className="text-[24px] sm:text-[20px] lg:text-[28px] font-semibold text-black">
               Eliteimage Ai
             </h1>
 
-            <h2 className="mt-4 sm:mt-6 lg:mt-10 text-2xl sm:text-3xl lg:text-4xl font-bold text-black leading-tight">
-              Welcome Back, User
+            <h2 className="mt-4 sm:mt-6 lg:mt-10 text-[32px] sm:text-[28px] lg:text-[40px] font-bold text-black leading-tight">
+              Welcome Back, Google User
             </h2>
 
-            <p className="mt-2 text-black text-sm sm:text-base">
+            <p className="mt-2 text-black text-[20px] sm:text-[24px]">
               Transform your real estate images with AI
             </p>
           </div>
 
           <button className="flex items-center gap-2 rounded-lg bg-[#034F75] px-4 py-2 text-white w-full sm:w-auto lg:mt-20 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start">
             <span className="text-base mb-1">💳</span>
-            <span className="text-base font-medium">Credits : 12</span>
+            <span className="text-[20px] font-medium">Credits : 12</span>
           </button>
         </div>
 
         <section className="mt-8 sm:mt-12 lg:mt-16">
-          <h3 className="text-xl sm:text-2xl font-bold text-black">
+          <h3 className="text-xl sm:text-[40.12px] font-semibold text-black">
             AI Enhancement Features
           </h3>
         </section>
@@ -103,7 +103,7 @@ const AIEnhancement = () => {
 
               <div className="p-4 sm:p-5 flex items-center justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-base sm:text-lg text-black truncate">
+                  <h3 className="font-semibold text-base sm:text-[25.53px] text-black truncate">
                     {item.title}
                   </h3>
                   <p className="text-sm sm:text-base text-gray-600 line-clamp-2">

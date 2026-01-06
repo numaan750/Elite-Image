@@ -52,21 +52,21 @@ const Projects = () => {
   }
   return (
     <>
-      <h2 className="text-base sm:text-lg font-semibold text-black px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
+      <h2 className="text-base sm:text-[28px] font-semibold text-black px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
         Eliteimage Ai
       </h2>
 
       <div className="py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
         <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-black">
+          <h2 className="text-[20px] sm:text-[28px] lg:text-[40px] font-semibold text-black">
             My Projects
           </h2>
 
           <button
             onClick={getAiImages}
-            className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-sm sm:text-base text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
+            className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[20px] text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
           >
-            Refresh
+            New Project
           </button>
         </div>
 
@@ -86,10 +86,10 @@ const Projects = () => {
 
               <div className="flex flex-1 flex-col justify-between gap-3">
                 <div>
-                  <p className="text-sm sm:text-base font-medium text-black">
+                  <p className="text-[16px] sm:text-[31.52px] font-medium text-black">
                     Project: {new Date(project.createdAt).toLocaleDateString()}
                   </p>
-                  <p className="text-xs sm:text-sm text-gray-600">
+                  <p className="text-[16px] sm:text-[31.52px] text-gray-600">
                     Multiple Image
                   </p>
                 </div>

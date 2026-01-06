@@ -92,10 +92,10 @@ export default function Payment() {
   return (
     <div className="flex items-start justify-start bg-white pt-6 sm:pt-8 lg:pt-10 px-4 sm:px-6 lg:px-10">
       <div className="w-full max-w-xl">
-        <h3 className="text-base sm:text-lg lg:text-xl font-semibold mb-4 sm:mb-6">
+        <h3 className="text-[18px] sm:text-[28px] lg:text-[28px] font-semibold mb-4 sm:mb-6">
           Eliteimage Ai
         </h3>
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-6 sm:mb-10 lg:mb-12">
+        <h2 className="text-[20px] sm:text-[28px] lg:text-[40px] font-semibold mb-6 sm:mb-10 lg:mb-12">
           Final step, complete your payment
         </h2>
 
@@ -104,7 +104,7 @@ export default function Payment() {
           onSubmit={handleSubmit}
         >
           <div>
-            <label className="block text-sm sm:text-base font-medium mb-1 sm:mb-2">
+            <label className="block text-[16px] sm:text-[22.83px] font-medium mb-1 sm:mb-2">
               Card Holder
             </label>
             <input
@@ -112,11 +112,11 @@ export default function Payment() {
               placeholder="Augustine Campbell"
               value={cardHolder}
               onChange={(e) => setCardHolder(e.target.value)}
-              className="w-full rounded-md border border-[#034F75] bg-[#D3E7F0] px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#034F75]"
+              className="w-full rounded-md border border-[#034F75] bg-[#D3E7F0] px-3 sm:px-4 py-2 text-[14px] sm:text-[18.76px] focus:outline-none focus:ring-2 focus:ring-[#034F75]"
             />
           </div>
           <div>
-            <label className="block text-sm sm:text-base font-medium mb-1 sm:mb-2">
+            <label className="block text-[16px] sm:text-[22.83px] font-medium mb-1 sm:mb-2">
               Amount (USD)
             </label>
             <input
@@ -125,12 +125,12 @@ export default function Payment() {
               value={amount === 0 ? "" : amount}
               onChange={(e) => setAmount(Number(e.target.value))}
               placeholder="Enter amount"
-              className="w-full rounded-md border border-[#034F75] bg-[#D3E7F0] px-3 sm:px-4 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#034F75]"
+              className="w-full rounded-md border border-[#034F75] bg-[#D3E7F0] px-3 sm:px-4 py-2 text-[14px] sm:text-[18.76px] focus:outline-none focus:ring-2 focus:ring-[#034F75]"
             />
           </div>
 
           <div>
-            <label className="block text-sm sm:text-base font-medium mb-1 sm:mb-2">
+            <label className="block text-[16px] sm:text-[22.83px] font-medium mb-1 sm:mb-2">
               Card Details
             </label>
             <div className="border border-[#034F75] bg-[#D3E7F0] rounded-md p-3 sm:p-4">
@@ -154,7 +154,7 @@ export default function Payment() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 sm:mt-6 w-full sm:w-auto rounded-md bg-[#034F75] px-8 sm:px-12 lg:px-14 py-2 sm:py-2.5 text-[#D3E7F0] font-medium text-sm sm:text-base hover:bg-[#023a56] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-4 sm:mt-6 w-full sm:w-auto rounded-md bg-[#034F75] px-8 sm:px-12 lg:px-14 py-2 sm:py-2.5 text-[#D3E7F0] font-medium text-[16px] sm:text-[22.83px] hover:bg-[#023a56] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Processing..." : "Pay"}
           </button>

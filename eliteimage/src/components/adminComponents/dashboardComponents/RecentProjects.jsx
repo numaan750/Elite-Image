@@ -36,11 +36,11 @@ const RecentProjects = () => {
   return (
     <div className="mt-6 sm:mt-10 lg:mt-14 px-4 sm:px-6 lg:px-8">
       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-black">
+        <h2 className="text-lg sm:text-xl lg:text-[42.03px] font-semibold text-black">
           Recent Projects
         </h2>
 
-        <button className="rounded-md bg-[#0B5C7A] px-4 py-1.5 text-sm sm:text-base text-white w-fit hover:bg-[#034F75] transition-colors">
+        <button className="rounded-md bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[21.02px] text-white w-fit hover:bg-[#034F75] transition-colors">
           View All
         </button>
       </div>
@@ -61,10 +61,10 @@ const RecentProjects = () => {
 
             <div className="flex flex-1 flex-col justify-between gap-3">
               <div>
-                <p className="text-sm sm:text-base font-medium text-black">
+                <p className="text-[16px] sm:text-[31.52px] font-medium text-black">
                   Project: {new Date(project.createdAt).toLocaleDateString()}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-600">
+                <p className="text-[16px] sm:text-[31.52px] text-gray-600">
                   Multiple Image
                 </p>
               </div>

@@ -30,10 +30,10 @@ export default function Support() {
 
   return (
     <div className="min-h-screen bg-white px-7 sm:px-10 py-6 sm:py-8">
-      <h3 className="text-[18px] sm:text-[20px] font-semibold mb-6 sm:mb-14">
+      <h3 className="text-[18px] sm:text-[28px] font-semibold mb-6 sm:mb-14">
         Eliteimage Ai
       </h3>
-      <h2 className="text-[20px] sm:text-[24px] font-semibold mb-4 sm:mb-8">
+      <h2 className="text-[20px] sm:text-[40px] font-semibold mb-6 sm:mb-10">
         How Can We Help?
       </h2>
 
@@ -47,14 +47,14 @@ export default function Support() {
               onClick={() => setOpen(open === i ? -1 : i)}
               className="w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 text-left text-sm sm:text-base"
             >
-              <span className="font-medium text-sm">
+              <span className="font-medium text-[16px] sm:text-[20px]">
                 {i + 1}. {item.q}
               </span>
               {open === i ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             </button>
 
             {open === i && (
-              <div className="px-4 sm:px-6 pb-3 sm:pb-4 text-sm sm:text-base text-gray-600">
+              <div className="px-4 sm:px-6 pb-3 sm:pb-4 text-sm sm:text-base text-black">
                 {item.a}
               </div>
             )}
