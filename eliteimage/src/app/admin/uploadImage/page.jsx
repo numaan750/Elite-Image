@@ -8,6 +8,8 @@ import Step2 from "@/components/adminComponents/Imgsupload/Step2";
 import Step3 from "@/components/adminComponents/Imgsupload/Step3";
 import Step4 from "@/components/adminComponents/Imgsupload/Step4";
 import Step5 from "@/components/adminComponents/Imgsupload/Step5";
+import Step2ObjectRemoval from "@/components/adminComponents/Imgsupload/Step2ObjectRemoval";
+import Step3Farniturestyle from "@/components/adminComponents/Imgsupload/Step3Farniturestyle";
 
 const FEATURE_STEPS_CONFIG = {
   // Feature 1: Enhance - 5 steps
@@ -51,7 +53,7 @@ const FEATURE_STEPS_CONFIG = {
     totalSteps: 4,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
-      { id: 2, component: Step2, name: "Feature Options" },
+      { id: 2, component: Step2ObjectRemoval, name: "Select Object" }, // ✅ CHANGED
       { id: 3, component: Step4, name: "Processing" },
       { id: 4, component: Step5, name: "Final Edit" },
     ],
@@ -70,14 +72,14 @@ const FEATURE_STEPS_CONFIG = {
 
   // Feature 6: Virtual Staging - 5 steps
   "Virtual Staging": {
-    totalSteps: 5,
+    totalSteps: 6,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Room Type" },
-      { id: 3, component: Step3, name: "Furniture type" },
-      //idhr ak tab add karna hy is ka hi sirf
-      { id: 4, component: Step4, name: "Processing" },
-      { id: 5, component: Step5, name: "Final Edit" },
+      { id: 3, component: Step3Farniturestyle, name: "Furniture Type" }, // ✅ Naya component
+      { id: 4, component: Step3, name: "Edit Styles" },
+      { id: 5, component: Step4, name: "Processing" },
+      { id: 6, component: Step5, name: "Final Edit" },
     ],
   },
 
@@ -131,9 +133,11 @@ const UploadImageTabs = () => {
     featureType: featureType,
     uploadedImages: [],
     selectedFeature: "",
+    selectedFurniture: "",
     selectedStyle: "",
     beforeAfterData: {},
     finalNotes: "",
+    totalSteps: currentConfig.totalSteps, // ✅ YE LINE ADD KARI
   });
 
   // useEffect(() => {
@@ -167,9 +171,10 @@ const UploadImageTabs = () => {
     setFormData((prev) => ({
       ...prev,
       featureType: featureType,
+      totalSteps: currentConfig.totalSteps, // ✅ YE LINE ADD KARI
     }));
     setActiveStep(1);
-  }, [featureType]);
+  }, [featureType, currentConfig.totalSteps]);
 
   const goNext = () => setActiveStep((prev) => Math.min(prev + 1, totalSteps));
   const goBack = () => setActiveStep((prev) => Math.max(prev - 1, 1));

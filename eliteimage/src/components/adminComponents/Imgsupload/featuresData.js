@@ -195,24 +195,24 @@ export const STYLES_DATA = {
     },
   ],
   "Virtual Staging": [
-    { name: "Living Room", img: "/projects/Visual/Furniture-Styles-1.webp" },
-    { name: "Bedroom", img: "/projects/Visual/Furniture-Styles-2.webp" },
-    { name: "Kitchen", img: "/projects/Visual/Furniture-Styles-3.webp" },
-    { name: "Dining Room", img: "/projects/Visual/Furniture-Styles-4.webp" },
-    { name: "Bathroom", img: "/projects/Visual/Furniture-Styles-5.webp" },
-    { name: "Home Office", img: "/projects/Visual/Furniture-Styles-6.webp" },
-    { name: "Kids Room", img: "/projects/Visual/Furniture-Styles-7.webp" },
-    { name: "Study Room", img: "/projects/Visual/Furniture-Styles-8.webp" },
-    {
-      name: "Entryway / Foyer",
-      img: "/projects/Visual/Furniture-Styles-9.webp",
-    },
-    { name: "Kids Room", img: "/projects/Visual/Furniture-Styles-10.webp" },
-    { name: "Study Room", img: "/projects/Visual/Furniture-Styles-11.webp" },
-    {
-      name: "Entryway / Foyer",
-      img: "/projects/Visual/Furniture-Styles-12.webp",
-    },
+    { name: "Living Room", img: "/projects/Enhancement-Options-2.webp" },
+    { name: "Bedroom", img: "/projects/Enhancement-Options-3.png" },
+    // { name: "Kitchen", img: "/projects/Visual/Furniture-Styles-3.webp" },
+    // { name: "Dining Room", img: "/projects/Visual/Furniture-Styles-4.webp" },
+    // { name: "Bathroom", img: "/projects/Visual/Furniture-Styles-5.webp" },
+    // { name: "Home Office", img: "/projects/Visual/Furniture-Styles-6.webp" },
+    // { name: "Kids Room", img: "/projects/Visual/Furniture-Styles-7.webp" },
+    // { name: "Study Room", img: "/projects/Visual/Furniture-Styles-8.webp" },
+    // {
+    //   name: "Entryway / Foyer",
+    //   img: "/projects/Visual/Furniture-Styles-9.webp",
+    // },
+    // { name: "Kids Room", img: "/projects/Visual/Furniture-Styles-10.webp" },
+    // { name: "Study Room", img: "/projects/Visual/Furniture-Styles-11.webp" },
+    // {
+    //   name: "Entryway / Foyer",
+    //   img: "/projects/Visual/Furniture-Styles-12.webp",
+    // },
   ],
   "Day to Dusk": [
     { name: "Golden Hour", img: "/projects/DUSK/DUST-7.webp" },
@@ -245,6 +245,31 @@ export const STYLES_DATA = {
     {
       name: "Advanced Removal",
       img: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=250&fit=crop",
+    },
+  ],
+};
+
+
+// ==================== FURNITURE TYPES DATA FOR VIRTUAL STAGING - STEP 3 ====================
+export const FURNITURE_TYPES_DATA = {
+  "Virtual Staging": [
+    { name: "Modern Furniture", img: "/projects/Visual/Furniture-Styles-1.webp" },
+    { name: "Contemporary", img: "/projects/Visual/Furniture-Styles-2.webp" },
+    { name: "Minimalist", img: "/projects/Visual/Furniture-Styles-3.webp" },
+    { name: "Scandinavian", img: "/projects/Visual/Furniture-Styles-4.webp" },
+    { name: "Mid-Century", img: "/projects/Visual/Furniture-Styles-5.webp" },
+    { name: "Industrial", img: "/projects/Visual/Furniture-Styles-6.webp" },
+    { name: "Traditional", img: "/projects/Visual/Furniture-Styles-7.webp" },
+    { name: "Transitional", img: "/projects/Visual/Furniture-Styles-8.webp" },
+    {
+      name: "Rustic",
+      img: "/projects/Visual/Furniture-Styles-9.webp",
+    },
+    { name: "Bohemian", img: "/projects/Visual/Furniture-Styles-10.webp" },
+    { name: "Study Room", img: "/projects/Visual/Furniture-Styles-11.webp" },
+    {
+      name: "Farmhouse",
+      img: "/projects/Visual/Furniture-Styles-12.webp",
     },
   ],
 };

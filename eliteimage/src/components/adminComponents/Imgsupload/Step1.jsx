@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Upload, ArrowRight, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
+import ProgressBar from "./ProgressBar";
 
 const CLOUD_NAME = "dhtpqla2b";
 const UPLOAD_PRESET = "unsigned_preset";
@@ -51,10 +52,14 @@ const Step1 = ({ formData, setFormData, next }) => {
       }
 
       const data = await res.json();
+      const optimizedUrl = data.secure_url.replace(
+        "/upload/",
+        "/upload/f_auto,q_auto,w_1200/"
+      );
 
       setFormData((prev) => ({
         ...prev,
-        uploadedImages: [...prev.uploadedImages, data.secure_url],
+        uploadedImages: [...prev.uploadedImages, optimizedUrl],
         lastUploadedAt: new Date().toISOString(),
       }));
 
@@ -112,22 +117,24 @@ const Step1 = ({ formData, setFormData, next }) => {
         <button className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors">
           <ChevronRight size={16} />
         </button>
-        <span className="font-medium text-black text-sm sm:text-base">
+        <span className="font-medium text-black text-[16px] sm:text-[20px]">
           Elite Image Ai
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-6 lg:mt-8 text-base sm:text-lg lg:text-xl font-semibold text-black">
+      <h2 className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[24px] font-semibold text-black">
         Upload Images
       </h2>
 
       <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
+        {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#034F75]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#CFE8F2]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#D3E7F0]" />
+        <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#D3E7F0]" /> */}
+
+        <ProgressBar currentStep={1} totalSteps={formData.totalSteps} />
       </div>
 
       <div className="mt-6 sm:mt-8 lg:mt-10 rounded-2xl border border-[#6FB6D6] bg-[#D3E7F0] p-3 sm:p-4 min-h-[250px] sm:min-h-[300px] lg:min-h-[400px]">
@@ -155,16 +162,16 @@ const Step1 = ({ formData, setFormData, next }) => {
                 size={32}
                 className="text-[#034F75] sm:w-10 sm:h-10 lg:w-[50px] lg:h-[50px]"
               />
-              <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg font-medium text-[#034F75] px-2">
+              <p className="mt-3 sm:mt-4 text-[16px] sm:text-[20px] lg:text-[24px] font-medium text-[#034F75] px-2">
                 Drag and drop your images here
               </p>
-              <span className="my-2 sm:my-3 text-xs sm:text-sm lg:text-base text-[#034F75]">
+              <span className="my-2 sm:my-3 text-[12px] sm:text-[16px] lg:text-[24px] text-[#034F75]">
                 Or
               </span>
-              <label className="rounded-lg bg-[#034F75] px-4 sm:px-5 lg:px-6 py-2 text-white text-xs sm:text-sm cursor-pointer hover:bg-[#023d5c] transition-colors">
+              <label className="rounded-lg bg-[#034F75] px-4 sm:px-5 lg:px-6 py-2 text-white text-[16px] sm:text-[20px] cursor-pointer hover:bg-[#023d5c] transition-colors">
                 {uploadingImage ? "Uploading..." : "Browse File"}
               </label>
-              <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-[#034F75] px-2">
+              <p className="mt-3 sm:mt-4 text-[12px] sm:text-[24px] text-[#034F75] px-2">
                 Supports: JPG, PNG, HEIC • Max 5MB per file
               </p>
             </>
@@ -189,12 +196,13 @@ const Step1 = ({ formData, setFormData, next }) => {
                     alt={`Uploaded ${idx + 1}`}
                     width={400}
                     height={350}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className={`w-full ${
                       formData.uploadedImages.length === 1
                         ? "h-full min-h-[250px] sm:min-h-[300px] lg:min-h-[350px]"
                         : "h-32 sm:h-36 lg:h-40"
                     } object-cover`}
-                    priority
+                    priority={idx === 0}
                   />
                   <button
                     onClick={() => handleRemoveImage(idx)}
@@ -244,14 +252,14 @@ const Step1 = ({ formData, setFormData, next }) => {
         <button
           onClick={next}
           disabled={formData.uploadedImages.length === 0}
-          className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors ${
+          className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[12px] sm:text-[20px] text-white hover:bg-[#023d5c] transition-colors ${
             formData.uploadedImages.length === 0
               ? "opacity-50 cursor-not-allowed"
               : ""
           }`}
         >
           Continue
-          <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
+          <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
         </button>
       </div>
     </div>

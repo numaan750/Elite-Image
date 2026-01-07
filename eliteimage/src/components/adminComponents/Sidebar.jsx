@@ -59,7 +59,7 @@ export default function Sidebar() {
         `}
       >
         <div className="flex items-center justify-between mb-12">
-          <h2 className="text-2xl font-semibold">Logo</h2>
+          <h2 className="text-[24px] font-semibold">Logo</h2>
           <button className="lg:hidden" onClick={() => setOpen(false)}>
             <X />
           </button>
@@ -71,7 +71,7 @@ export default function Sidebar() {
               key={item.name}
               href={item.href}
               onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[16px]
                 ${
                   pathname === item.href
                     ? "bg-[#034F75] text-white"
@@ -89,7 +89,7 @@ export default function Sidebar() {
             logoutUser();
             toast.success("Logged out successfully ✅");
           }}
-          className="flex items-center cursor-pointer gap-2 mt-10 text-sm hover:text-red-600 ml-2"
+          className="flex items-center cursor-pointer gap-2 mt-50 text-[16px] hover:text-red-600 ml-2"
         >
           Logout
         </button>
