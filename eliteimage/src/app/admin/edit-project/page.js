@@ -4,30 +4,74 @@ import React, { useState, useEffect, useContext } from "react";
 import { ChevronLeft, ChevronRight, MoveHorizontal } from "lucide-react";
 import { FaMagic } from "react-icons/fa";
 import { AppContext } from "@/context/AppContext";
+import { useSearchParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
-const Step5 = ({ formData, setFormData, back }) => {
-  const { token, saveGeneratedImage } = useContext(AppContext);
+const EditProjectPage = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { token, saveGeneratedImage, getProjectById } = useContext(AppContext);
+
+  const [formData, setFormData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
-  const [isSaving, setIsSaving] = useState(false); // ✅ ADD THIS
+  const [isSaving, setIsSaving] = useState(false);
+  const [editDescription, setEditDescription] = useState("");
 
-  // Initialize slider positions for each image
+  // Load project data
   useEffect(() => {
-    const initialPositions = {};
-    formData.uploadedImages.forEach((_, index) => {
-      initialPositions[index] = 50;
-    });
-    setSliderPositions(initialPositions);
-  }, [formData.uploadedImages.length]);
-  const [editDescription, setEditDescription] = useState(
-    formData.finalNotes || ""
-  );
+    const loadProject = async () => {
+      const projectId = searchParams.get("projectId");
+
+      if (!projectId) {
+        toast.error("Project ID missing!");
+        router.push("/admin/dashboard");
+        return;
+      }
+
+      try {
+        const project = await getProjectById(projectId);
+
+        const loadedFormData = {
+          uploadedImages: project.uploadedImages || [],
+          featureType: project.featureType || "",
+          selectedFeature: project.selectedFeature?.[0] || "",
+          selectedStyle: project.selectedStyle?.[0] || "",
+          beforeAfterData: project.beforeAfterData?.[0] || {},
+          finalNotes: project.finalNotes || "",
+          userId: project.userid,
+          projectId: projectId,
+        };
+
+        setFormData(loadedFormData);
+        setEditDescription(project.finalNotes || "");
+
+        toast.success("Project loaded successfully!");
+      } catch (error) {
+        console.error("Failed to load project:", error);
+        toast.error("Failed to load project");
+        router.push("/admin/dashboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProject();
+  }, []);
+
+  // Initialize slider positions
   useEffect(() => {
-    if (formData.finalNotes) {
-      setEditDescription(formData.finalNotes);
+    if (formData?.uploadedImages) {
+      const initialPositions = {};
+      formData.uploadedImages.forEach((_, index) => {
+        initialPositions[index] = 50;
+      });
+      setSliderPositions(initialPositions);
     }
-  }, [formData.finalNotes]);
+  }, [formData?.uploadedImages]);
 
+  // Handle mouse/touch events
   useEffect(() => {
     const handleMouseUp = () => setIsDragging(null);
     const handleTouchEnd = () => setIsDragging(null);
@@ -45,19 +89,18 @@ const Step5 = ({ formData, setFormData, back }) => {
 
   const handleGenerate = async () => {
     if (!token) {
-      alert("Please login to save images");
+      toast.error("Please login to save images");
       return;
     }
 
     setIsSaving(true);
+    toast.loading("Updating project...", { id: "update" });
 
     const finalData = {
       ...formData,
       finalNotes: editDescription,
       lastModified: new Date().toISOString(),
     };
-
-    setFormData(finalData);
 
     const backendPayload = {
       userid: finalData.userId,
@@ -80,30 +123,35 @@ const Step5 = ({ formData, setFormData, back }) => {
     };
 
     try {
-      console.log("💾 Saving to backend...", backendPayload);
+      await saveGeneratedImage(backendPayload, token, true, formData.projectId);
+      toast.success("Project updated successfully!", { id: "update" });
 
-      // ✅ Check if editing existing project
-      if (formData.projectId) {
-        await saveGeneratedImage(
-          backendPayload,
-          token,
-          true,
-          formData.projectId
-        );
-        alert("Project updated successfully!");
-      } else {
-        await saveGeneratedImage(backendPayload, token);
-        alert("Image saved successfully!");
-      }
-
-      router.push("/admin/dashboard");
+      setTimeout(() => {
+        router.push("/admin/dashboard");
+      }, 1000);
     } catch (error) {
-      console.error("❌ Failed to save:", error);
-      alert(`Failed to save image: ${error.message}`);
+      console.error("❌ Failed to update:", error);
+      toast.error(`Failed to update: ${error.message}`, { id: "update" });
     } finally {
       setIsSaving(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#034F75]"></div>
+      </div>
+    );
+  }
+
+  if (!formData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Project not found</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
@@ -111,25 +159,28 @@ const Step5 = ({ formData, setFormData, back }) => {
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
           <div className="flex items-center gap-2">
             <button
-              onClick={back}
+              onClick={() => router.back()}
               className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
-            <button className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors">
+            <button
+              onClick={() => router.push("/admin/dashboard")}
+              className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
+            >
               <ChevronRight size={16} />
             </button>
           </div>
 
           <span className="font-medium text-black text-[16px] sm:text-[20px]">
-            Elite Image Ai
+            Elite Image AI - Edit Mode
           </span>
         </div>
       </div>
 
       <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[40px] font-semibold text-black">
-          Processing Complete
+          Edit Project
         </h2>
       </div>
 
@@ -182,7 +233,6 @@ const Step5 = ({ formData, setFormData, back }) => {
                       }));
                     }}
                   >
-                    {/* Before Image (Full) */}
                     <div className="absolute inset-0">
                       <Image
                         src={img}
@@ -194,7 +244,6 @@ const Step5 = ({ formData, setFormData, back }) => {
                       />
                     </div>
 
-                    {/* After Image (Clipped) */}
                     <div
                       className="absolute inset-0"
                       style={{
@@ -213,12 +262,10 @@ const Step5 = ({ formData, setFormData, back }) => {
                       />
                     </div>
 
-                    {/* Slider Line */}
                     <div
                       className="absolute top-0 bottom-0 w-1 bg-white shadow-lg z-10"
                       style={{ left: `${sliderPositions[index] || 50}%` }}
                     >
-                      {/* Slider Handle */}
                       <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
                         w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
@@ -230,7 +277,6 @@ const Step5 = ({ formData, setFormData, back }) => {
                       </div>
                     </div>
 
-                    {/* Labels */}
                     <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[14px] px-3 py-1.5 rounded z-20">
                       Before
                     </div>
@@ -262,24 +308,26 @@ const Step5 = ({ formData, setFormData, back }) => {
         </div>
 
         <div className="flex justify-center sm:justify-end mt-4 sm:mt-5 gap-3 w-full sm:w-auto">
-          {/* Back Button */}
           <button
-            onClick={back} // ya router.back() agar browser history chahiye
+            onClick={() => router.back()}
             className="flex items-center justify-center gap-2 bg-gray-300 text-black text-[14px] sm:text-[16px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-gray-400 transition-colors w-full sm:w-auto"
           >
-            Back
+            Cancel
           </button>
 
-          {/* Generate Button */}
           <button
             onClick={handleGenerate}
             disabled={isSaving}
             className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[14px] sm:text-[16px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors w-full sm:w-auto
-    ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-[#023d5c]"}
-  `}
+              ${
+                isSaving
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-[#023d5c]"
+              }
+            `}
           >
             <FaMagic size={15} className="sm:w-4 sm:h-4" />
-            <span>{isSaving ? "Saving..." : "Generate"}</span>
+            <span>{isSaving ? "Updating..." : "Update Project"}</span>
           </button>
         </div>
       </div>
@@ -287,4 +335,4 @@ const Step5 = ({ formData, setFormData, back }) => {
   );
 };
 
-export default Step5;
+export default EditProjectPage;

@@ -88,9 +88,24 @@ export default function Sidebar() {
           onClick={() => {
             logoutUser();
             toast.success("Logged out successfully ✅");
+            setOpen(false); // mobile sidebar close
           }}
-          className="flex items-center cursor-pointer gap-2 mt-50 text-[16px] hover:text-red-600 ml-2"
+          className="
+             mt-50
+             flex items-center justify-center gap-3
+             w-full
+             bg-red-400
+             hover:bg-red-500
+             text-black
+             px-4
+             py-2.5
+             rounded-lg
+             text-[16px]
+             font-medium         
+             transition-colors cursor-pointer
+              "
         >
+          <LogOut size={18} />
           Logout
         </button>
       </aside>

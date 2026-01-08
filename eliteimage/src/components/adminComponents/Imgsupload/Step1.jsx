@@ -18,59 +18,55 @@ const Step1 = ({ formData, setFormData, next }) => {
   };
 
   const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
-      return;
-    }
-
-    const uploadForm = new FormData();
-    uploadForm.append("file", file);
-    uploadForm.append("upload_preset", UPLOAD_PRESET);
-
-    try {
-      setUploadingImage(true);
-      toast.loading("Uploading image...");
-
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        {
-          method: "POST",
-          body: uploadForm,
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Upload failed");
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Only image files allowed");
+        continue;
       }
 
-      const data = await res.json();
-      const optimizedUrl = data.secure_url.replace(
-        "/upload/",
-        "/upload/f_auto,q_auto,w_1200/"
-      );
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image must be under 5MB");
+        continue;
+      }
 
-      setFormData((prev) => ({
-        ...prev,
-        uploadedImages: [...prev.uploadedImages, optimizedUrl],
-        lastUploadedAt: new Date().toISOString(),
-      }));
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
+      uploadForm.append("upload_preset", UPLOAD_PRESET);
 
-      toast.success("Image uploaded successfully!");
-    } catch (err) {
-      console.error("Upload error:", err);
-      toast.error("Image upload failed!");
-    } finally {
-      setUploadingImage(false);
-      e.target.value = "";
+      try {
+        setUploadingImage(true);
+
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          {
+            method: "POST",
+            body: uploadForm,
+          }
+        );
+
+        const data = await res.json();
+
+        const optimizedUrl = data.secure_url.replace(
+          "/upload/",
+          "/upload/f_auto,q_auto,w_1200/"
+        );
+
+        setFormData((prev) => ({
+          ...prev,
+          uploadedImages: [...prev.uploadedImages, optimizedUrl],
+          lastUploadedAt: new Date().toISOString(),
+        }));
+      } catch (err) {
+        toast.error("Upload failed");
+      } finally {
+        setUploadingImage(false);
+      }
     }
+
+    e.target.value = "";
   };
 
   const handleDragEnter = (e) => {
@@ -189,7 +185,7 @@ const Step1 = ({ formData, setFormData, next }) => {
                   className={`relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6] group ${
                     formData.uploadedImages.length === 1 ? "w-full h-full" : ""
                   }`}
-                  onClick={(e) => e.stopPropagation()}
+                  // onClick={(e) => e.stopPropagation()}
                 >
                   <Image
                     src={img}
@@ -205,7 +201,10 @@ const Step1 = ({ formData, setFormData, next }) => {
                     priority={idx === 0}
                   />
                   <button
-                    onClick={() => handleRemoveImage(idx)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // ✅ ADD THIS
+                      handleRemoveImage(idx);
+                    }}
                     className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 cursor-pointer text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X size={14} className="sm:w-4 sm:h-4" />
@@ -219,6 +218,7 @@ const Step1 = ({ formData, setFormData, next }) => {
             type="file"
             className="hidden"
             accept="image/*"
+            multiple // ✅ ADD THIS LINE
             onChange={handleFileUpload}
             disabled={uploadingImage}
           />

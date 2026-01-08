@@ -93,15 +93,15 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-white px-6 sm:px-10 py-7">
       <Toaster position="top-right" />
-      <h3 className="text-[16px] sm:text-[28px] font-semibold mb-6 sm:mb-15">
+      <h3 className="text-[16px] sm:text-[26px] font-semibold mb-6 sm:mb-15">
         Eliteimage Ai
       </h3>
-      <h2 className="text-[20px] sm:text-[40px] font-semibold mb-6 sm:mb-8">
+      <h2 className="text-[18px] sm:text-[32px] font-medium mb-6 sm:mb-8">
         Account Settings
       </h2>
       <div className="max-w-full sm:max-w-3xl space-y-6 sm:space-y-10">
         <div className="rounded-lg bg-[#D3E7F0] p-4 sm:p-6">
-          <h3 className="font-normal mb-4 text-[20px] sm:text-[30px]">Personal Information</h3>
+          <h3 className="font-normal mb-4 text-[18px] sm:text-[26px]">Personal Information</h3>
 
           <div className="space-y-4">
             <div>
@@ -148,7 +148,7 @@ export default function Profile() {
         </div>
 
         <div className="rounded-lg bg-[#D3E7F0] p-6">
-          <h2 className="font-semibold mb-4 text-[20px] sm:text-[30px]">Change Password</h2>
+          <h2 className="font-normal mb-4 text-[20px] sm:text-[26px]">Change Password</h2>
 
           <div className="space-y-3 sm:space-y-4">
             <div>

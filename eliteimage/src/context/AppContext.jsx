@@ -46,11 +46,14 @@ const AppProvider = ({ children }) => {
   };
 
   const loginUser = async (email, password) => {
-    const res = await fetch("https://elite-image.vercel.app/api/loginUser/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    const res = await fetch(
+      "https://elite-image.vercel.app/api/loginUser/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    );
 
     const data = await res.json();
 
@@ -127,8 +130,96 @@ const AppProvider = ({ children }) => {
     setImages((prev) => prev.filter((img) => img._id !== id));
   };
 
-  //profile k liya
+  // ✅ ADD THIS NEW FUNCTION
+const getProjectById = async (projectId) => {
+  try {
+    const res = await fetch(`${API_URL}/api/aiImagesmodels/${projectId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
+    if (!res.ok) throw new Error("Failed to fetch project");
+    return await res.json();
+  } catch (err) {
+    console.error("Fetch project error:", err);
+    throw err;
+  }
+};
+
+// ✅ UPDATE THIS FUNCTION (modify existing saveGeneratedImage)
+const saveGeneratedImage = async (imageData, token, isUpdate = false, projectId = null) => {
+  try {
+    const isBulkSave = Array.isArray(imageData);
+
+    // ✅ NEW: Handle UPDATE mode
+    if (isUpdate && projectId) {
+      const response = await fetch(`${API_URL}/api/aiImagesmodels/${projectId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(imageData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update image");
+      }
+
+      toast.success("Project updated successfully!");
+      return await response.json();
+    }
+
+    // Existing save logic...
+    if (isBulkSave) {
+      const savedImages = [];
+      for (const data of imageData) {
+        const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to save image");
+        }
+
+        const result = await response.json();
+        savedImages.push(result);
+      }
+      return savedImages;
+    } else {
+      const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(imageData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to save image");
+      }
+
+      return await response.json();
+    }
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
+};
+
+  //profile k liya
   const updateProfile = async (userId, userData) => {
     setLoading(true);
     try {
@@ -216,11 +307,13 @@ const AppProvider = ({ children }) => {
         images,
         getAiImages,
         deleteImages,
+        saveGeneratedImage,
         signupUser,
         loginUser,
         logoutUser,
         updateProfile,
         updatePassword,
+        getProjectById, // ← YE LINE ADD KARO
       }}
     >
       {children}

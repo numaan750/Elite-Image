@@ -52,13 +52,13 @@ const Projects = () => {
   }
   return (
     <>
-      <h2 className="text-base sm:text-[28px] font-semibold text-black px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
+      <h2 className="text-base sm:text-[26px] font-medium text-black px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
         Eliteimage Ai
       </h2>
 
       <div className="py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
         <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <h2 className="text-[20px] sm:text-[28px] lg:text-[40px] font-semibold text-black">
+          <h2 className="text-[20px] sm:text-[28px] lg:text-[40px] font-medium text-black">
             My Projects
           </h2>
 
@@ -81,32 +81,32 @@ const Projects = () => {
                 alt="project"
                 width={112}
                 height={112}
-                className="h-24 w-24 sm:h-28 sm:w-28 rounded-lg object-cover flex-shrink-0"
+                className="h-24 w-24 sm:h-30 sm:w-30 rounded-lg object-cover flex-shrink-0"
               />
 
               <div className="flex flex-1 flex-col justify-between gap-3">
                 <div>
-                  <p className="text-[16px] sm:text-[31.52px] font-medium text-black">
+                  <p className="text-[16px] sm:text-[24px] font-medium text-black">
                     Project: {new Date(project.createdAt).toLocaleDateString()}
                   </p>
-                  <p className="text-[16px] sm:text-[31.52px] text-gray-600">
+                  <p className="text-[16px] sm:text-[24px] text-gray-600">
                     Multiple Image
                   </p>
                 </div>
 
                 <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
-                  <button
-                    onClick={() => setSelectedProject(project)}
+                  <Link
+                    href={`/admin/step4?mode=view&projectId=${project._id}`}
                     className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
                   >
                     <Eye size={16} className="flex-shrink-0" />
                     <span className="whitespace-nowrap">View Results</span>
-                  </button>
+                  </Link>
 
                   <Link
-                    href={`/admin/uploadImageTabs?type=${encodeURIComponent(
-                      project.featureType
-                    )}&editMode=true&projectId=${project._id}`}
+                    href={`/admin/step4?mode=edit&projectId=${
+                      project._id
+                    }&featureType=${encodeURIComponent(project.featureType)}`}
                     className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
                   >
                     <Pencil size={16} className="flex-shrink-0" />

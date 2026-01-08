@@ -4,24 +4,146 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { STYLES_DATA } from "./featuresData";
 import ProgressBar from "./ProgressBar";
+import { useContext } from "react";
+import { AppContext } from "@/context/AppContext";
+import toast, { Toaster } from "react-hot-toast";
 
 const Step3 = ({ formData, setFormData, next, back, featureType }) => {
+  const { token, saveGeneratedImage, user } = useContext(AppContext); // ← ADD THIS LINE
   const styles = STYLES_DATA[featureType];
 
   const [selected, setSelected] = useState(
     formData.selectedStyle || styles[0].name
   );
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
+      toast.error("Please upload at least one image first!");
+      return;
+    }
+
+    if (!token) {
+      toast.error("Please login to save images");
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       selectedStyle: selected,
     }));
-    next();
+
+    setIsSaving(true);
+    toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
+      id: "processing",
+    });
+
+    try {
+      const allProcessedData = [];
+      const allBackendPayloads = [];
+
+      const CLOUD_NAME = "dhtpqla2b";
+      const UPLOAD_PRESET = "unsigned_preset";
+
+      const uploadToCloudinary = async (imageUrl) => {
+        const formData = new FormData();
+        let imageBlob;
+
+        if (typeof imageUrl === "string" && imageUrl.startsWith("http")) {
+          const response = await fetch(imageUrl);
+          imageBlob = await response.blob();
+        } else if (
+          typeof imageUrl === "string" &&
+          imageUrl.startsWith("data:")
+        ) {
+          const response = await fetch(imageUrl);
+          imageBlob = await response.blob();
+        } else {
+          imageBlob = imageUrl;
+        }
+
+        formData.append("file", imageBlob);
+        formData.append("upload_preset", UPLOAD_PRESET);
+        formData.append("cloud_name", CLOUD_NAME);
+
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          { method: "POST", body: formData }
+        );
+
+        if (!response.ok) throw new Error("Cloudinary upload failed");
+        const data = await response.json();
+        return data.secure_url;
+      };
+
+      for (let i = 0; i < formData.uploadedImages.length; i++) {
+        const uploadedImage = formData.uploadedImages[i];
+
+        console.log(`📤 [${i + 1}] Uploading original image...`);
+        const originalCloudinaryUrl = await uploadToCloudinary(uploadedImage);
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const processedCloudinaryUrl = await uploadToCloudinary(uploadedImage);
+
+        const processedData = {
+          originalImage: originalCloudinaryUrl,
+          processedImage: processedCloudinaryUrl,
+          processedAt: new Date().toISOString(),
+          status: "completed",
+          userId: user?._id || formData.userId,
+          featureType: formData.featureType,
+          selectedOptions: {
+            feature: formData.selectedFeature,
+            style: selected,
+          },
+        };
+        allProcessedData.push(processedData);
+
+        const backendPayload = {
+          userid: user?._id || formData.userId,
+          title: `${formData.featureType} - Image ${
+            i + 1
+          } - ${new Date().toLocaleDateString()}`,
+          description: formData.finalNotes || `Generated image ${i + 1}`,
+          featureType: formData.featureType,
+          uploadedImages: [originalCloudinaryUrl],
+          selectedFeature: formData.selectedFeature
+            ? [formData.selectedFeature]
+            : [],
+          selectedStyle: [selected],
+          beforeAfterData: [processedData],
+          finalNotes: formData.finalNotes || "",
+          image: processedCloudinaryUrl,
+        };
+        allBackendPayloads.push(backendPayload);
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        beforeAfterData: allProcessedData,
+        selectedStyle: selected,
+      }));
+
+      await saveGeneratedImage(allBackendPayloads, token);
+
+      toast.success(
+        `${formData.uploadedImages.length} image(s) processed and saved!`,
+        { id: "processing" }
+      );
+
+      next();
+    } catch (error) {
+      console.error("❌ Error:", error);
+      toast.error(`Error: ${error.message}`, { id: "processing" });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-10">
+      <Toaster position="top-right" reverseOrder={false} />
+
       <div className="flex items-center gap-3 text-gray-700">
         <div className="flex items-center gap-2">
           <button
@@ -103,12 +225,12 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         {/* Generate Now Button */}
         <button
           onClick={handleGenerate}
-          disabled={!selected}
+          disabled={!selected || isSaving}
           className={`flex items-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-[#023d5c] transition-colors ${
-            !selected ? "opacity-50 cursor-not-allowed" : ""
+            !selected || isSaving ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          Generate Now
+          {isSaving ? "Processing..." : "Generate Now"}
         </button>
       </div>
     </div>

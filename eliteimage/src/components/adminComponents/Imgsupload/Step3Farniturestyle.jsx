@@ -8,10 +8,13 @@ import ProgressBar from "./ProgressBar";
 const FURNITURE_TYPES = [
   { name: "Modern Furniture", img: "/projects/Visual/Furniture-Styles-1.webp" },
   { name: "Contemporary", img: "/projects/Visual/Furniture-Styles-2.webp" },
-  { name: "Minimalist", img: "/projects/Visual/Furniture-Styles-3.webp" },
+  {
+    name: "Minimalist",
+    img: "/projects/Visual/Furniture-Styles-3.webp",
+  },
   { name: "Scandinavian", img: "/projects/Visual/Furniture-Styles-4.webp" },
   { name: "Mid-Century", img: "/projects/Visual/Furniture-Styles-5.webp" },
-  { name: "Industrial", img: "/projects/Visual/Furniture-Styles-6.webp" },
+  { name: "Industrial", img: "/projects/Visual/Furniture-Styles-16.webp" },
   { name: "Traditional", img: "/projects/Visual/Furniture-Styles-7.webp" },
   { name: "Transitional", img: "/projects/Visual/Furniture-Styles-8.webp" },
   {
@@ -19,10 +22,16 @@ const FURNITURE_TYPES = [
     img: "/projects/Visual/Furniture-Styles-9.webp",
   },
   { name: "Bohemian", img: "/projects/Visual/Furniture-Styles-10.webp" },
-  { name: "Study Room", img: "/projects/Visual/Furniture-Styles-11.webp" },
+  { name: "Farmhouse", img: "/projects/Visual/Furniture-Styles-11.webp" },
   {
-    name: "Farmhouse",
+    name: "Luxury / Glam",
     img: "/projects/Visual/Furniture-Styles-12.webp",
+  },
+  { name: "Japandi", img: "/projects/Visual/Furniture-Styles-13.webp" },
+  { name: "Vintage", img: "/projects/Visual/Furniture-Styles-14.webp" },
+  {
+    name: "Art Deco",
+    img: "/projects/Visual/Furniture-Styles-15.webp",
   },
 ];
 

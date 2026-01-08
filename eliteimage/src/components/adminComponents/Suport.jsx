@@ -30,10 +30,10 @@ export default function Support() {
 
   return (
     <div className="min-h-screen bg-white px-7 sm:px-10 py-6 sm:py-8">
-      <h3 className="text-[18px] sm:text-[28px] font-semibold mb-6 sm:mb-14">
+      <h3 className="text-[18px] sm:text-[26px] font-semibold mb-6 sm:mb-14">
         Eliteimage Ai
       </h3>
-      <h2 className="text-[20px] sm:text-[40px] font-semibold mb-6 sm:mb-10">
+      <h2 className="text-[20px] sm:text-[32px] font-medium mb-6 sm:mb-10">
         How Can We Help?
       </h2>
 

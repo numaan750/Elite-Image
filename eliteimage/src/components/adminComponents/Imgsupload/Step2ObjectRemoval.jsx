@@ -8,7 +8,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);
   const [dragEnd, setDragEnd] = useState(null);
-  const [selectedArea, setSelectedArea] = useState(null);
+  const [selectedAreas, setSelectedAreas] = useState([]);
   const imageRef = useRef(null);
 
   // Mouse down event - dragging shuru karna
@@ -46,12 +46,11 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         height: Math.abs(dragEnd.y - dragStart.y),
       };
 
-      setSelectedArea(area);
+      setSelectedAreas((prev) => [...prev, area]);
 
-      // FormData mein save karna
       setFormData((prev) => ({
         ...prev,
-        selectedObjectArea: area,
+        selectedObjectAreas: [...(prev.selectedObjectAreas || []), area],
       }));
     }
 
@@ -76,15 +75,15 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   };
 
   const handleContinue = () => {
-    if (!selectedArea) {
-      alert("Please select the object you want to remove by dragging over it");
+    if (selectedAreas.length === 0) {
+      alert("Please select at least one object to remove");
       return;
     }
     next();
   };
 
   const handleRemoveObject = () => {
-    console.log("Removing object from area:", selectedArea);
+    console.log("Removing objects from areas:", selectedAreas);
     // Yahan aap API call kar sakte hain object removal ke liye
     next();
   };
@@ -135,9 +134,9 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               className="text-[20px] sm:text-[30px] text-black
               font-medium mb-2"
             >
-              {!selectedArea
-                ? "Select the Object — Just Drag Over It"
-                : "Object selected! Click 'Remove Object' to continue"}
+              {selectedAreas.length === 0
+                ? "Select Objects — Drag Over Each One"
+                : `${selectedAreas.length} object(s) selected`}
             </p>
           </div>
           <div
@@ -168,22 +167,22 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               />
             )}
 
-            {/* Final Selected Area */}
-            {selectedArea && !isDragging && (
+            {selectedAreas.map((area, index) => (
               <div
+                key={index}
                 className="absolute border-2 border-solid border-[#034F75] bg-[#034F75]/20"
                 style={{
-                  left: `${selectedArea.x}px`,
-                  top: `${selectedArea.y}px`,
-                  width: `${selectedArea.width}px`,
-                  height: `${selectedArea.height}px`,
+                  left: `${area.x}px`,
+                  top: `${area.y}px`,
+                  width: `${area.width}px`,
+                  height: `${area.height}px`,
                 }}
               >
                 <div className="absolute -top-6 left-0 bg-[#034F75] text-white text-xs px-2 py-1 rounded">
-                  Selected
+                  Selected {index + 1}
                 </div>
               </div>
-            )}
+            ))}
           </div>
         </div>
       </div>
@@ -198,23 +197,28 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           Back
         </button>
 
-        {/* Clear Selection */}
-        {selectedArea && (
+        {selectedAreas.length > 0 && (
           <button
-            onClick={() => setSelectedArea(null)}
-            className="px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-[#034F75] text-[#034F75] rounded-lg hover:bg-gray-50 transition-colors"
+            onClick={() => {
+              setSelectedAreas([]);
+              setFormData((prev) => ({
+                ...prev,
+                selectedObjectAreas: [],
+              }));
+            }}
+            className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-[#034F75] text-[#034F75] rounded-lg"
           >
-            Clear Selection
+            Clear All Selections
           </button>
         )}
 
         {/* Remove Object */}
         <button
           onClick={handleRemoveObject}
-          disabled={!selectedArea}
+          disabled={selectedAreas.length === 0}
           className={`flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 text-[16px] sm:text-[20px] rounded-lg transition-colors
       ${
-        selectedArea
+        selectedAreas.length > 0
           ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
           : "bg-gray-300 text-gray-500 cursor-not-allowed"
       }`}

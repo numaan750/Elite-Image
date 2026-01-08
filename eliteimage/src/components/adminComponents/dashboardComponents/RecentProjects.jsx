@@ -36,7 +36,7 @@ const RecentProjects = () => {
   return (
     <div className="mt-6 sm:mt-10 lg:mt-14 px-4 sm:px-6 lg:px-8">
       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 className="text-lg sm:text-xl lg:text-[42.03px] font-semibold text-black">
+        <h2 className="text-lg sm:text-xl lg:text-[40px] font-medium text-black">
           Recent Projects
         </h2>
 
@@ -56,32 +56,32 @@ const RecentProjects = () => {
               alt="project"
               width={112}
               height={112}
-              className="h-24 w-24 sm:h-28 sm:w-28 rounded-lg object-cover flex-shrink-0"
+              className="h-24 w-25 sm:h-30 sm:w-30 rounded-lg object-cover flex-shrink-0"
             />
 
             <div className="flex flex-1 flex-col justify-between gap-3">
               <div>
-                <p className="text-[16px] sm:text-[31.52px] font-medium text-black">
+                <p className="text-[16px] sm:text-[24px] font-medium text-black">
                   Project: {new Date(project.createdAt).toLocaleDateString()}
                 </p>
-                <p className="text-[16px] sm:text-[31.52px] text-gray-600">
+                <p className="text-[16px] sm:text-[20px] text-gray-600">
                   Multiple Image
                 </p>
               </div>
 
               <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
-                <button
-                  onClick={() => setSelectedProject(project)}
+                <Link
+                  href={`/admin/step4?mode=view&projectId=${project._id}`}
                   className="flex cursor-pointer items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
                 >
                   <Eye size={16} className="flex-shrink-0" />
                   <span className="whitespace-nowrap">View Results</span>
-                </button>
+                </Link>
 
                 <Link
-                  href={`/admin/uploadImageTabs?type=${encodeURIComponent(
-                    project.featureType
-                  )}`}
+                  href={`/admin/step4?mode=edit&projectId=${
+                    project._id
+                  }&featureType=${encodeURIComponent(project.featureType)}`}
                   className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
                 >
                   <Pencil size={16} className="flex-shrink-0" />

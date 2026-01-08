@@ -8,14 +8,12 @@ import ProgressBar from "./ProgressBar";
 const Step2 = ({ formData, setFormData, next, back, featureType }) => {
   const featureData = FEATURES_DATA[featureType];
 
-  const [selected, setSelected] = useState(
-    formData.selectedFeature || featureData.options[0].name
-  );
+  const [selected, setSelected] = useState(formData.selectedFeatures || []);
 
   const handleContinue = () => {
     setFormData((prev) => ({
       ...prev,
-      selectedFeature: selected,
+      selectedFeatures: selected,
     }));
     next();
   };
@@ -59,9 +57,11 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         {featureData.options.map((item) => (
           <div
             key={item.name}
-            onClick={() => setSelected(item.name)}
+            onClick={() => {
+              setSelected([item.name]); // 🔥 sirf ek hi select hoga
+            }}
             className={`rounded-xl cursor-pointer border-2 overflow-hidden transition-all hover:shadow-lg ${
-              selected === item.name
+              selected.includes(item.name)
                 ? "border-[#034F75] shadow-md"
                 : "border-gray-200"
             }`}
@@ -83,7 +83,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
 
               <input
                 type="checkbox"
-                checked={selected === item.name}
+                checked={selected.includes(item.name)}
                 readOnly
                 className="w-4 h-4 accent-[#034F75] cursor-pointer flex-shrink-0"
               />
@@ -101,9 +101,9 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         </button>
         <button
           onClick={handleContinue}
-          disabled={!selected}
+          disabled={selected.length === 0}
           className={`flex items-center gap-2 bg-[#034F75] hover:bg-[#023a5c] text-white text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors ${
-            !selected ? "opacity-50 cursor-not-allowed" : ""
+            selected.length === 0 ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
           Generate Now

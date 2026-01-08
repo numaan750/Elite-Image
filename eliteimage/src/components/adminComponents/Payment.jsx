@@ -92,10 +92,10 @@ export default function Payment() {
   return (
     <div className="flex items-start justify-start bg-white pt-6 sm:pt-8 lg:pt-10 px-4 sm:px-6 lg:px-10">
       <div className="w-full max-w-xl">
-        <h3 className="text-[18px] sm:text-[28px] lg:text-[28px] font-semibold mb-4 sm:mb-6">
+        <h3 className="text-[18px] sm:text-[28px] lg:text-[26px] font-semibold mb-4 sm:mb-6">
           Eliteimage Ai
         </h3>
-        <h2 className="text-[20px] sm:text-[28px] lg:text-[40px] font-semibold mb-6 sm:mb-10 lg:mb-12">
+        <h2 className="text-[18px] sm:text-[26px] lg:text-[32px] font-medium mb-6 sm:mb-10 lg:mb-12">
           Final step, complete your payment
         </h2>
 
@@ -104,7 +104,7 @@ export default function Payment() {
           onSubmit={handleSubmit}
         >
           <div>
-            <label className="block text-[16px] sm:text-[22.83px] font-medium mb-1 sm:mb-2">
+            <label className="block text-[16px] sm:text-[20px] font-medium mb-1 sm:mb-2">
               Card Holder
             </label>
             <input
@@ -116,7 +116,7 @@ export default function Payment() {
             />
           </div>
           <div>
-            <label className="block text-[16px] sm:text-[22.83px] font-medium mb-1 sm:mb-2">
+            <label className="block text-[16px] sm:text-[20px] font-medium mb-1 sm:mb-2">
               Amount (USD)
             </label>
             <input
@@ -130,7 +130,7 @@ export default function Payment() {
           </div>
 
           <div>
-            <label className="block text-[16px] sm:text-[22.83px] font-medium mb-1 sm:mb-2">
+            <label className="block text-[16px] sm:text-[20px] font-medium mb-1 sm:mb-2">
               Card Details
             </label>
             <div className="border border-[#034F75] bg-[#D3E7F0] rounded-md p-3 sm:p-4">
