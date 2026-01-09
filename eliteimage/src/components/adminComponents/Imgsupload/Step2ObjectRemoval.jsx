@@ -3,13 +3,28 @@ import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
+import { useContext } from "react";
+import { AppContext } from "@/context/AppContext";
+import toast from "react-hot-toast";
 
 const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
+  const { token, saveGeneratedImage, user } = useContext(AppContext);
+
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);
   const [dragEnd, setDragEnd] = useState(null);
-  const [selectedAreas, setSelectedAreas] = useState([]);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [selectedAreas, setSelectedAreas] = useState({});
   const imageRef = useRef(null);
+
+  const totalSelectedObjects = Object.values(selectedAreas).reduce(
+    (total, areas) => total + areas.length,
+    0
+  );
+
+  const allImagesHaveSelection = formData.uploadedImages.every(
+    (img, index) => selectedAreas[index] && selectedAreas[index].length > 0
+  );
 
   // Mouse down event - dragging shuru karna
   const handleMouseDown = (e) => {
@@ -46,11 +61,19 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         height: Math.abs(dragEnd.y - dragStart.y),
       };
 
-      setSelectedAreas((prev) => [...prev, area]);
-
+      setSelectedAreas((prev) => ({
+        ...prev,
+        [activeImageIndex]: [...(prev[activeImageIndex] || []), area],
+      }));
       setFormData((prev) => ({
         ...prev,
-        selectedObjectAreas: [...(prev.selectedObjectAreas || []), area],
+        selectedObjectAreas: {
+          ...(prev.selectedObjectAreas || {}),
+          [activeImageIndex]: [
+            ...(prev.selectedObjectAreas?.[activeImageIndex] || []),
+            area,
+          ],
+        },
       }));
     }
 
@@ -75,17 +98,75 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   };
 
   const handleContinue = () => {
-    if (selectedAreas.length === 0) {
+    if (totalSelectedObjects === 0) {
       alert("Please select at least one object to remove");
       return;
     }
     next();
   };
 
-  const handleRemoveObject = () => {
-    console.log("Removing objects from areas:", selectedAreas);
-    // Yahan aap API call kar sakte hain object removal ke liye
-    next();
+  const handleRemoveObject = async () => {
+    if (!token) {
+      toast.error("Please login first");
+      return;
+    }
+
+    toast.loading("Removing objects...", { id: "remove" });
+
+    try {
+      const allBackendPayloads = [];
+      const CLOUD_NAME = "dhtpqla2b";
+      const UPLOAD_PRESET = "unsigned_preset";
+
+      const uploadToCloudinary = async (img) => {
+        const fd = new FormData();
+        const blob = await fetch(img).then((r) => r.blob());
+        fd.append("file", blob);
+        fd.append("upload_preset", UPLOAD_PRESET);
+
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          { method: "POST", body: fd }
+        );
+        const data = await res.json();
+        return data.secure_url;
+      };
+
+      for (let i = 0; i < formData.uploadedImages.length; i++) {
+        const originalUrl = await uploadToCloudinary(
+          formData.uploadedImages[i]
+        );
+
+        // ⚠ yahan future me AI object removal API call lagegi
+        const processedUrl = originalUrl;
+
+        allBackendPayloads.push({
+          userid: user?._id || formData.userId,
+          title: `Object Removal - Image ${i + 1}`,
+          featureType: "object-removal",
+          uploadedImages: [originalUrl],
+          selectedFeature: ["object-removal"],
+          beforeAfterData: [
+            {
+              originalImage: originalUrl,
+              processedImage: processedUrl,
+              removedAreas: selectedAreas[i] || [],
+            },
+          ],
+          image: processedUrl,
+        });
+      }
+
+      await saveGeneratedImage(allBackendPayloads, token);
+
+      toast.dismiss("remove");
+      toast.success("Objects removed & saved successfully!");
+      next();
+    } catch (err) {
+      console.error(err);
+      toast.dismiss("remove");
+      toast.error("Failed to remove objects");
+    }
   };
 
   return (
@@ -134,11 +215,24 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               className="text-[20px] sm:text-[30px] text-black
               font-medium mb-2"
             >
-              {selectedAreas.length === 0
+              {totalSelectedObjects === 0
                 ? "Select Objects — Drag Over Each One"
-                : `${selectedAreas.length} object(s) selected`}
+                : `${totalSelectedObjects} object(s) selected`}
             </p>
           </div>
+
+          <div className="flex gap-3 mb-4 overflow-x-auto">
+            {formData.uploadedImages.map((img, index) => (
+              <img
+                key={index}
+                src={typeof img === "string" ? img : URL.createObjectURL(img)}
+                onClick={() => setActiveImageIndex(index)}
+                className={`h-20 w-28 object-cover rounded cursor-pointer border-2
+        ${activeImageIndex === index ? "border-[#034F75]" : "border-gray-300"}`}
+              />
+            ))}
+          </div>
+
           <div
             className="relative w-full bg-white rounded-[40px] overflow-hidden cursor-crosshair"
             onMouseDown={handleMouseDown}
@@ -149,7 +243,13 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             {/* Image */}
             <Image
               ref={imageRef}
-              src={formData.uploadedImages[0]}
+              src={
+                typeof formData.uploadedImages[activeImageIndex] === "string"
+                  ? formData.uploadedImages[activeImageIndex]
+                  : URL.createObjectURL(
+                      formData.uploadedImages[activeImageIndex]
+                    )
+              }
               alt="Select object to remove"
               width={800}
               height={600}
@@ -167,7 +267,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               />
             )}
 
-            {selectedAreas.map((area, index) => (
+            {(selectedAreas[activeImageIndex] || []).map((area, index) => (
               <div
                 key={index}
                 className="absolute border-2 border-solid border-[#034F75] bg-[#034F75]/20"
@@ -197,31 +297,40 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           Back
         </button>
 
-        {selectedAreas.length > 0 && (
-          <button
-            onClick={() => {
-              setSelectedAreas([]);
-              setFormData((prev) => ({
-                ...prev,
-                selectedObjectAreas: [],
-              }));
-            }}
-            className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-[#034F75] text-[#034F75] rounded-lg"
-          >
-            Clear All Selections
-          </button>
-        )}
+        {/* Clear Selections Button */}
+        {selectedAreas[activeImageIndex] &&
+          selectedAreas[activeImageIndex].length > 0 && (
+            <button
+              onClick={() => {
+                setSelectedAreas((prev) => ({
+                  ...prev,
+                  [activeImageIndex]: [],
+                }));
+                setFormData((prev) => ({
+                  ...prev,
+                  selectedObjectAreas: {
+                    ...(prev.selectedObjectAreas || {}),
+                    [activeImageIndex]: [],
+                  },
+                }));
+              }}
+              className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-[#034F75] text-[#034F75] rounded-lg"
+            >
+              Clear All Selections
+            </button>
+          )}
 
         {/* Remove Object */}
         <button
           onClick={handleRemoveObject}
-          disabled={selectedAreas.length === 0}
-          className={`flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 text-[16px] sm:text-[20px] rounded-lg transition-colors
-      ${
-        selectedAreas.length > 0
-          ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
-          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-      }`}
+          disabled={!allImagesHaveSelection}
+          className={`flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 
+  text-[16px] sm:text-[20px] rounded-lg transition-colors
+  ${
+    allImagesHaveSelection
+      ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
+      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+  }`}
         >
           Remove Object
         </button>
