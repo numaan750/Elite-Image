@@ -109,7 +109,11 @@ const History = () => {
                 className="flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
               >
                 <Image
-                  src={item.image}
+                  src={
+                    item.image ||
+                    item.uploadedImages?.[0] || // ✅ SKY REPLACEMENT FIX
+                    "/placeholder.png"
+                  }
                   alt={item.title}
                   width={112}
                   height={112}

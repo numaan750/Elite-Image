@@ -138,6 +138,7 @@ const UploadImageTabs = () => {
     beforeAfterData: {},
     finalNotes: "",
     totalSteps: currentConfig.totalSteps, // ✅ YE LINE ADD KARI
+    projectId: null, // ✅ YE LINE ADD KAREIN
   });
 
   // useEffect(() => {

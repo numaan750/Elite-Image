@@ -140,7 +140,16 @@ const Step4Page = () => {
           featureType: project.featureType || "",
           selectedFeature: project.selectedFeature?.[0] || "",
           selectedStyle: project.selectedStyle?.[0] || "",
-          beforeAfterData: project.beforeAfterData || [],
+          beforeAfterData:
+            project.beforeAfterData && project.beforeAfterData.length > 0
+              ? project.beforeAfterData
+              : project.image
+              ? [
+                  {
+                    processedImage: project.image,
+                  },
+                ]
+              : [],
           finalNotes: project.finalNotes || "",
           userId: project.userid || user?._id,
         });
@@ -309,7 +318,62 @@ const Step4Page = () => {
   };
 
   const handleDownloadConfirmed = async () => {
-    const processedData = formData.beforeAfterData;
+    const processedData =
+      formData.beforeAfterData && formData.beforeAfterData.length > 0
+        ? formData.beforeAfterData
+        : formData.uploadedImages.map((img) => ({
+            processedImage: img, // Sky Replacement ke liye uploaded image hi download hogi
+          }));
+
+    // ✅ NAYA CODE: Agar sirf 1 image hai to seedha download karo (no ZIP)
+    if (processedData.length === 1) {
+      toast.loading("Downloading image...", { id: "download" });
+
+      try {
+        const response = await fetch(processedData[0].processedImage);
+        const blob = await response.blob();
+
+        if (window.showSaveFilePicker) {
+          try {
+            const fileHandle = await window.showSaveFilePicker({
+              suggestedName: "elite-image-1.jpg",
+              types: [
+                {
+                  description: "JPEG Image",
+                  accept: { "image/jpeg": [".jpg"] },
+                },
+              ],
+            });
+
+            const writable = await fileHandle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+
+            // ✅ Success toast with auto-dismiss
+            toast.success("Download complete", {
+              id: "download",
+              duration: 2000,
+            });
+          } catch {
+            // ✅ Cancel toast with auto-dismiss
+            toast("Download cancelled", { id: "download", duration: 2000 });
+            return;
+          }
+        } else {
+          saveAs(blob, "elite-image-1.jpg");
+          // ✅ Success toast with auto-dismiss
+          toast.success("Download complete", {
+            id: "download",
+            duration: 2000,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        // ✅ Error toast with auto-dismiss
+        toast.error("Download failed", { id: "download", duration: 3000 });
+      }
+      return;
+    }
 
     if (!processedData || processedData.length === 0) {
       toast.error("No images to download");
@@ -346,17 +410,17 @@ const Step4Page = () => {
           await writable.write(zipBlob);
           await writable.close();
         } catch {
-          toast("Download cancelled", { id: "zip" });
+          toast("Download cancelled", { id: "zip", duration: 2000 });
           return;
         }
       } else {
         saveAs(zipBlob, "Elite-Image-AI-Project.zip");
       }
 
-      toast.success("Download complete", { id: "zip" });
+      toast.success("Download complete", { id: "zip", duration: 2000 });
     } catch (err) {
       console.error(err);
-      toast.error("Download failed", { id: "zip" });
+      toast.error("Download failed", { id: "zip", duration: 3000 });
     }
   };
 
@@ -518,15 +582,14 @@ const Step4Page = () => {
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full sm:w-auto">
           {!isViewMode && (
             <button
-    onClick={() => {
-      router.push(`/admin/edit-project?projectId=${projectId}`);
-      
-    }}
-    className="flex items-center justify-center gap-2 border border-[#034F75] text-[12px] sm:text-[16px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
-  >
-    <TbEdit size={17} />
-    Edit
-  </button>
+              onClick={() => {
+                router.push(`/admin/edit-project?projectId=${projectId}`);
+              }}
+              className="flex items-center justify-center gap-2 border border-[#034F75] text-[12px] sm:text-[16px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
+            >
+              <TbEdit size={17} />
+              Edit
+            </button>
           )}
 
           <button
@@ -564,23 +627,17 @@ const Step4Page = () => {
         <button
           onClick={showDownloadConfirmToast}
           disabled={
-            !formData.beforeAfterData ||
-            (Array.isArray(formData.beforeAfterData) &&
-              formData.beforeAfterData.length === 0)
+            !formData.uploadedImages || formData.uploadedImages.length === 0
           }
           className={`w-full sm:w-[280px] flex items-center justify-center gap-2 text-[12px] sm:text-[16px] py-2.5 sm:py-3 rounded-lg transition-colors
-            ${
-              formData.beforeAfterData && formData.beforeAfterData.length > 0
-                ? "bg-[#034F75] text-white hover:bg-[#023d5c] cursor-pointer"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
+  ${
+    formData.uploadedImages && formData.uploadedImages.length > 0
+      ? "bg-[#034F75] text-white hover:bg-[#023d5c] cursor-pointer"
+      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+  }`}
         >
           <PiDownload size={20} />
-          <span>
-            {formData.beforeAfterData && formData.beforeAfterData.length > 0
-              ? `Download ${formData.beforeAfterData.length} Image(s)`
-              : "Generate First"}
-          </span>
+          <span>Download</span>
         </button>
       </div>
     </div>

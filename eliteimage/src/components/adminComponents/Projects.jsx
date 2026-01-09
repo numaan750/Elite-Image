@@ -77,7 +77,11 @@ const Projects = () => {
               className="flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
             >
               <Image
-                src={project.image}
+                src={
+                  project.image || // ✅ normal features
+                  project.uploadedImages?.[0] || // ✅ Sky Replacement FIX
+                  "/placeholder.png" // fallback
+                }
                 alt="project"
                 width={112}
                 height={112}
@@ -160,7 +164,11 @@ const Projects = () => {
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
               <div className="flex justify-center bg-gray-100 rounded-lg p-3 sm:p-4">
                 <Image
-                  src={selectedProject.image}
+                  src={
+                    selectedProject.image ||
+                    selectedProject.uploadedImages?.[0] ||
+                    "/placeholder.png"
+                  }
                   alt={selectedProject.title}
                   width={400}
                   height={400}

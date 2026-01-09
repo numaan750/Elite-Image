@@ -6,8 +6,10 @@ import ProgressBar from "./ProgressBar";
 import { useContext } from "react";
 import { AppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation"; // ✅ ADD THIS
 
 const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
+  const router = useRouter(); // ✅ ADD THIS LINE
   const { token, saveGeneratedImage, user } = useContext(AppContext);
 
   const [isDragging, setIsDragging] = useState(false);
@@ -105,19 +107,27 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     next();
   };
 
+  // ✅ UPDATED: Complete backend integration
   const handleRemoveObject = async () => {
     if (!token) {
       toast.error("Please login first");
       return;
     }
 
-    toast.loading("Removing objects...", { id: "remove" });
+    // ✅ Validate selections
+    if (!allImagesHaveSelection) {
+      toast.error("Please select objects in all images first");
+      return;
+    }
+
+    toast.loading("Removing objects & saving...", { id: "remove" });
 
     try {
       const allBackendPayloads = [];
       const CLOUD_NAME = "dhtpqla2b";
       const UPLOAD_PRESET = "unsigned_preset";
 
+      // ✅ Cloudinary upload function
       const uploadToCloudinary = async (img) => {
         const fd = new FormData();
         const blob = await fetch(img).then((r) => r.blob());
@@ -132,17 +142,24 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         return data.secure_url;
       };
 
+      // ✅ Process each uploaded image
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const originalUrl = await uploadToCloudinary(
           formData.uploadedImages[i]
         );
 
-        // ⚠ yahan future me AI object removal API call lagegi
+        // ⚠ Future: AI object removal API will be called here
         const processedUrl = originalUrl;
 
+        // ✅ Create backend payload
         allBackendPayloads.push({
           userid: user?._id || formData.userId,
-          title: `Object Removal - Image ${i + 1}`,
+          title: `Object Removal - Image ${
+            i + 1
+          } - ${new Date().toLocaleDateString()}`,
+          description: `Object removal with ${
+            selectedAreas[i]?.length || 0
+          } selected area(s)`,
           featureType: "object-removal",
           uploadedImages: [originalUrl],
           selectedFeature: ["object-removal"],
@@ -151,16 +168,32 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               originalImage: originalUrl,
               processedImage: processedUrl,
               removedAreas: selectedAreas[i] || [],
+              processedAt: new Date().toISOString(),
+              status: "completed",
             },
           ],
+          finalNotes: `Removed ${selectedAreas[i]?.length || 0} object(s)`,
           image: processedUrl,
         });
       }
 
-      await saveGeneratedImage(allBackendPayloads, token);
+      // ✅ Save to backend
+      const savedData = await saveGeneratedImage(allBackendPayloads, token);
+
+      // ✅ CRITICAL: Update formData with response
+      const normalizedBeforeAfter = Array.isArray(savedData)
+        ? savedData.flatMap((item) => item.beforeAfterData || [])
+        : savedData.beforeAfterData || [];
+
+      setFormData((prev) => ({
+        ...prev,
+        beforeAfterData: normalizedBeforeAfter,
+      }));
 
       toast.dismiss("remove");
       toast.success("Objects removed & saved successfully!");
+
+      
       next();
     } catch (err) {
       console.error(err);
@@ -199,10 +232,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
       {/* Progress Bar */}
       <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-        {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-12 sm:w-16 lg:w-20 bg-[#CFE8F2]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
-        <div className="h-[2px] sm:h-[3px] w-12 sm:w-16 lg:w-20 bg-[#034F75]" /> */}
         <ProgressBar currentStep={2} totalSteps={formData.totalSteps} />
       </div>
 
@@ -291,7 +320,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
       <div className="mt-8 sm:mt-10 lg:mt-12 flex justify-center lg:justify-end gap-3 max-w-4xl mx-auto">
         {/* Back Button */}
         <button
-          onClick={back} // ya router.back() agar browser history chahiye
+          onClick={back}
           className="px-6 sm:px-8 py-2.5 sm:py-3 text-[16px] sm:text-[20px] border-2 border-gray-400 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
         >
           Back
@@ -320,7 +349,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             </button>
           )}
 
-        {/* Remove Object */}
+        {/* Remove Object Button */}
         <button
           onClick={handleRemoveObject}
           disabled={!allImagesHaveSelection}

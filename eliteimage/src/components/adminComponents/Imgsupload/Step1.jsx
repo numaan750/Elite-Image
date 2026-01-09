@@ -1,20 +1,113 @@
 "use client";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Upload, ArrowRight, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
+import { AppContext } from "@/context/AppContext";
+import toast from "react-hot-toast";
 
 const CLOUD_NAME = "dhtpqla2b";
 const UPLOAD_PRESET = "unsigned_preset";
 
 const Step1 = ({ formData, setFormData, next }) => {
+  const { token, saveGeneratedImage } = useContext(AppContext);
+  const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const toast = {
-    loading: (msg) => console.log(msg),
-    success: (msg) => console.log(msg),
-    error: (msg) => console.error(msg),
+  // const toast = {
+  //   loading: (msg) => console.log(msg),
+  //   success: (msg) => console.log(msg),
+  //   error: (msg) => console.error(msg),
+  // };
+
+  // ✅ NEW FUNCTION: Generate & Save for Straighten and Watermark Remove
+  const handleGenerateAndSave = async () => {
+    if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
+      toast.error("Please upload at least one image first!");
+      return;
+    }
+
+    if (!token) {
+      toast.error("Please login to save images");
+      return;
+    }
+
+    setIsSaving(true);
+    toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
+      id: "processing",
+    });
+
+    try {
+      const allProcessedData = [];
+      const allBackendPayloads = [];
+
+      for (let i = 0; i < formData.uploadedImages.length; i++) {
+        const uploadedImage = formData.uploadedImages[i];
+
+        console.log(`📤 [${i + 1}] Processing ${formData.featureType}...`);
+
+        // ✅ For Straighten and Watermark Remove, use uploaded image as is
+        // Backend will handle actual processing
+        const processedImageUrl = uploadedImage;
+
+        const processedData = {
+          originalImage: uploadedImage,
+          processedImage: processedImageUrl,
+          processedAt: new Date().toISOString(),
+          status: "completed",
+          userId: formData.userId,
+          featureType: formData.featureType,
+        };
+        allProcessedData.push(processedData);
+
+        const backendPayload = {
+          userid: formData.userId,
+          title: `${formData.featureType} - Image ${
+            i + 1
+          } - ${new Date().toLocaleDateString()}`,
+          description: formData.finalNotes || `${formData.featureType} applied`,
+          featureType: formData.featureType,
+          uploadedImages: [uploadedImage],
+          selectedFeature: [],
+          selectedStyle: [],
+          beforeAfterData: [processedData],
+          finalNotes: formData.finalNotes || "",
+          image: processedImageUrl,
+        };
+        allBackendPayloads.push(backendPayload);
+      }
+
+      // ✅ Update formData with processed images
+      setFormData((prev) => ({
+        ...prev,
+        beforeAfterData: allProcessedData,
+      }));
+
+      // ✅ Save to backend
+      if (formData.projectId) {
+        await saveGeneratedImage(
+          allBackendPayloads[0],
+          token,
+          true,
+          formData.projectId
+        );
+        toast.success("Project updated successfully!", { id: "processing" });
+      } else {
+        await saveGeneratedImage(allBackendPayloads, token);
+        toast.success(`${formData.uploadedImages.length} image(s) saved!`, {
+          id: "processing",
+        });
+      }
+
+      // ✅ Move to Step 4 (Processing/Download page)
+      next();
+    } catch (error) {
+      console.error("❌ Error:", error);
+      toast.error(`Error: ${error.message}`, { id: "processing" });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleFileUpload = async (e) => {
@@ -68,7 +161,6 @@ const Step1 = ({ formData, setFormData, next }) => {
 
     e.target.value = "";
   };
-
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -106,6 +198,11 @@ const Step1 = ({ formData, setFormData, next }) => {
       ),
     }));
   };
+
+  // ✅ Determine which button to show
+  const isSpecialFeature =
+    formData.featureType === "Straighten" ||
+    formData.featureType === "Watermark Remove";
 
   return (
     <div className="bg-white px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-8">
@@ -248,19 +345,37 @@ const Step1 = ({ formData, setFormData, next }) => {
         </div>
       )} */}
 
-      <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-center sm:justify-end">
-        <button
-          onClick={next}
-          disabled={formData.uploadedImages.length === 0}
-          className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[12px] sm:text-[20px] text-white hover:bg-[#023d5c] transition-colors ${
-            formData.uploadedImages.length === 0
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-        >
-          Continue
-          <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
-        </button>
+      {/* ✅ UPDATED BUTTONS SECTION */}
+      <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-center sm:justify-end gap-3">
+        {isSpecialFeature ? (
+          // ✅ Show "Generate & Save" button for Straighten and Watermark Remove
+          <button
+            onClick={handleGenerateAndSave}
+            disabled={formData.uploadedImages.length === 0 || isSaving}
+            className={`flex items-center gap-2 rounded-lg px-5 sm:px-6 py-2 text-[12px] sm:text-[20px] text-white transition-colors ${
+              formData.uploadedImages.length === 0 || isSaving
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
+            }`}
+          >
+            {isSaving ? "Saving..." : "Generate & Save"}
+            <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
+          </button>
+        ) : (
+          // ✅ Show normal "Continue" button for other features
+          <button
+            onClick={next}
+            disabled={formData.uploadedImages.length === 0}
+            className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[12px] sm:text-[20px] text-white hover:bg-[#023d5c] transition-colors ${
+              formData.uploadedImages.length === 0
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+          >
+            Continue
+            <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
+          </button>
+        )}
       </div>
     </div>
   );

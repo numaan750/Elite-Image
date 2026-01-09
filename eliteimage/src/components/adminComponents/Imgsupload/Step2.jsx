@@ -4,19 +4,91 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FEATURES_DATA } from "./featuresData";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
+import toast, { Toaster } from "react-hot-toast";
+
 
 const Step2 = ({ formData, setFormData, next, back, featureType }) => {
   const featureData = FEATURES_DATA[featureType];
 
   const [selected, setSelected] = useState(formData.selectedFeatures || []);
 
-  const handleContinue = () => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedFeatures: selected,
-    }));
-    next();
-  };
+const handleContinue = async () => {
+  setFormData((prev) => ({
+    ...prev,
+    selectedFeatures: selected,
+  }));
+
+  // ✅ SIRF SKY REPLACEMENT KE LIYE BACKEND SAVE
+  if (featureType === "Sky Replacement") {
+    try {
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        toast.error("Please login first");
+        return;
+      }
+
+      toast.loading("Saving your selection...", { id: "save-sky" });
+
+      const backendPayload = {
+        userid: formData.userId,
+        title: `Sky Replacement - ${new Date().toLocaleDateString()}`,
+        description: `Selected Sky: ${selected[0]}`,
+        featureType: "Sky Replacement",
+        uploadedImages: formData.uploadedImages,
+        selectedFeature: selected,
+        selectedStyle: [],
+        selectedFurniture: [],
+        beforeAfterData: [],
+        finalNotes: "",
+      };
+
+      // ✅ CORRECT API URL - AppContext se API_URL use karo
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://elite-image.vercel.app";
+      
+      const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(backendPayload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save");
+      }
+
+      const data = await response.json();
+      
+      toast.success("Selection saved!", { id: "save-sky" });
+      
+      // Save project ID in formData
+      setFormData((prev) => ({
+        ...prev,
+        projectId: data._id, // ✅ Backend se _id milegi
+      }));
+
+    } catch (error) {
+      console.error("Save error:", error);
+      toast.error(`Failed: ${error.message}`, { id: "save-sky" });
+      return; // Don't proceed if save fails
+    }
+  }
+
+  // ✅ SKY REPLACEMENT TEMP FIX – images show karne ke liye
+if (featureType === "Sky Replacement") {
+  setFormData((prev) => ({
+    ...prev,
+    beforeAfterData: prev.uploadedImages.map((img) => ({
+      processedImage: img, // 👈 same image use karo
+    })),
+  }));
+}
+
+  next(); // Ab next step par jao
+};
 
   return (
     <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">

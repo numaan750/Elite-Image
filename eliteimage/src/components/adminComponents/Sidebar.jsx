@@ -91,12 +91,12 @@ export default function Sidebar() {
             setOpen(false); // mobile sidebar close
           }}
           className="
-             mt-50
-             flex items-center justify-center gap-3
+             mt-40
+             flex items-center justify-start gap-3
              w-full
-             bg-red-400
-             hover:bg-red-500
-             text-black
+             bg-[#D30000]
+            
+             text-white
              px-4
              py-2.5
              rounded-lg

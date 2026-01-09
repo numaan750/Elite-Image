@@ -4,8 +4,12 @@ import { Eye, Pencil, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { AppContext } from "@/context/AppContext";
+import { useRouter } from "next/navigation";
+
 
 const RecentProjects = () => {
+  const router = useRouter();
+
   const { images, loading, error, getAiImages, deleteImages } =
     useContext(AppContext);
 
@@ -40,19 +44,25 @@ const RecentProjects = () => {
           Recent Projects
         </h2>
 
-        <button className="rounded-md bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[21.02px] text-white w-fit hover:bg-[#034F75] transition-colors">
-          View All
-        </button>
+        <Link href="/admin/projects">
+          <button className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[21.02px] text-white w-fit hover:bg-[#034F75] transition-colors">
+            View All
+          </button>
+        </Link>
       </div>
 
       <div className="space-y-4 sm:space-y-5">
-        {images.map((project) => (
+        {images.slice(0, 5).map((project) => (
           <div
             key={project._id}
             className="flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
           >
             <Image
-              src={project.image}
+              src={
+                project.image ||
+                project.uploadedImages?.[0] || // ✅ SKY REPLACEMENT FIX
+                "/placeholder.png"
+              }
               alt="project"
               width={112}
               height={112}
@@ -130,11 +140,15 @@ const RecentProjects = () => {
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
               <div className="flex justify-center bg-gray-100 rounded-lg p-3 sm:p-4">
                 <Image
-                  src={selectedProject.image}
-                  alt={selectedProject.title}
-                  width={400}
-                  height={400}
-                  className="max-w-full max-h-[300px] sm:max-h-[400px] object-contain rounded-lg"
+                  src={
+                    project.image ||
+                    project.uploadedImages?.[0] || // ✅ SKY REPLACEMENT FIX
+                    "/placeholder.png"
+                  }
+                  alt="project"
+                  width={112}
+                  height={112}
+                  className="h-24 w-24 sm:h-30 sm:w-30 rounded-lg object-cover flex-shrink-0"
                 />
               </div>
 

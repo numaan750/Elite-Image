@@ -71,6 +71,117 @@ const processImage = async (imageUrl, options) => {
 
 const downloadImagesAsZip = async (formData) => {
   try {
+    // ✅ SKY REPLACEMENT KE LIYE SPECIAL HANDLING
+    if (formData.featureType === "Sky Replacement" && formData.projectId) {
+      // Prepare payload for backend
+      const backendPayload = {
+        beforeAfterData: formData.beforeAfterData, // processed images
+        uploadedImages: formData.uploadedImages, // original images
+        selectedFeature: formData.selectedFeatures, // selected sky
+        featureType: "Sky Replacement",
+        finalNotes: formData.finalNotes || "",
+      };
+      // await saveGeneratedImage(backendPayload, token, true, formData.projectId);
+
+      toast.success("Sky Replacement images saved!", { id: "processing" });
+
+      if (formData.uploadedImages.length === 1) {
+  toast.loading("Downloading single image...", { id: "download" });
+
+  try {
+    const imageUrl = formData.uploadedImages[0];
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+
+    if (window.showSaveFilePicker) {
+      const fileHandle = await window.showSaveFilePicker({
+        suggestedName: "sky-replacement-image.jpg",
+        types: [
+          {
+            description: "Image",
+            accept: { "image/jpeg": [".jpg"], "image/png": [".png"] },
+          },
+        ],
+      });
+
+      const writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+
+      toast.success("Image downloaded!", { id: "download" });
+    } else {
+      // fallback
+      saveAs(blob, "sky-replacement-image.jpg");
+      toast.success("Image downloaded!", { id: "download" });
+    }
+  } catch (error) {
+    if (error.name === "AbortError") {
+      toast.error("Download cancelled", { id: "download" });
+    } else {
+      toast.error("Download failed!", { id: "download" });
+    }
+  }
+
+  return;
+}
+
+
+      // ✅ MULTIPLE IMAGES - ZIP DOWNLOAD
+      const zip = new JSZip();
+      const folder = zip.folder("Elite-Image-AI-Sky-Replacement");
+
+      // Original images download (kyunki processing nahi hui)
+      for (let i = 0; i < formData.uploadedImages.length; i++) {
+        const imageUrl = formData.uploadedImages[i];
+
+        try {
+          const response = await fetch(imageUrl);
+          if (!response.ok) throw new Error(`Failed to fetch image ${i + 1}`);
+
+          const blob = await response.blob();
+          folder.file(`sky-original-${i + 1}.jpg`, blob);
+        } catch (error) {
+          console.error(`Error downloading image ${i + 1}:`, error);
+        }
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+
+      if (window.showSaveFilePicker) {
+        try {
+          const fileHandle = await window.showSaveFilePicker({
+            suggestedName: "Sky-Replacement-Images.zip",
+            types: [
+              {
+                description: "ZIP Archive",
+                accept: { "application/zip": [".zip"] },
+              },
+            ],
+          });
+
+          const writableStream = await fileHandle.createWritable();
+          await writableStream.write(zipBlob);
+          await writableStream.close();
+
+          toast.success(
+            `${formData.uploadedImages.length} image(s) downloaded!`,
+            { id: "zip" }
+          );
+        } catch (error) {
+          if (error.name === "AbortError") {
+            toast.error("Download cancelled", { id: "zip" });
+          } else {
+            saveAs(zipBlob, "Sky-Replacement-Images.zip");
+            toast.success(`Downloaded!`, { id: "zip" });
+          }
+        }
+      } else {
+        saveAs(zipBlob, "Sky-Replacement-Images.zip");
+        toast.success(`Downloaded!`, { id: "zip" });
+      }
+
+      return; // Early return for Sky Replacement
+    }
     const processedData = formData.beforeAfterData;
 
     // Check if data exists
@@ -82,12 +193,52 @@ const downloadImagesAsZip = async (formData) => {
       return;
     }
 
-    toast.loading("Preparing download...", { id: "zip" });
+    // toast.loading("Preparing download...", { id: "zip" });
 
     // Handle both array and single object
     const dataArray = Array.isArray(processedData)
       ? processedData
       : [processedData];
+
+    if (dataArray.length === 1) {
+  toast.loading("Downloading image...", { id: "download" });
+
+  try {
+    const imageUrl = dataArray[0].processedImage;
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+
+    if (window.showSaveFilePicker) {
+      const fileHandle = await window.showSaveFilePicker({
+        suggestedName: "elite-image-ai.jpg",
+        types: [
+          {
+            description: "Image",
+            accept: { "image/jpeg": [".jpg"], "image/png": [".png"] },
+          },
+        ],
+      });
+
+      const writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+
+      toast.success("Image downloaded!", { id: "download" });
+    } else {
+      saveAs(blob, "elite-image-ai.jpg");
+      toast.success("Image downloaded!", { id: "download" });
+    }
+  } catch (error) {
+    if (error.name === "AbortError") {
+      toast.error("Download cancelled", { id: "download" });
+    } else {
+      toast.error("Download failed!", { id: "download" });
+    }
+  }
+
+  return;
+}
+
 
     const zip = new JSZip();
     const folder = zip.folder("Elite-Image-AI");
@@ -495,9 +646,11 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                     >
                       <Image
                         src={
-                          Array.isArray(formData.beforeAfterData)
+                          formData.featureType === "Sky Replacement"
+                            ? img
+                            : Array.isArray(formData.beforeAfterData)
                             ? formData.beforeAfterData[index]?.processedImage
-                            : formData.beforeAfterData?.processedImage || img
+                            : formData.beforeAfterData?.processedImage
                         }
                         alt={`After ${index + 1}`}
                         fill
@@ -588,32 +741,41 @@ const Step4 = ({ formData, setFormData, next, back }) => {
         <button
           onClick={() => downloadImagesAsZip(formData)}
           disabled={
-            !formData.beforeAfterData ||
-            (Array.isArray(formData.beforeAfterData) &&
-              formData.beforeAfterData.length === 0) ||
-            (!Array.isArray(formData.beforeAfterData) &&
-              !formData.beforeAfterData.processedImage)
+            formData.featureType === "Sky Replacement"
+              ? formData.uploadedImages.length === 0
+              : !formData.beforeAfterData ||
+                (Array.isArray(formData.beforeAfterData) &&
+                  formData.beforeAfterData.length === 0) ||
+                (!Array.isArray(formData.beforeAfterData) &&
+                  !formData.beforeAfterData.processedImage)
           }
           className={`w-full sm:w-[280px] flex items-center justify-center gap-2 text-[12px] sm:text-[16px] py-2.5 sm:py-3 rounded-lg transition-colors
     ${
-      formData.beforeAfterData &&
-      ((Array.isArray(formData.beforeAfterData) &&
-        formData.beforeAfterData.length > 0) ||
-        (!Array.isArray(formData.beforeAfterData) &&
-          formData.beforeAfterData.processedImage))
+      (formData.featureType === "Sky Replacement" &&
+        formData.uploadedImages.length > 0) ||
+      (formData.featureType !== "Sky Replacement" &&
+        formData.beforeAfterData &&
+        ((Array.isArray(formData.beforeAfterData) &&
+          formData.beforeAfterData.length > 0) ||
+          (!Array.isArray(formData.beforeAfterData) &&
+            formData.beforeAfterData.processedImage)))
         ? "bg-[#034F75] text-white hover:bg-[#023d5c] cursor-pointer"
         : "bg-gray-300 text-gray-500 cursor-not-allowed"
     }`}
         >
           <PiDownload size={20} className="sm:w-5 sm:h-5" />
           <span>
-            {formData.beforeAfterData &&
-            ((Array.isArray(formData.beforeAfterData) &&
-              formData.beforeAfterData.length > 0) ||
-              (!Array.isArray(formData.beforeAfterData) &&
-                formData.beforeAfterData.processedImage))
+            {formData.featureType === "Sky Replacement"
+              ? formData.uploadedImages.length > 0
+                ? "Download Images"
+                : "No Images"
+              : formData.beforeAfterData &&
+                ((Array.isArray(formData.beforeAfterData) &&
+                  formData.beforeAfterData.length > 0) ||
+                  (!Array.isArray(formData.beforeAfterData) &&
+                    formData.beforeAfterData.processedImage))
               ? "Download"
-              : "No Images to Download"}
+              : "No Images"}
           </span>
         </button>
       </div>
