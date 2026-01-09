@@ -81,7 +81,7 @@ const Navbar = () => {
           <button
             className="md:hidden p-1"
             onClick={() => setOpen(!open)}
-            aria-label="Toggle menu"
+            aria-label="Close modal"
           >
             {open ? (
               <X size={24} className="sm:w-7 sm:h-7" />
