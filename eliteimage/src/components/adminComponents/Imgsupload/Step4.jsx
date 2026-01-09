@@ -136,7 +136,7 @@ const downloadImagesAsZip = async (formData) => {
         await writableStream.close();
 
         toast.dismiss("zip");
-toast.success(`${dataArray.length} image(s) downloaded!`);
+        toast.success(`${dataArray.length} image(s) downloaded!`);
       } catch (error) {
         // User cancelled the dialog
         if (error.name === "AbortError") {
@@ -146,7 +146,7 @@ toast.success(`${dataArray.length} image(s) downloaded!`);
           // Fallback to default download
           saveAs(zipBlob, "Elite-Image-AI-Project.zip");
           toast.dismiss("zip");
-toast.success(`${dataArray.length} image(s) downloaded!`);
+          toast.success(`${dataArray.length} image(s) downloaded!`);
         }
       }
     } else {
@@ -160,7 +160,7 @@ toast.success(`${dataArray.length} image(s) downloaded!`);
   } catch (error) {
     console.error("Zip download error:", error);
     toast.dismiss("zip");
-toast.error("Failed to create zip file");
+    toast.error("Failed to create zip file");
   }
 };
 
@@ -612,11 +612,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
               formData.beforeAfterData.length > 0) ||
               (!Array.isArray(formData.beforeAfterData) &&
                 formData.beforeAfterData.processedImage))
-              ? `Download ${
-                  Array.isArray(formData.beforeAfterData)
-                    ? formData.beforeAfterData.length
-                    : 1
-                } Image(s)`
+              ? "Download"
               : "No Images to Download"}
           </span>
         </button>
