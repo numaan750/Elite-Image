@@ -126,15 +126,17 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
       await saveGeneratedImage(allBackendPayloads, token);
 
-      toast.success(
-        `${formData.uploadedImages.length} image(s) processed and saved!`,
-        { id: "processing" }
-      );
+      toast.dismiss("processing");
+
+toast.success(
+  `${formData.uploadedImages.length} image(s) processed and saved!`
+);
 
       next();
     } catch (error) {
       console.error("❌ Error:", error);
-      toast.error(`Error: ${error.message}`, { id: "processing" });
+      toast.dismiss("processing");
+toast.error(`Error: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -142,7 +144,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
   return (
     <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-10">
-      <Toaster position="top-right" reverseOrder={false} />
+      {/* <Toaster position="top-right" reverseOrder={false} /> */}
 
       <div className="flex items-center gap-3 text-gray-700">
         <div className="flex items-center gap-2">

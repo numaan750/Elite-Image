@@ -135,9 +135,8 @@ const downloadImagesAsZip = async (formData) => {
         await writableStream.write(zipBlob);
         await writableStream.close();
 
-        toast.success(`${dataArray.length} image(s) downloaded!`, {
-          id: "zip",
-        });
+        toast.dismiss("zip");
+toast.success(`${dataArray.length} image(s) downloaded!`);
       } catch (error) {
         // User cancelled the dialog
         if (error.name === "AbortError") {
@@ -146,9 +145,8 @@ const downloadImagesAsZip = async (formData) => {
           console.error("Save dialog error:", error);
           // Fallback to default download
           saveAs(zipBlob, "Elite-Image-AI-Project.zip");
-          toast.success(`${dataArray.length} image(s) downloaded!`, {
-            id: "zip",
-          });
+          toast.dismiss("zip");
+toast.success(`${dataArray.length} image(s) downloaded!`);
         }
       }
     } else {
@@ -161,7 +159,8 @@ const downloadImagesAsZip = async (formData) => {
     }
   } catch (error) {
     console.error("Zip download error:", error);
-    toast.error("Failed to create zip file", { id: "zip" });
+    toast.dismiss("zip");
+toast.error("Failed to create zip file");
   }
 };
 
@@ -395,7 +394,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
-      <Toaster position="top-right" reverseOrder={false} />
+      {/* <Toaster position="top-right" reverseOrder={false} /> */}
 
       <div className="w-full flex justify-start">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
