@@ -30,7 +30,7 @@ const Hero = () => {
             priority
             fetchPriority="high"
             sizes="(max-width: 768px) 100vw, 100vw"
-            quality={50}
+            quality={75}
             className="object-cover -z-10"
             placeholder="blur"
             blurDataURL="/LandingPage/hero2-blur.png"

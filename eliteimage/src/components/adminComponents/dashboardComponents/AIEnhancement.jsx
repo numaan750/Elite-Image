@@ -96,7 +96,7 @@ const AIEnhancement = () => {
                   alt={item.title}
                   height={200}
                   width={400}
-                  quality={100}
+                  quality={75}
                   className="h-48 sm:h-52 lg:h-56 w-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
