@@ -1,6 +1,7 @@
 import Image from "next/image";
-import React from "react";
+import { useState, useRef } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const FaPlay = dynamic(
   () => import("react-icons/fa").then((mod) => mod.FaPlay),
@@ -11,6 +12,34 @@ const PiUpload = dynamic(
   { ssr: false }
 );
 const Hero = () => {
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef(null);
+
+  const handleMove = (clientX) => {
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const percentage = (x / rect.width) * 100;
+
+    setSliderPosition(Math.min(Math.max(percentage, 0), 100));
+  };
+
+  const handleMouseDown = () => setIsDragging(true);
+
+  const handleMouseUp = () => setIsDragging(false);
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    handleMove(e.clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+    handleMove(e.touches[0].clientX);
+  };
+
   return (
     <>
       <section id="home" className="relative flex items-center justify-center">
@@ -48,13 +77,14 @@ const Hero = () => {
             </p>
 
             <div className="mt-[24px] sm:mt-[30px] flex flex-col sm:flex-row justify-center gap-[16px] sm:gap-[25px] px-4">
-              <button
+              <Link
+                href="/login"
                 className="bg-[#034F75] text-white px-[20px] sm:px-[24px] py-[12px] sm:py-[14px] rounded-xl text-[14px] sm:text-[16px] font-medium flex items-center gap-[10px] justify-center min-w-[180px] hover:bg-[#023a57] transition-colors"
                 aria-label="Upload Image"
               >
                 <PiUpload className="text-[16px] sm:text-[20px]" />
                 Upload Image
-              </button>
+              </Link>
 
               <button
                 className="border-2 border-[#034F75] text-[#034F75] px-[20px] sm:px-[24px] py-[12px] sm:py-[14px] rounded-xl text-[14px] sm:text-[16px] font-medium flex items-center gap-[10px] justify-center min-w-[180px] hover:bg-[#034F75] hover:text-white transition-colors"
@@ -68,7 +98,7 @@ const Hero = () => {
         </div>
       </section>
 
-      <div className="mycontainer mt-[40px] sm:mt-[50px] lg:mt-[60px] pb-10 flex justify-center">
+      {/* <div className="mycontainer mt-[40px] sm:mt-[50px] lg:mt-[60px] pb-10 flex justify-center">
         <div className="relative w-full max-w-[1440px] h-[300px] sm:h-[400px] lg:h-[500px] rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] overflow-hidden shadow-lg">
           <div className="grid grid-cols-2 h-full">
             <div className="relative">
@@ -103,16 +133,78 @@ const Hero = () => {
   className="object-cover"
   quality={60}
   sizes="(max-width: 768px) 50vw, 50vw"
-/> */}
-              <span className="absolute top-[12px] sm:top-[16px] lg:top-[20px] right-[12px] sm:right-[16px] lg:right-[20px] bg-[#034F75] text-white text-[12px] sm:text-[14px] lg:text-[16px] px-[10px] sm:px-[12px] lg:px-[16px] py-[4px] sm:py-[5px] lg:py-[6px] rounded-[6px] lg:rounded-[8px] font-medium">
-                After
-              </span>
-            </div>
+// /> */}
+      {/* //               <span className="absolute top-[12px] sm:top-[16px] lg:top-[20px] right-[12px] sm:right-[16px] lg:right-[20px] bg-[#034F75] text-white text-[12px] sm:text-[14px] lg:text-[16px] px-[10px] sm:px-[12px] lg:px-[16px] py-[4px] sm:py-[5px] lg:py-[6px] rounded-[6px] lg:rounded-[8px] font-medium">
+//                 After
+//               </span>
+//             </div> */}
+      {/* //           </div> */}
+
+      {/* //           <div className="absolute inset-y-0 left-1/2 w-[1px] sm:w-[2px] bg-white/80 z-20"></div>
+
+//           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#034F75] w-12 h-12 sm:w-[40px] sm:h-[40px] lg:w-[44px] lg:h-[44px] rounded-full flex items-center justify-center z-30 shadow-lg">
+//             <span className="text-white text-[20px] sm:text-[24px] lg:text-[30px]">{`<>`}</span>
+//           </div>
+//         </div> */}
+      {/* //       </div> */}
+      <div className="mycontainer mt-[40px] sm:mt-[50px] lg:mt-[60px] pb-10 flex justify-center">
+        <div
+          ref={containerRef}
+          className="relative w-full max-w-[1440px] h-[300px] sm:h-[400px] lg:h-[500px] rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] overflow-hidden shadow-lg select-none"
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleMouseUp}
+        >
+          {/* Before Image (Right side - full width) */}
+          <div className="absolute inset-0">
+            <Image
+              src="/LandingPage/heroimg1.webp"
+              alt="Before"
+              fill
+              className="object-cover"
+              loading="lazy"
+              sizes="(max-width: 640px) 100vw, 100vw"
+              quality={60}
+            />
+            <span className="absolute top-[12px] sm:top-[16px] lg:top-[20px] right-[12px] sm:right-[16px] lg:right-[20px] bg-[#034F75] text-white text-[12px] sm:text-[14px] lg:text-[16px] px-[10px] sm:px-[12px] lg:px-[16px] py-[4px] sm:py-[5px] lg:py-[6px] rounded-[6px] lg:rounded-[8px] font-medium z-10">
+              Before
+            </span>
           </div>
 
-          <div className="absolute inset-y-0 left-1/2 w-[1px] sm:w-[2px] bg-white/80 z-20"></div>
+          {/* After Image (Left side - clipped) */}
+          <div
+            className="absolute inset-0"
+            style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+          >
+            <Image
+              src="/LandingPage/heroimg2.webp"
+              alt="After"
+              fill
+              className="object-cover"
+              loading="lazy"
+              sizes="(max-width: 640px) 100vw, 100vw"
+              quality={60}
+            />
+            <span className="absolute top-[12px] sm:top-[16px] lg:top-[20px] left-[12px] sm:left-[16px] lg:left-[20px] bg-[#034F75] text-white text-[12px] sm:text-[14px] lg:text-[16px] px-[10px] sm:px-[12px] lg:px-[16px] py-[4px] sm:py-[5px] lg:py-[6px] rounded-[6px] lg:rounded-[8px] font-medium z-10">
+              After
+            </span>
+          </div>
 
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#034F75] w-12 h-12 sm:w-[40px] sm:h-[40px] lg:w-[44px] lg:h-[44px] rounded-full flex items-center justify-center z-30 shadow-lg">
+          {/* Divider Line */}
+          <div
+            className="absolute inset-y-0 w-[2px] bg-white/80 z-20 cursor-ew-resize"
+            style={{ left: `${sliderPosition}%` }}
+          ></div>
+
+          {/* Draggable Handle */}
+          <div
+            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#034F75] w-12 h-12 sm:w-[40px] sm:h-[40px] lg:w-[44px] lg:h-[44px] rounded-full flex items-center justify-center z-30 shadow-lg cursor-ew-resize hover:scale-110 transition-transform active:scale-95"
+            style={{ left: `${sliderPosition}%` }}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleMouseDown}
+          >
             <span className="text-white text-[20px] sm:text-[24px] lg:text-[30px]">{`<>`}</span>
           </div>
         </div>
