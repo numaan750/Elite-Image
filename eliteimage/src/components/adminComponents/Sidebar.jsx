@@ -31,7 +31,7 @@ export default function Sidebar() {
     { name: "Pricing", href: "/admin/pricing", icon: CreditCard },
     { name: "Support", href: "/admin/support", icon: HelpCircle },
     { name: "Profile", href: "/admin/profile", icon: User },
-    { name: "history", href: "/admin/history", icon: History },
+    // { name: "history", href: "/admin/history", icon: History },
   ];
 
   return (
@@ -91,7 +91,7 @@ export default function Sidebar() {
             setOpen(false); // mobile sidebar close
           }}
           className="
-             mt-47
+             mt-60
              flex items-center justify-start gap-3
              w-full
              bg-[#D30000]
