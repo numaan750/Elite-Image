@@ -91,18 +91,17 @@ export default function ContactSection() {
           <div className="flex flex-col gap-4 sm:gap-5 lg:gap-6">
             <div className="flex gap-3 sm:gap-4 lg:gap-5 text-sm sm:text-base lg:text-lg">
               <Mail className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 flex-shrink-0" />
-              <p className="leading-relaxed">hello@devsrank.com</p>
+              <p className="leading-relaxed">Example@example.com</p>
             </div>
             <div className="flex gap-3 sm:gap-4 lg:gap-5 text-sm sm:text-base lg:text-lg">
               <Home className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 flex-shrink-0" />
               <p className="leading-relaxed">
-                Office #112, 2nd Floor Kohinoor Plaza 1, Faisalabad, Punjab,
-                Pakistan
+                lorum ipsum dolor sit amet, consectetur adipiscing elit
               </p>
             </div>
             <div className="flex gap-3 sm:gap-4 lg:gap-5 text-sm sm:text-base lg:text-lg">
               <Phone className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 flex-shrink-0" />
-              <p className="leading-relaxed">+92 (300) 1234 968</p>
+              <p className="leading-relaxed">+92 0000000000</p>
             </div>
           </div>
         </div>
