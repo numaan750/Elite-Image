@@ -48,7 +48,7 @@ const Hero = () => {
             src="/LandingPage/LINES.webp"
             alt="Background Lines"
             fill
-            className="object-cover -z-10"
+            className="object-cover -z-10 opacity-50"
             loading="lazy"
             priority={false}
           />
