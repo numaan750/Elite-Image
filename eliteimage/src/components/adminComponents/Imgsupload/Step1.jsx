@@ -196,17 +196,17 @@ const Step1 = ({ formData, setFormData, next }) => {
     formData.featureType === "Watermark Remove";
 
   return (
-    <div className="bg-white px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-8">
+    <div className="bg-white py-10 sm:py-10 lg:py-10">
       <div className="flex items-center gap-3 text-gray-700">
-        <button className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors">
+        {/* <button className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors">
           <ChevronRight size={16} />
-        </button>
+        </button> */}
         <span className="font-medium text-black text-[16px] sm:text-[20px]">
           Elite Image Ai
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[24px] font-semibold text-black">
+      <h2 className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[32px] font-semibold text-black">
         Upload Images
       </h2>
       {formData.totalSteps > 0 && (
@@ -253,7 +253,7 @@ const Step1 = ({ formData, setFormData, next }) => {
               <span className="my-2 sm:my-3 text-[12px] sm:text-[16px] lg:text-[24px] text-[#034F75]">
                 Or
               </span>
-              <label className="rounded-lg bg-[#034F75] px-4 sm:px-5 lg:px-6 py-2 text-white text-[16px] sm:text-[20px] cursor-pointer hover:bg-[#023d5c] transition-colors">
+              <label className="rounded-lg bg-[#034F75] px-4 sm:px-5 lg:px-6 py-2 text-white text-[16px] sm:text-[18px] cursor-pointer hover:bg-[#023d5c] transition-colors">
                 {uploadingImage ? "Uploading..." : "Browse File"}
               </label>
               <p className="mt-3 sm:mt-4 text-[12px] sm:text-[24px] text-[#034F75] px-2">
@@ -281,6 +281,7 @@ const Step1 = ({ formData, setFormData, next }) => {
                     alt={`Uploaded ${idx + 1}`}
                     width={400}
                     height={350}
+                    quality={75}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className={`w-full ${
                       formData.uploadedImages.length === 1
@@ -354,7 +355,7 @@ const Step1 = ({ formData, setFormData, next }) => {
           <button
             onClick={next}
             disabled={formData.uploadedImages.length === 0}
-            className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[12px] sm:text-[20px] text-white hover:bg-[#023d5c] transition-colors ${
+            className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors ${
               formData.uploadedImages.length === 0
                 ? "opacity-50 cursor-not-allowed"
                 : ""

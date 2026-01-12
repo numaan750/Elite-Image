@@ -81,19 +81,19 @@ const Projects = () => {
   }
   return (
     <>
-      <h2 className="text-base sm:text-[26px] font-medium text-black px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
+      <h2 className="text-base sm:text-[20px] font-medium text-black py-10 sm:py-10">
         Eliteimage Ai
       </h2>
 
-      <div className="py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+      <div className="py-4 sm:py-6 lg:py-8 w-full">
         <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <h2 className="text-[20px] sm:text-[28px] lg:text-[40px] font-medium text-black">
+          <h2 className="text-[20px] sm:text-[32px] lg:text-[32px] font-medium text-black">
             My Projects
           </h2>
 
           <button
             onClick={getAiImages}
-            className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[20px] text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
+            className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[18px] text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
           >
             New Project
           </button>
@@ -122,7 +122,7 @@ const Projects = () => {
                   <p className="text-[16px] sm:text-[24px] font-medium text-black">
                     Project: {new Date(project.createdAt).toLocaleDateString()}
                   </p>
-                  <p className="text-[16px] sm:text-[24px] text-gray-600">
+                  <p className="text-[16px] sm:text-[18px] text-gray-600">
                     Multiple Image
                   </p>
                 </div>
@@ -130,7 +130,7 @@ const Projects = () => {
                 <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
                   <Link
                     href={`/admin/step4?mode=view&projectId=${project._id}`}
-                    className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
+                    className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
                   >
                     <Eye size={16} className="flex-shrink-0" />
                     <span className="whitespace-nowrap">View Results</span>
@@ -140,7 +140,7 @@ const Projects = () => {
                     href={`/admin/step4?mode=edit&projectId=${
                       project._id
                     }&featureType=${encodeURIComponent(project.featureType)}`}
-                    className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
+                    className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
                   >
                     <Pencil size={16} className="flex-shrink-0" />
                     <span className="whitespace-nowrap">Re-Edit</span>
@@ -149,7 +149,7 @@ const Projects = () => {
                   <button
                     onClick={() => handleDelete(project._id)}
                     disabled={deleteLoading === project._id}
-                    className="flex items-center cursor-pointer gap-2 rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center cursor-pointer gap-2 rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deleteLoading === project._id ? (
                       <Loader2

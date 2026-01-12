@@ -433,10 +433,10 @@ const Step4Page = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center py-10 sm:py-10 lg:py-10">
       <div className="w-full flex justify-start mb-4">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button
               onClick={() => router.back()}
               className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -449,7 +449,7 @@ const Step4Page = () => {
             >
               <ChevronRight size={16} />
             </button>
-          </div>
+          </div> */}
 
           <span className="font-medium text-black text-[16px] sm:text-[20px]">
             Elite Image AI -{" "}
@@ -459,7 +459,7 @@ const Step4Page = () => {
       </div>
 
       <div className="w-full mb-4 sm:mb-6 lg:mb-8">
-        <h2 className="text-[20px] sm:text-[24px] lg:text-[40px] font-semibold text-black">
+        <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
           {isViewMode
             ? "View Results"
             : isEditMode
@@ -469,10 +469,10 @@ const Step4Page = () => {
       </div>
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
-        <h3 className="text-[20px] sm:text-[24px] lg:text-[30px] font-semibold text-black mb-1">
+        <h3 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
-        <p className="text-[12px] sm:text-[16px] lg:text-[20px] text-black mb-3 sm:mb-4">
+        <p className="text-[12px] sm:text-[16px] lg:text-[18px] text-black mb-3 sm:mb-4">
           Drag the slider to compare original and enhanced versions
         </p>
 
@@ -578,23 +578,60 @@ const Step4Page = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-full sm:max-w-[820px] flex flex-col items-center mt-6 sm:mt-8 gap-3 sm:gap-4">
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full sm:w-auto">
+      <div
+        className="
+  w-full
+  max-w-full sm:max-w-[820px]
+  flex flex-col
+  items-center
+  mt-6 sm:mt-8
+  gap-4 sm:gap-5
+"
+      >
+        <div
+          className="
+  flex
+  flex-col sm:flex-row
+  w-full
+  justify-center
+  gap-2 sm:gap-3
+"
+        >
+          {" "}
           {!isViewMode && (
             <button
               onClick={() => {
                 router.push(`/admin/edit-project?projectId=${projectId}`);
               }}
-              className="flex items-center justify-center gap-2 border border-[#034F75] text-[12px] sm:text-[16px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
+              className="
+  w-full sm:w-auto
+  flex items-center justify-center gap-2
+  border border-[#034F75]
+  text-[16px] sm:text-[16px] lg:text-[18px]
+  px-4 sm:px-5
+  py-2.5 sm:py-3
+  rounded-lg
+  hover:bg-[#034F75] hover:text-white
+  transition-colors
+"
             >
               <TbEdit size={17} />
               Edit
             </button>
           )}
-
           <button
             onClick={() => alert("Share functionality coming soon!")}
-            className="flex items-center justify-center gap-2 border border-[#034F75] text-[12px] sm:text-[16px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
+            className="
+  w-full sm:w-auto
+  flex items-center justify-center gap-2
+  border border-[#034F75]
+  text-[16px] sm:text-[16px] lg:text-[18px]
+  px-4 sm:px-5
+  py-2.5 sm:py-3
+  rounded-lg
+  hover:bg-[#034F75] hover:text-white
+  transition-colors
+"
           >
             <IoShareSocial size={17} />
             Share Link
@@ -629,7 +666,13 @@ const Step4Page = () => {
           disabled={
             !formData.uploadedImages || formData.uploadedImages.length === 0
           }
-          className={`w-full sm:w-[280px] flex items-center justify-center gap-2 text-[12px] sm:text-[16px] py-2.5 sm:py-3 rounded-lg transition-colors
+          className={`
+  w-full sm:w-[280px]
+  flex items-center justify-center gap-2
+  text-[16px] sm:text-[18px]
+  py-2.5 sm:py-3
+  rounded-lg
+  transition-colors
   ${
     formData.uploadedImages && formData.uploadedImages.length > 0
       ? "bg-[#034F75] text-white hover:bg-[#023d5c] cursor-pointer"

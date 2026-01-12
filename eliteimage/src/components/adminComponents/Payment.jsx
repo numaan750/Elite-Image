@@ -90,12 +90,12 @@ export default function Payment() {
   };
 
   return (
-    <div className="flex items-start justify-start bg-white pt-6 sm:pt-8 lg:pt-10 px-4 sm:px-6 lg:px-10">
+    <div className="flex items-start justify-start bg-white pt-10 sm:pt-10 lg:pt-10">
       <div className="w-full max-w-xl">
-        <h3 className="text-[18px] sm:text-[28px] lg:text-[26px] font-semibold mb-4 sm:mb-6">
+        <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium mb-6 sm:mb-6">
           Eliteimage Ai
         </h3>
-        <h2 className="text-[18px] sm:text-[26px] lg:text-[32px] font-medium mb-6 sm:mb-10 lg:mb-12">
+        <h2 className="text-[18px] sm:text-[20px] lg:text-[32px] font-semibold mb-6 sm:mb-10 lg:mb-12">
           Final step, complete your payment
         </h2>
 
@@ -154,7 +154,7 @@ export default function Payment() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 sm:mt-6 w-full sm:w-auto rounded-md bg-[#034F75] px-8 sm:px-12 lg:px-14 py-2 sm:py-2.5 text-[#D3E7F0] font-medium text-[16px] sm:text-[22.83px] hover:bg-[#023a56] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-4 sm:mt-6 w-full sm:w-auto rounded-md bg-[#034F75] px-8 sm:px-12 lg:px-14 py-2 sm:py-2.5 text-[#D3E7F0] font-medium text-[16px] sm:text-[18px] hover:bg-[#023a56] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Processing..." : "Pay"}
           </button>

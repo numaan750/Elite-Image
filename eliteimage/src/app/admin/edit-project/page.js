@@ -154,10 +154,10 @@ const EditProjectPage = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center py-10 sm:py-10 lg:py-10">
       <div className="w-full flex justify-start">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button
               onClick={() => router.back()}
               className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -170,7 +170,7 @@ const EditProjectPage = () => {
             >
               <ChevronRight size={16} />
             </button>
-          </div>
+          </div> */}
 
           <span className="font-medium text-black text-[16px] sm:text-[20px]">
             Elite Image AI - Edit Mode
@@ -179,13 +179,13 @@ const EditProjectPage = () => {
       </div>
 
       <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
-        <h2 className="text-[20px] sm:text-[24px] lg:text-[40px] font-semibold text-black">
+        <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
           Edit Project
         </h2>
       </div>
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
-        <h3 className="text-[20px] sm:text-[24px] lg:text-[30px] font-semibold text-black mb-1">
+        <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
         <p className="text-[12px] sm:text-[16px] lg:text-[20px] text-black mb-3 sm:mb-4">
@@ -292,7 +292,7 @@ const EditProjectPage = () => {
       </div>
 
       <div className="w-full mt-6 sm:mt-8 lg:mt-10">
-        <label className="block text-[14px] sm:text-[18px] lg:text-[24px] font-medium text-black mb-2">
+        <label className="block text-[14px] sm:text-[18px] lg:text-[20px] font-medium text-black mb-2">
           Describe What You Can Edit
         </label>
 
@@ -307,10 +307,29 @@ const EditProjectPage = () => {
           />
         </div>
 
-        <div className="flex justify-center sm:justify-end mt-4 sm:mt-5 gap-3 w-full sm:w-auto">
+        <div
+          className="
+  flex flex-col sm:flex-row
+  w-full
+  justify-center sm:justify-end
+  items-stretch sm:items-center
+  gap-3 sm:gap-4
+  mt-4 sm:mt-6
+"
+        >
           <button
             onClick={() => router.back()}
-            className="flex items-center justify-center gap-2 bg-gray-300 text-black text-[14px] sm:text-[16px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-gray-400 transition-colors w-full sm:w-auto"
+            className="
+      w-full sm:w-auto
+      flex items-center justify-center gap-2
+      bg-gray-300 text-black
+      text-[16px] sm:text-[16px] lg:text-[18px]
+      px-4 sm:px-6
+      py-2.5 sm:py-3
+      rounded-lg
+      hover:bg-gray-400
+      transition-colors
+    "
           >
             Cancel
           </button>
@@ -318,15 +337,19 @@ const EditProjectPage = () => {
           <button
             onClick={handleGenerate}
             disabled={isSaving}
-            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[14px] sm:text-[16px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors w-full sm:w-auto
-              ${
-                isSaving
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#023d5c]"
-              }
-            `}
+            className={`
+      w-full sm:w-auto
+      flex items-center justify-center gap-2
+      bg-[#034F75] text-white
+      text-[16px] sm:text-[16px] lg:text-[18px]
+      px-4 sm:px-6
+      py-2.5 sm:py-3
+      rounded-lg
+      transition-colors
+      ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-[#023d5c]"}
+    `}
           >
-            <FaMagic size={15} className="sm:w-4 sm:h-4" />
+            <FaMagic size={16} />
             <span>{isSaving ? "Updating..." : "Update Project"}</span>
           </button>
         </div>

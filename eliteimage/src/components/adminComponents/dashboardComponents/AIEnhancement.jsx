@@ -53,16 +53,16 @@ const features = [
 
 const AIEnhancement = () => {
   return (
-    <div className="w-full">
-      <main className="bg-white px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    <div className="w-auto">
+      <main className="bg-white py-10 sm:py-10">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
           <div className="w-full lg:w-auto">
-            <h1 className="text-[16px] sm:text-[18px] lg:text-[20px] font-semibold text-black">
+            <h1 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium text-black">
               Eliteimage Ai
             </h1>
 
-            <h2 className="mt-4 sm:mt-6 lg:mt-10 text-[22px] sm:text-[26px] lg:text-[30px] font-semibold text-black leading-tight">
-              Welcome Back, Google User
+            <h2 className="mt-4 sm:mt-6 lg:mt-10 text-[22px] sm:text-[26px] lg:text-[32px] font-semibold text-black leading-tight">
+              Welcome Back, Google  User
             </h2>
 
             <p className="mt-2 text-black text-[14px] sm:text-[16px]">
@@ -83,14 +83,14 @@ const AIEnhancement = () => {
         </section>
       </main>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mt-6 sm:mt-8 px-4 sm:px-6 lg:px-8 pb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mt-6 sm:mt-8  pb-6">
         {features.map((item, index) => (
           <Link
             key={index}
             href={`/admin/uploadImage?type=${encodeURIComponent(item.title)}`}
           >
             <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
-              <div className="overflow-hidden rounded-t-2xl sm:rounded-t-3xl">
+              <div className="overflow-hidden rounded-t-2xl sm:rounded-t-3xl shrink-0">
                 <Image
                   src={item.Image}
                   alt={item.title}

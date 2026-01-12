@@ -143,9 +143,9 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-10">
+    <div className="w-full min-h-screen bg-white py-10 sm:py-10 lg:py-10">
       <div className="flex items-center gap-3 text-gray-700">
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <button
             onClick={back}
             className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -158,13 +158,13 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
           >
             <ChevronRight size={16} />
           </button>
-        </div>
-        <span className="font-medium text-black text-[16px] sm:text-[20px]">
+        </div> */}
+        <span className="font-medium text-black text-[16px] sm:text-[18px]">
           Elite Image Ai
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-6 lg:mt-9 mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[40px] font-semibold text-black">
+      <h2 className="mt-4 sm:mt-6 lg:mt-9 mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
         Edit Styles - {featureType}
       </h2>
       {formData.totalSteps > 0 && (
@@ -200,7 +200,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
               priority
             />
             <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 bg-white">
-              <span className="text-[15px] sm:text-[19.05px] font-medium text-gray-800 truncate pr-2">
+              <span className="text-[16px] sm:text-[18px] font-medium text-gray-800 truncate pr-2">
                 {item.name}
               </span>
               <input
@@ -214,17 +214,17 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         ))}
       </div>
 
-      <div className="mt-8 sm:mt-12 lg:mt-16 flex justify-center lg:justify-end gap-4">
+      <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center lg:justify-end gap-3 sm:gap-4">
         <button
           onClick={back}
-          className="flex items-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-gray-400 transition-colors"
+          className="flex items-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-gray-400 transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleGenerate}
           disabled={!selected || isSaving}
-          className={`flex items-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-[#023d5c] transition-colors ${
+          className={`flex items-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-[#023d5c] transition-colors ${
             !selected || isSaving ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

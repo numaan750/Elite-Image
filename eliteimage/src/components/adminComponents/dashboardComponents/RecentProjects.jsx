@@ -65,14 +65,14 @@ const RecentProjects = () => {
     );
   }
   return (
-    <div className="mt-6 sm:mt-10 lg:mt-14 px-4 sm:px-6 lg:px-8">
+    <div className="mt-10 sm:mt-12 lg:mt-14 ">
       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 className="text-lg sm:text-xl lg:text-[40px] font-medium text-black">
+        <h2 className="text-[20px] sm:text-[32px] lg:text-[32px] font-medium text-black">
           Recent Projects
         </h2>
 
         <Link href="/admin/projects">
-          <button className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[21.02px] text-white w-fit hover:bg-[#034F75] transition-colors">
+          <button className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[18px] text-white w-fit hover:bg-[#034F75] transition-colors">
             View All
           </button>
         </Link>
@@ -101,7 +101,7 @@ const RecentProjects = () => {
                 <p className="text-[16px] sm:text-[24px] font-medium text-black">
                   Project: {new Date(project.createdAt).toLocaleDateString()}
                 </p>
-                <p className="text-[16px] sm:text-[20px] text-gray-600">
+                <p className="text-[16px] sm:text-[18px] text-gray-600">
                   Multiple Image
                 </p>
               </div>
@@ -109,7 +109,7 @@ const RecentProjects = () => {
               <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
                 <Link
                   href={`/admin/step4?mode=view&projectId=${project._id}`}
-                  className="flex cursor-pointer items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
+                  className="flex cursor-pointer items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
                 >
                   <Eye size={16} className="flex-shrink-0" />
                   <span className="whitespace-nowrap">View Results</span>
@@ -119,7 +119,7 @@ const RecentProjects = () => {
                   href={`/admin/step4?mode=edit&projectId=${
                     project._id
                   }&featureType=${encodeURIComponent(project.featureType)}`}
-                  className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
+                  className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
                 >
                   <Pencil size={16} className="flex-shrink-0" />
                   <span className="whitespace-nowrap">Re-Edit</span>
@@ -128,7 +128,7 @@ const RecentProjects = () => {
                 <button
                   onClick={() => handleDelete(project._id)}
                   disabled={deleteLoading === project._id}
-                  className="flex items-center gap-2 cursor-pointer rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 cursor-pointer rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {deleteLoading === project._id ? (
                     <Loader2 size={16} className="animate-spin flex-shrink-0" />

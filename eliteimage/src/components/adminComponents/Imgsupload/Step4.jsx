@@ -86,45 +86,44 @@ const downloadImagesAsZip = async (formData) => {
       toast.success("Sky Replacement images saved!", { id: "processing" });
 
       if (formData.uploadedImages.length === 1) {
-  toast.loading("Downloading single image...", { id: "download" });
+        toast.loading("Downloading single image...", { id: "download" });
 
-  try {
-    const imageUrl = formData.uploadedImages[0];
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
+        try {
+          const imageUrl = formData.uploadedImages[0];
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
 
-    if (window.showSaveFilePicker) {
-      const fileHandle = await window.showSaveFilePicker({
-        suggestedName: "sky-replacement-image.jpg",
-        types: [
-          {
-            description: "Image",
-            accept: { "image/jpeg": [".jpg"], "image/png": [".png"] },
-          },
-        ],
-      });
+          if (window.showSaveFilePicker) {
+            const fileHandle = await window.showSaveFilePicker({
+              suggestedName: "sky-replacement-image.jpg",
+              types: [
+                {
+                  description: "Image",
+                  accept: { "image/jpeg": [".jpg"], "image/png": [".png"] },
+                },
+              ],
+            });
 
-      const writable = await fileHandle.createWritable();
-      await writable.write(blob);
-      await writable.close();
+            const writable = await fileHandle.createWritable();
+            await writable.write(blob);
+            await writable.close();
 
-      toast.success("Image downloaded!", { id: "download" });
-    } else {
-      // fallback
-      saveAs(blob, "sky-replacement-image.jpg");
-      toast.success("Image downloaded!", { id: "download" });
-    }
-  } catch (error) {
-    if (error.name === "AbortError") {
-      toast.error("Download cancelled", { id: "download" });
-    } else {
-      toast.error("Download failed!", { id: "download" });
-    }
-  }
+            toast.success("Image downloaded!", { id: "download" });
+          } else {
+            // fallback
+            saveAs(blob, "sky-replacement-image.jpg");
+            toast.success("Image downloaded!", { id: "download" });
+          }
+        } catch (error) {
+          if (error.name === "AbortError") {
+            toast.error("Download cancelled", { id: "download" });
+          } else {
+            toast.error("Download failed!", { id: "download" });
+          }
+        }
 
-  return;
-}
-
+        return;
+      }
 
       // ✅ MULTIPLE IMAGES - ZIP DOWNLOAD
       const zip = new JSZip();
@@ -201,44 +200,43 @@ const downloadImagesAsZip = async (formData) => {
       : [processedData];
 
     if (dataArray.length === 1) {
-  toast.loading("Downloading image...", { id: "download" });
+      toast.loading("Downloading image...", { id: "download" });
 
-  try {
-    const imageUrl = dataArray[0].processedImage;
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
+      try {
+        const imageUrl = dataArray[0].processedImage;
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
 
-    if (window.showSaveFilePicker) {
-      const fileHandle = await window.showSaveFilePicker({
-        suggestedName: "elite-image-ai.jpg",
-        types: [
-          {
-            description: "Image",
-            accept: { "image/jpeg": [".jpg"], "image/png": [".png"] },
-          },
-        ],
-      });
+        if (window.showSaveFilePicker) {
+          const fileHandle = await window.showSaveFilePicker({
+            suggestedName: "elite-image-ai.jpg",
+            types: [
+              {
+                description: "Image",
+                accept: { "image/jpeg": [".jpg"], "image/png": [".png"] },
+              },
+            ],
+          });
 
-      const writable = await fileHandle.createWritable();
-      await writable.write(blob);
-      await writable.close();
+          const writable = await fileHandle.createWritable();
+          await writable.write(blob);
+          await writable.close();
 
-      toast.success("Image downloaded!", { id: "download" });
-    } else {
-      saveAs(blob, "elite-image-ai.jpg");
-      toast.success("Image downloaded!", { id: "download" });
+          toast.success("Image downloaded!", { id: "download" });
+        } else {
+          saveAs(blob, "elite-image-ai.jpg");
+          toast.success("Image downloaded!", { id: "download" });
+        }
+      } catch (error) {
+        if (error.name === "AbortError") {
+          toast.error("Download cancelled", { id: "download" });
+        } else {
+          toast.error("Download failed!", { id: "download" });
+        }
+      }
+
+      return;
     }
-  } catch (error) {
-    if (error.name === "AbortError") {
-      toast.error("Download cancelled", { id: "download" });
-    } else {
-      toast.error("Download failed!", { id: "download" });
-    }
-  }
-
-  return;
-}
-
 
     const zip = new JSZip();
     const folder = zip.folder("Elite-Image-AI");
@@ -544,12 +542,12 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center py-10 sm:py-10 lg:py-10">
       {/* <Toaster position="top-right" reverseOrder={false} /> */}
 
       <div className="w-full flex justify-start">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button
               onClick={back}
               className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -562,22 +560,22 @@ const Step4 = ({ formData, setFormData, next, back }) => {
             >
               <ChevronRight size={16} />
             </button>
-          </div>
+          </div> */}
 
-          <span className="font-medium text-black text-[16px] sm:text-[20px]">
+          <span className="font-medium text-black text-[16px] sm:text-[18px]">
             Elite Image Ai
           </span>
         </div>
       </div>
 
       <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
-        <h2 className="text-[20px] sm:text-[24px] lg:text-[40px] font-semibold text-black">
+        <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
           Processing Complete
         </h2>
       </div>
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
-        <h3 className="text-[20px] sm:text-[24px] lg:text-[30px] font-semibold text-black mb-1">
+        <h3 className="text-[18px] sm:text-[24px] lg:text-[28px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
         <p className="text-[12px] sm:text-[16px] lg:text-[20px] text-black mb-3 sm:mb-4">
@@ -603,7 +601,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
                 <div className="flex flex-col gap-3 sm:gap-4">
                   <div
-                    className="relative w-full aspect-video bg-gray-100 rounded-lg overflow-hidden cursor-ew-resize select-none"
+                    className="relative w-full h-[220px] sm:h-[300px] lg:h-[400px] bg-gray-100 rounded-lg overflow-hidden cursor-ew-resize select-none"
                     onMouseMove={(e) => {
                       if (isDragging !== index) return;
                       const rect = e.currentTarget.getBoundingClientRect();
@@ -631,7 +629,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                         alt={`Before ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-cover"
+                        className="object-contain"
                         priority
                       />
                     </div>
@@ -655,7 +653,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                         alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-cover"
+                        className="object-contain "
                         priority
                       />
                     </div>
@@ -693,7 +691,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full sm:w-auto">
           <button
             onClick={next}
-            className="flex items-center justify-center gap-2 border border-[#034F75] text-[12px] sm:text-[16px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
+            className="flex items-center justify-center gap-2 border border-[#034F75] text-[16px] sm:text-[18px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
           >
             <TbEdit size={17} className="sm:w-[18px] sm:h-[18px]" />
             Edit
@@ -701,7 +699,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
           <button
             onClick={handleShare}
-            className="flex items-center justify-center gap-2 border border-[#034F75] text-[12px] sm:text-[16px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
+            className="flex items-center justify-center gap-2 border border-[#034F75] text-[16px] sm:text-[18px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
           >
             <IoShareSocial size={17} className="sm:w-[18px] sm:h-[18px]" />
             Share Link
@@ -749,7 +747,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                 (!Array.isArray(formData.beforeAfterData) &&
                   !formData.beforeAfterData.processedImage)
           }
-          className={`w-full sm:w-[280px] flex items-center justify-center gap-2 text-[12px] sm:text-[16px] py-2.5 sm:py-3 rounded-lg transition-colors
+          className={`w-full sm:w-[280px] flex items-center justify-center gap-2 text-[16px] sm:text-[18px] py-2.5 sm:py-3 rounded-lg transition-colors
     ${
       (formData.featureType === "Sky Replacement" &&
         formData.uploadedImages.length > 0) ||
@@ -778,6 +776,19 @@ const Step4 = ({ formData, setFormData, next, back }) => {
               : "No Images"}
           </span>
         </button>
+        {/* Bottom Back Button */}
+        <div className="w-full flex justify-start mt-6 sm:mt-8">
+          <button
+            onClick={back}
+            className="flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 
+    border border-[#034F75] rounded-lg 
+    text-[14px] sm:text-[16px] text-[#034F75]
+    hover:bg-[#034F75] hover:text-white transition-colors"
+          >
+            <ChevronLeft size={18} />
+            <span>Back</span>
+          </button>
+        </div>
       </div>
     </div>
   );

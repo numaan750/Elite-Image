@@ -48,9 +48,9 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
+    <div className="w-full min-h-screen bg-white py-10 sm:py-10 lg:py-10">
       <div className="flex items-center gap-3 text-gray-700">
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <button
             onClick={back}
             className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -63,17 +63,17 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
           >
             <ChevronRight size={16} />
           </button>
-        </div>
+        </div> */}
         <span className="font-medium text-black text-[16px] sm:text-[20px]">
           Elite Image AI
         </span>
       </div>
-      <h2 className="mt-4 sm:mt-5 mb-4 sm:mb-6 text-[20px] sm:text-[30px] lg:text-[40px] font-semibold text-gray-900">
+      <h2 className="mt-4 sm:mt-5 mb-4 sm:mb-6 text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-gray-900">
         Select Furniture Type
       </h2>
-        {formData.totalSteps > 0 && (
-      <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-        {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
+      {formData.totalSteps > 0 && (
+        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+          {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#CFE8F2]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#CFE8F2]" />
@@ -84,8 +84,8 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#D3E7F0]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" /> */}
-        <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
-      </div>
+          <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
+        </div>
       )}
 
       {/* Furniture Options Grid */}
@@ -126,21 +126,50 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
         ))}
       </div>
 
-
-      <div className="mt-8 sm:mt-10 lg:mt-12 flex justify-center lg:justify-end gap-4 max-w-7xl mx-auto">
-
+      <div
+        className="
+    mt-8 sm:mt-10 lg:mt-12
+    flex flex-col sm:flex-row
+    items-stretch sm:items-center
+    justify-center sm:justify-center lg:justify-end
+    gap-3 sm:gap-4
+    max-w-7xl mx-auto px-4
+  "
+      >
+        {/* Back Button */}
         <button
           onClick={back}
-          className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-black text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors"
+          className="
+      w-full sm:w-auto
+      flex items-center justify-center gap-2
+      bg-gray-300 hover:bg-gray-400
+      text-black
+      text-[14px] sm:text-[16px] lg:text-[18px]
+      px-4 sm:px-6 lg:px-8
+      py-2.5 sm:py-3
+      rounded-lg
+      transition-colors
+    "
         >
           Back
         </button>
+
+        {/* Generate Button */}
         <button
           onClick={handleContinue}
           disabled={!selectedFurniture}
-          className={`flex items-center gap-2 bg-[#034F75] hover:bg-[#023a5c] text-white text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors ${
-            !selectedFurniture ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`
+      w-full sm:w-auto
+      flex items-center justify-center gap-2
+      bg-[#034F75] hover:bg-[#023a5c]
+      text-white
+      text-[14px] sm:text-[16px] lg:text-[18px]
+      px-4 sm:px-6 lg:px-8
+      py-2.5 sm:py-3
+      rounded-lg
+      transition-colors
+      ${!selectedFurniture ? "opacity-50 cursor-not-allowed" : ""}
+    `}
         >
           Generate Now
         </button>

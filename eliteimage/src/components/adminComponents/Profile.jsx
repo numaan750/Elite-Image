@@ -91,17 +91,17 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-white px-6 sm:px-10 py-7">
+    <div className="min-h-screen bg-white py-10 sm-py-12">
       <Toaster position="top-right" />
-      <h3 className="text-[16px] sm:text-[26px] font-semibold mb-6 sm:mb-15">
+      <h3 className="text-[16px] sm:text-[20px] font-semibold mb-6 sm:mb-15">
         Eliteimage Ai
       </h3>
-      <h2 className="text-[18px] sm:text-[32px] font-medium mb-6 sm:mb-8">
+      <h2 className="text-[20px] sm:text-[32px] font-semibold mb-6 sm:mb-8">
         Account Settings
       </h2>
       <div className="max-w-full sm:max-w-3xl space-y-6 sm:space-y-10">
         <div className="rounded-lg bg-[#D3E7F0] p-4 sm:p-6">
-          <h3 className="font-normal mb-4 text-[18px] sm:text-[26px]">Personal Information</h3>
+          <h3 className="font-normal mb-4 text-[18px] sm:text-[24px]">Personal Information</h3>
 
           <div className="space-y-4">
             <div>
@@ -140,7 +140,7 @@ export default function Profile() {
               type="submit"
               onClick={handleProfileUpdate}
               disabled={loading}
-              className="mt-2 sm:mt-4 w-full sm:w-auto rounded-md bg-[#034F75] px-3 sm:px-4 py-2 sm:py-2.5 text-[16px] sm:text-[20px] font-medium text-white hover:bg-[#023a5a] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-2 sm:mt-4 w-full sm:w-auto rounded-md bg-[#034F75] px-3 sm:px-4 py-2 sm:py-2.5 text-[16px] sm:text-[18px] font-medium text-white hover:bg-[#023a5a] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Saving..." : "Save Changes"}
             </button>
@@ -148,7 +148,7 @@ export default function Profile() {
         </div>
 
         <div className="rounded-lg bg-[#D3E7F0] p-6">
-          <h2 className="font-normal mb-4 text-[20px] sm:text-[26px]">Change Password</h2>
+          <h2 className="font-normal mb-4 text-[20px] sm:text-[24px]">Change Password</h2>
 
           <div className="space-y-3 sm:space-y-4">
             <div>
@@ -207,7 +207,7 @@ export default function Profile() {
               type="submit"
               onClick={handlePasswordUpdate}
               disabled={loading}
-              className="mt-2 sm:mt-4 w-full sm:w-auto rounded-md bg-[#034F75] px-3 sm:px-4 py-2 sm:py-2.5 text-[14px] sm:text-[16px] font-medium text-white hover:bg-[#023a5a] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-2 sm:mt-4 w-full sm:w-auto rounded-md bg-[#034F75] px-3 sm:px-4 py-2 sm:py-2.5 text-[14px] sm:text-[18px] font-medium text-white hover:bg-[#023a5a] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Updating..." : "Update Password"}
             </button>

@@ -106,10 +106,10 @@ const Step5 = ({ formData, setFormData, back }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center py-10 sm:py-10 lg:py-10">
       <div className="w-full flex justify-start">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button
               onClick={back}
               className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -119,7 +119,7 @@ const Step5 = ({ formData, setFormData, back }) => {
             <button className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors">
               <ChevronRight size={16} />
             </button>
-          </div>
+          </div> */}
 
           <span className="font-medium text-black text-[16px] sm:text-[20px]">
             Elite Image Ai
@@ -128,16 +128,16 @@ const Step5 = ({ formData, setFormData, back }) => {
       </div>
 
       <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
-        <h2 className="text-[20px] sm:text-[24px] lg:text-[40px] font-semibold text-black">
+        <h2 className="text-[20px] sm:text-[20px] lg:text-[32px] font-semibold text-black">
           Processing Complete
         </h2>
       </div>
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
-        <h3 className="text-[20px] sm:text-[24px] lg:text-[30px] font-semibold text-black mb-1">
+        <h3 className="text-[20px] sm:text-[10px] lg:text-[28px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
-        <p className="text-[12px] sm:text-[16px] lg:text-[20px] text-black mb-3 sm:mb-4">
+        <p className="text-[12px] sm:text-[16px] lg:text-[18px] text-black mb-3 sm:mb-4">
           Drag the slider to compare original and enhanced versions
         </p>
 
@@ -146,7 +146,7 @@ const Step5 = ({ formData, setFormData, back }) => {
             className={`w-full ${
               formData.uploadedImages.length === 1
                 ? "flex flex-col gap-4 sm:gap-6"
-                : "grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6"
+                : "grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 gap-4 sm:gap-6"
             }`}
           >
             {formData.uploadedImages.map((img, index) => (
@@ -160,7 +160,8 @@ const Step5 = ({ formData, setFormData, back }) => {
 
                 <div className="flex flex-col gap-3 sm:gap-4">
                   <div
-                    className="relative w-full aspect-video bg-gray-100 rounded-lg overflow-hidden cursor-ew-resize select-none"
+                    className="relative w-full h-[220px] sm:h-[300px] lg:h-[420px]
+ bg-gray-100 rounded-lg overflow-hidden cursor-ew-resize select-none"
                     onMouseMove={(e) => {
                       if (isDragging !== index) return;
                       const rect = e.currentTarget.getBoundingClientRect();
@@ -189,7 +190,7 @@ const Step5 = ({ formData, setFormData, back }) => {
                         alt={`Before ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-cover"
+                        className="object-contain"
                         priority
                       />
                     </div>
@@ -208,7 +209,7 @@ const Step5 = ({ formData, setFormData, back }) => {
                         alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-cover"
+                        className="object-contain"
                         priority
                       />
                     </div>
@@ -221,7 +222,7 @@ const Step5 = ({ formData, setFormData, back }) => {
                       {/* Slider Handle */}
                       <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                        w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
+                        w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow-xl flex items-center justify-center
                         cursor-ew-resize border-2 border-[#034F75]"
                         onMouseDown={() => setIsDragging(index)}
                         onTouchStart={() => setIsDragging(index)}
@@ -231,10 +232,10 @@ const Step5 = ({ formData, setFormData, back }) => {
                     </div>
 
                     {/* Labels */}
-                    <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[14px] px-3 py-1.5 rounded z-20">
+                    <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[12px] px-3 py-1.5 rounded z-20">
                       Before
                     </div>
-                    <div className="absolute top-2 right-2 bg-[#034F75] text-white text-[14px] px-3 py-1.5 rounded z-20">
+                    <div className="absolute top-2 right-2 bg-[#034F75] text-white text-[12px] px-3 py-1.5 rounded z-20">
                       After
                     </div>
                   </div>
@@ -246,7 +247,7 @@ const Step5 = ({ formData, setFormData, back }) => {
       </div>
 
       <div className="w-full mt-6 sm:mt-8 lg:mt-10">
-        <label className="block text-[14px] sm:text-[18px] lg:text-[24px] font-medium text-black mb-2">
+        <label className="block text-[16px] sm:text-[20px] lg:text-[20px] font-medium text-black mb-2">
           Describe What You Can Edit
         </label>
 
@@ -256,7 +257,7 @@ const Step5 = ({ formData, setFormData, back }) => {
             onChange={(e) => setEditDescription(e.target.value)}
             placeholder="Enter Here"
             className="w-full h-20 sm:h-24 lg:h-28 resize-none rounded border-none bg-transparent 
-            text-[14px] sm:text-[20px] text-gray-800 placeholder:text-gray-400
+            text-[14px] sm:text-[18px] text-gray-800 placeholder:text-gray-400
             focus:outline-none"
           />
         </div>
@@ -265,7 +266,7 @@ const Step5 = ({ formData, setFormData, back }) => {
           {/* Back Button */}
           <button
             onClick={back} // ya router.back() agar browser history chahiye
-            className="flex items-center justify-center gap-2 bg-gray-300 text-black text-[14px] sm:text-[16px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-gray-400 transition-colors w-full sm:w-auto"
+            className="flex items-center justify-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-gray-400 transition-colors w-full sm:w-auto"
           >
             Back
           </button>
@@ -274,7 +275,7 @@ const Step5 = ({ formData, setFormData, back }) => {
           <button
             onClick={handleGenerate}
             disabled={isSaving}
-            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[14px] sm:text-[16px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors w-full sm:w-auto
+            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors w-full sm:w-auto
     ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-[#023d5c]"}
   `}
           >

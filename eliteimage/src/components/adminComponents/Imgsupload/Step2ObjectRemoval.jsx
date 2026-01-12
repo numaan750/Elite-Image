@@ -184,9 +184,9 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
+    <div className="w-full min-h-screen bg-white py-10 sm:py-10 lg:py-10">
       <div className="flex items-center gap-3 text-gray-700">
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <button
             onClick={back}
             className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -199,13 +199,13 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           >
             <ChevronRight size={16} />
           </button>
-        </div>
+        </div> */}
         <span className="font-medium text-black text-[18px] sm:text-[20px]">
           Elite Image AI
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-5 mb-2 text-[24px] sm:text-[30px] lg:text-[40px] font-semibold text-gray-900">
+      <h2 className="mt-4 sm:mt-5 mb-2 text-[20px] sm:text-[28px] lg:text-[32px] font-semibold text-gray-900">
         Object Removal Options
       </h2>
 
@@ -217,9 +217,9 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
       <div className="mt-6 sm:mt-8 lg:mt-10 ">
         <div className="bg-[#D3E7F0] border-2 border-[#6FB6D6] rounded-2xl p-4 sm:p-6">
-          <div className="mt-4 text-start">
+          <div className="text-start mb-5">
             <p
-              className="text-[20px] sm:text-[30px] text-black
+              className="text-[18px] sm:text-[20px] text-black
               font-medium mb-2"
             >
               {totalSelectedObjects === 0
@@ -295,45 +295,84 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         </div>
       </div>
 
-      <div className="mt-8 sm:mt-10 lg:mt-12 flex justify-center lg:justify-end gap-3 max-w-4xl mx-auto">
+      <div
+        className="
+  mt-8 sm:mt-10 lg:mt-12 
+  flex flex-col sm:flex-row 
+  items-stretch sm:items-center
+  justify-center sm:justify-center lg:justify-end 
+  gap-3 
+  max-w-4xl mx-auto px-3
+"
+      >
+        {/* Back Button */}
         <button
           onClick={back}
-          className="px-6 sm:px-8 py-2.5 sm:py-3 text-[16px] sm:text-[20px] border-2 border-gray-400 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          className="
+      w-full sm:w-auto
+      px-4 sm:px-6 lg:px-8 
+      py-2.5 sm:py-3 
+      text-[14px] sm:text-[16px] lg:text-[18px] 
+      border-2 border-gray-400 
+      text-gray-700 
+      rounded-lg 
+      hover:bg-gray-100 
+      transition-colors
+    "
         >
           Back
         </button>
 
-        {selectedAreas[activeImageIndex] &&
-          selectedAreas[activeImageIndex].length > 0 && (
-            <button
-              onClick={() => {
-                setSelectedAreas((prev) => ({
-                  ...prev,
+        {/* Clear Selection */}
+        {selectedAreas[activeImageIndex]?.length > 0 && (
+          <button
+            onClick={() => {
+              setSelectedAreas((prev) => ({
+                ...prev,
+                [activeImageIndex]: [],
+              }));
+              setFormData((prev) => ({
+                ...prev,
+                selectedObjectAreas: {
+                  ...(prev.selectedObjectAreas || {}),
                   [activeImageIndex]: [],
-                }));
-                setFormData((prev) => ({
-                  ...prev,
-                  selectedObjectAreas: {
-                    ...(prev.selectedObjectAreas || {}),
-                    [activeImageIndex]: [],
-                  },
-                }));
-              }}
-              className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-[#034F75] text-[#034F75] rounded-lg"
-            >
-              Clear All Selections
-            </button>
-          )}
+                },
+              }));
+            }}
+            className="
+        w-full sm:w-auto
+        px-4 sm:px-6 lg:px-8 
+        py-2.5 sm:py-3 
+        text-[14px] sm:text-[16px] lg:text-[18px]
+        border-2 border-[#034F75] 
+        text-[#034F75] 
+        rounded-lg 
+        hover:bg-[#034F75] hover:text-white
+        transition-colors
+      "
+          >
+            Clear All Selections
+          </button>
+        )}
+
+        {/* Remove Object */}
         <button
           onClick={handleRemoveObject}
           disabled={!allImagesHaveSelection}
-          className={`flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 
-  text-[16px] sm:text-[20px] rounded-lg transition-colors
-  ${
-    allImagesHaveSelection
-      ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
-      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-  }`}
+          className={`
+      w-full sm:w-auto
+      flex items-center justify-center gap-2
+      px-4 sm:px-6 lg:px-8 
+      py-2.5 sm:py-3 
+      text-[14px] sm:text-[16px] lg:text-[18px]
+      rounded-lg 
+      transition-colors
+      ${
+        allImagesHaveSelection
+          ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
+          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+      }
+    `}
         >
           Remove Object
         </button>
