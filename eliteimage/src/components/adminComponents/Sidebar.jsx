@@ -38,7 +38,7 @@ export default function Sidebar() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#D3E7F0] w-full rounded-md"
+        className="lg:hidden fixed z-50 p-3 bg-[#D3E7F0] w-full"
       >
         <Menu size={24} />
       </button>
@@ -52,11 +52,13 @@ export default function Sidebar() {
 
       <aside
         className={`
-          fixed top-0 left-0 z-50 h-screen w-64 bg-[#D3E7F0] p-6
-          transform transition-transform duration-300
-          ${open ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0 lg:static
-        `}
+    fixed top-0 left-0 z-50 h-screen w-64
+    bg-[#D3E7F0] p-6
+    flex flex-col
+    transform transition-transform duration-300
+    ${open ? "translate-x-0" : "-translate-x-full"}
+    lg:translate-x-0 lg:static
+  `}
       >
         <div className="flex items-center justify-between mb-12">
           <h2 className="text-[24px] font-semibold">Logo</h2>
@@ -88,22 +90,22 @@ export default function Sidebar() {
           onClick={() => {
             logoutUser();
             toast.success("Logged out successfully ✅");
-            setOpen(false); // mobile sidebar close
+            setOpen(false);
           }}
           className="
-             mt-60
-             flex items-center justify-start gap-3
-             w-full
-             bg-[#D30000]
-            
-             text-white
-             px-4
-             py-2.5
-             rounded-lg
-             text-[16px]
-             font-medium         
-             transition-colors cursor-pointer
-              "
+    mt-auto
+    flex items-center gap-3
+    w-full
+    bg-[#D30000]
+    text-white
+    px-4
+    py-2.5
+    rounded-lg
+    text-[16px]
+    font-medium
+    transition-colors
+    hover:bg-[#b00000]
+  "
         >
           <LogOut size={18} />
           Logout
