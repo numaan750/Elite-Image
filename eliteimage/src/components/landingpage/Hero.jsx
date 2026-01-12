@@ -68,7 +68,7 @@ const Hero = () => {
         </div>
       </section>
 
-      <div className="mycontainer mt-[40px] sm:mt-[50px] lg:mt-[60px] flex justify-center">
+      <div className="mycontainer mt-[40px] sm:mt-[50px] lg:mt-[60px] pb-10 flex justify-center">
         <div className="relative w-full max-w-[1440px] h-[300px] sm:h-[400px] lg:h-[500px] rounded-[16px] sm:rounded-[20px] lg:rounded-[24px] overflow-hidden shadow-lg">
           <div className="grid grid-cols-2 h-full">
             <div className="relative">

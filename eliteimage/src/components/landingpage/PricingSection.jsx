@@ -123,7 +123,7 @@ export default function PricingSection() {
             </button>
           </div>
 
-          <div className="bg-[#034F75] rounded-3xl p-8 lg:py-12 shadow-lg lg:scale-105 relative">
+          <div className="bg-[#034F75] rounded-3xl p-8 lg:py-8 shadow-lg lg:scale-100 relative">
             <div className="flex justify-center mb-3">
               <span className="px-6 py-2 bg-[#034F75] bg-opacity-20 rounded-xl text-white font-bold border border-[#FFFFFF] border-opacity-30">
                 Pro
