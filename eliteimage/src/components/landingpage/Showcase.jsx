@@ -30,10 +30,10 @@ const Showcase = () => {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-white/80 z-20" />
 
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1f6b8f] flex items-center justify-center">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 rounded-full bg-[#1f6b8f] flex items-center justify-center">
                 <div className="flex items-center justify-center text-white">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -47,7 +47,7 @@ const Showcase = () => {
                   </svg>
 
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -73,10 +73,10 @@ const Showcase = () => {
             />
 
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1f6b8f] flex items-center justify-center">
+              <div className="relative w-12 h-12 sm:w-14 sm:h- md:w-12 md:h-12 rounded-full bg-[#1f6b8f] flex items-center justify-center">
                 <div className="flex items-center justify-center text-white">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -90,7 +90,7 @@ const Showcase = () => {
                   </svg>
 
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -117,10 +117,10 @@ const Showcase = () => {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-white/80 z-20" />
 
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1f6b8f] flex items-center justify-center">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 rounded-full bg-[#1f6b8f] flex items-center justify-center">
                 <div className="flex items-center justify-center text-white">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -134,7 +134,7 @@ const Showcase = () => {
                   </svg>
 
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -160,10 +160,10 @@ const Showcase = () => {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-white/80 z-20" />
 
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1f6b8f] flex items-center justify-center">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 rounded-full bg-[#1f6b8f] flex items-center justify-center">
                 <div className="flex items-center justify-center text-white">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -177,7 +177,7 @@ const Showcase = () => {
                   </svg>
 
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -204,10 +204,10 @@ const Showcase = () => {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-white/80 z-20" />
 
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1f6b8f] flex items-center justify-center">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 rounded-full bg-[#1f6b8f] flex items-center justify-center">
                 <div className="flex items-center justify-center text-white">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -221,7 +221,7 @@ const Showcase = () => {
                   </svg>
 
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -247,10 +247,10 @@ const Showcase = () => {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[3px] h-full bg-white/80 z-20" />
 
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-[#1f6b8f] flex items-center justify-center">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 rounded-full bg-[#1f6b8f] flex items-center justify-center">
                 <div className="flex items-center justify-center text-white">
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
@@ -264,7 +264,7 @@ const Showcase = () => {
                   </svg>
 
                   <svg
-                    className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"
+                    className="w-5 h-5 sm:w-5 sm:h-5 md:w-6 md:h-6"
                     viewBox="0 0 24 24"
                     fill="none"
                   >
