@@ -57,7 +57,7 @@ const Footer = () => {
                   onClick={(e) => handleScroll(e, "growers")}
                   className="hover:text-gray-300 transition-colors cursor-pointer"
                 >
-                  Growers
+                  privacy policy
                 </a>
               </li>
               <li>
@@ -66,7 +66,7 @@ const Footer = () => {
                   onClick={(e) => handleScroll(e, "merchants")}
                   className="hover:text-gray-300 transition-colors cursor-pointer"
                 >
-                  Merchants
+                  terms and conditions
                 </a>
               </li>
               <li>
