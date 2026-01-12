@@ -200,7 +200,7 @@ const Hero = () => {
 
           {/* Draggable Handle */}
           <div
-            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#034F75] w-12 h-12 sm:w-[40px] sm:h-[40px] lg:w-[44px] lg:h-[44px] rounded-full flex items-center justify-center z-30 shadow-lg cursor-ew-resize hover:scale-110 transition-transform active:scale-95"
+            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#034F75] w-10 h-10 sm:w-[40px] sm:h-[40px] lg:w-[44px] lg:h-[44px] rounded-full flex items-center justify-center z-3 shadow-lg cursor-ew-resize hover:scale-110 transition-transform active:scale-95"
             style={{ left: `${sliderPosition}%` }}
             onMouseDown={handleMouseDown}
             onTouchStart={handleMouseDown}

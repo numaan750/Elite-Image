@@ -19,7 +19,7 @@ const Testimonials = () => {
           </div>
 
           <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="border-2 border-[#034F75] rounded-3xl p-8 bg-white">
+            <div className="border-1 border-[#034F75] rounded-3xl p-8 bg-white">
               <div className="flex items-center gap-3 mb-4">
                 <UserCircleIcon className="w-12 h-12 text-[#034F75]" />
                 <h3 className="text-[20px] font-semibold text-black">
@@ -36,7 +36,7 @@ const Testimonials = () => {
               </div>
             </div>
 
-            <div className="border-2 border-[#034F75] rounded-3xl p-8 bg-white">
+            <div className="border-1 border-[#034F75] rounded-3xl p-8 bg-white">
               <div className="flex items-center gap-3 mb-4">
                 <UserCircleIcon className="w-12 h-12 text-[#034F75]" />
                 <h3 className="text-[20px] font-semibold text-black">
