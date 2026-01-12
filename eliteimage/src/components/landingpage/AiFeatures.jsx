@@ -91,7 +91,7 @@ const AiFeatures = () => {
           {features.map((item, index) => (
             <div
               key={index}
-              className="bg-[#D3E7F0] rounded-3xl cursor-pointer "
+              className="bg-[#D3E7F0] rounded-3xl cursor-pointer hover:shadow-lg transition-shadow duration-300"
               onClick={() => handleFeatureClick(item.route)}
             >
               <div className="overflow-hidden">
