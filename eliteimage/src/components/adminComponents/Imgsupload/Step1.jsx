@@ -21,7 +21,6 @@ const Step1 = ({ formData, setFormData, next }) => {
   //   error: (msg) => console.error(msg),
   // };
 
-  // ✅ NEW FUNCTION: Generate & Save for Straighten and Watermark Remove
   const handleGenerateAndSave = async () => {
     if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
       toast.error("Please upload at least one image first!");
@@ -47,8 +46,6 @@ const Step1 = ({ formData, setFormData, next }) => {
 
         console.log(`📤 [${i + 1}] Processing ${formData.featureType}...`);
 
-        // ✅ For Straighten and Watermark Remove, use uploaded image as is
-        // Backend will handle actual processing
         const processedImageUrl = uploadedImage;
 
         const processedData = {
@@ -77,14 +74,11 @@ const Step1 = ({ formData, setFormData, next }) => {
         };
         allBackendPayloads.push(backendPayload);
       }
-
-      // ✅ Update formData with processed images
       setFormData((prev) => ({
         ...prev,
         beforeAfterData: allProcessedData,
       }));
 
-      // ✅ Save to backend
       if (formData.projectId) {
         await saveGeneratedImage(
           allBackendPayloads[0],
@@ -99,8 +93,6 @@ const Step1 = ({ formData, setFormData, next }) => {
           id: "processing",
         });
       }
-
-      // ✅ Move to Step 4 (Processing/Download page)
       next();
     } catch (error) {
       console.error("❌ Error:", error);
@@ -199,7 +191,6 @@ const Step1 = ({ formData, setFormData, next }) => {
     }));
   };
 
-  // ✅ Determine which button to show
   const isSpecialFeature =
     formData.featureType === "Straighten" ||
     formData.featureType === "Watermark Remove";
@@ -218,7 +209,7 @@ const Step1 = ({ formData, setFormData, next }) => {
       <h2 className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[24px] font-semibold text-black">
         Upload Images
       </h2>
-
+      {formData.totalSteps > 0 && (
       <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
         {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#034F75]" />
@@ -229,6 +220,7 @@ const Step1 = ({ formData, setFormData, next }) => {
 
         <ProgressBar currentStep={1} totalSteps={formData.totalSteps} />
       </div>
+      )}
 
       <div className="mt-6 sm:mt-8 lg:mt-10 rounded-2xl border border-[#6FB6D6] bg-[#D3E7F0] p-3 sm:p-4 min-h-[250px] sm:min-h-[300px] lg:min-h-[400px]">
         <div
@@ -299,7 +291,7 @@ const Step1 = ({ formData, setFormData, next }) => {
                   />
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // ✅ ADD THIS
+                      e.stopPropagation();
                       handleRemoveImage(idx);
                     }}
                     className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 cursor-pointer text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -315,7 +307,7 @@ const Step1 = ({ formData, setFormData, next }) => {
             type="file"
             className="hidden"
             accept="image/*"
-            multiple // ✅ ADD THIS LINE
+            multiple
             onChange={handleFileUpload}
             disabled={uploadingImage}
           />
@@ -344,25 +336,21 @@ const Step1 = ({ formData, setFormData, next }) => {
           ))}
         </div>
       )} */}
-
-      {/* ✅ UPDATED BUTTONS SECTION */}
       <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-center sm:justify-end gap-3">
         {isSpecialFeature ? (
-          // ✅ Show "Generate & Save" button for Straighten and Watermark Remove
           <button
             onClick={handleGenerateAndSave}
             disabled={formData.uploadedImages.length === 0 || isSaving}
             className={`flex items-center gap-2 rounded-lg px-5 sm:px-6 py-2 text-[12px] sm:text-[20px] text-white transition-colors ${
               formData.uploadedImages.length === 0 || isSaving
                 ? "bg-gray-300 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
+                : "bg-[#034F75]"
             }`}
           >
-            {isSaving ? "Saving..." : "Generate & Save"}
+            {isSaving ? "Saving..." : "Generate Now "}
             <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
           </button>
         ) : (
-          // ✅ Show normal "Continue" button for other features
           <button
             onClick={next}
             disabled={formData.uploadedImages.length === 0}

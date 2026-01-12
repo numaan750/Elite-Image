@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
 
-// Virtual Staging ke furniture types
 const FURNITURE_TYPES = [
   { name: "Modern Furniture", img: "/projects/Visual/Furniture-Styles-1.webp" },
   { name: "Contemporary", img: "/projects/Visual/Furniture-Styles-2.webp" },
@@ -50,7 +49,6 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
 
   return (
     <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
-      {/* Header */}
       <div className="flex items-center gap-3 text-gray-700">
         <div className="flex items-center gap-2">
           <button
@@ -70,13 +68,10 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
           Elite Image AI
         </span>
       </div>
-
-      {/* Title */}
       <h2 className="mt-4 sm:mt-5 mb-4 sm:mb-6 text-[20px] sm:text-[30px] lg:text-[40px] font-semibold text-gray-900">
         Select Furniture Type
       </h2>
-
-      {/* Progress Bar - Step 3 of 6 */}
+        {formData.totalSteps > 0 && (
       <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
         {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#CFE8F2]" />
@@ -91,6 +86,7 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" /> */}
         <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
       </div>
+      )}
 
       {/* Furniture Options Grid */}
       <div className="mt-6 sm:mt-8 lg:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-7xl mx-auto">
@@ -130,17 +126,15 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
         ))}
       </div>
 
-      {/* Continue Button */}
+
       <div className="mt-8 sm:mt-10 lg:mt-12 flex justify-center lg:justify-end gap-4 max-w-7xl mx-auto">
-        {/* Back Button */}
+
         <button
-          onClick={back} // ya router.back() agar browser history chahiye
+          onClick={back}
           className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-black text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors"
         >
           Back
         </button>
-
-        {/* Generate Now Button */}
         <button
           onClick={handleContinue}
           disabled={!selectedFurniture}

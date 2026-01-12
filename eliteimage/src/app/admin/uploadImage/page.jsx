@@ -12,9 +12,8 @@ import Step2ObjectRemoval from "@/components/adminComponents/Imgsupload/Step2Obj
 import Step3Farniturestyle from "@/components/adminComponents/Imgsupload/Step3Farniturestyle";
 
 const FEATURE_STEPS_CONFIG = {
-  // Feature 1: Enhance - 5 steps
   Enhance: {
-    totalSteps: 5,
+    totalSteps: 3,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Feature Options" },
@@ -24,9 +23,8 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
-  // Feature 2: HDR - 5 steps
   HDR: {
-    totalSteps: 5,
+    totalSteps: 3,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Feature Options" },
@@ -36,9 +34,8 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
-  // Feature 3: Grass Replacement - 5 steps
   "Grass Replacement": {
-    totalSteps: 5,
+    totalSteps: 3,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Enhancement Level" },
@@ -48,9 +45,8 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
-  // Feature 4: Object Removal - 4 steps
   "Object Removal": {
-    totalSteps: 4,
+    totalSteps: 2,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2ObjectRemoval, name: "Select Object" }, // ✅ CHANGED
@@ -59,9 +55,8 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
-  // Feature 5: Sky Replacement - 4 steps
   "Sky Replacement": {
-    totalSteps: 4,
+    totalSteps: 2,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Sky Options" },
@@ -70,9 +65,8 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
-  // Feature 6: Virtual Staging - 5 steps
   "Virtual Staging": {
-    totalSteps: 6,
+    totalSteps: 4,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Room Type" },
@@ -83,9 +77,8 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
-  // Feature 7: Day to Dusk - 5 steps
   "Day to Dusk": {
-    totalSteps: 5,
+    totalSteps: 3,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Dusk Options" },
@@ -95,9 +88,8 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
-  // Feature 8: Straighten - 3 steps
   Straighten: {
-    totalSteps: 3,
+    totalSteps: 0,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step4, name: "Processing" },
@@ -105,9 +97,8 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
-  // Feature 9: Watermark Remove - 3 steps
   "Watermark Remove": {
-    totalSteps: 3,
+    totalSteps: 0,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step4, name: "Processing" },
@@ -137,8 +128,8 @@ const UploadImageTabs = () => {
     selectedStyle: "",
     beforeAfterData: {},
     finalNotes: "",
-    totalSteps: currentConfig.totalSteps, // ✅ YE LINE ADD KARI
-    projectId: null, // ✅ YE LINE ADD KAREIN
+    totalSteps: currentConfig.totalSteps,
+    projectId: null,
   });
 
   // useEffect(() => {
@@ -172,12 +163,12 @@ const UploadImageTabs = () => {
     setFormData((prev) => ({
       ...prev,
       featureType: featureType,
-      totalSteps: currentConfig.totalSteps, // ✅ YE LINE ADD KARI
+      totalSteps: currentConfig.totalSteps, 
     }));
     setActiveStep(1);
   }, [featureType, currentConfig.totalSteps]);
-
-  const goNext = () => setActiveStep((prev) => Math.min(prev + 1, totalSteps));
+  const maxSteps = stepsConfig.length;
+  const goNext = () => setActiveStep((prev) => Math.min(prev + 1, maxSteps));
   const goBack = () => setActiveStep((prev) => Math.max(prev - 1, 1));
 
   const currentStepConfig = stepsConfig[activeStep - 1];
@@ -209,7 +200,7 @@ const UploadImageTabs = () => {
             )}
           </div>
           <div>
-            {activeStep < totalSteps && (
+            {activeStep < maxSteps && ( 
               <span>Next: {stepsConfig[activeStep]?.name} →</span>
             )}
           </div>

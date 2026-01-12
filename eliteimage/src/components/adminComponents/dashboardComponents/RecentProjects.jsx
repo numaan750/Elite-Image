@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { AppContext } from "@/context/AppContext";
 import { useRouter } from "next/navigation";
-
+import toast from "react-hot-toast";
 
 const RecentProjects = () => {
   const router = useRouter();
@@ -16,18 +16,45 @@ const RecentProjects = () => {
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this project?"))
-      return;
+  const handleDelete = (id) => {
+    toast.custom((t) => (
+      <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col gap-3 w-[300px]">
+        <p className="text-sm font-medium text-gray-800">
+          Are you sure you want to delete this project?
+        </p>
 
-    setDeleteLoading(id);
-    try {
-      await deleteImages(id);
-    } catch (err) {
-      alert("Delete failed");
-    } finally {
-      setDeleteLoading(null);
-    }
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300"
+          >
+            No
+          </button>
+
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              const toastId = toast.loading("Deleting project...");
+              setDeleteLoading(id);
+
+              try {
+                await deleteImages(id);
+                toast.success("Project deleted successfully ✅", {
+                  id: toastId,
+                });
+              } catch (err) {
+                toast.error("Delete failed ❌", { id: toastId });
+              } finally {
+                setDeleteLoading(null);
+              }
+            }}
+            className="px-3 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    ));
   };
 
   if (loading) {

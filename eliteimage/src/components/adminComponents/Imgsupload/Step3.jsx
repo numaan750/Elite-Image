@@ -9,7 +9,7 @@ import { AppContext } from "@/context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
 
 const Step3 = ({ formData, setFormData, next, back, featureType }) => {
-  const { token, saveGeneratedImage, user } = useContext(AppContext); // ← ADD THIS LINE
+  const { token, saveGeneratedImage, user } = useContext(AppContext);
   const styles = STYLES_DATA[featureType];
 
   const [selected, setSelected] = useState(
@@ -128,15 +128,15 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
       toast.dismiss("processing");
 
-toast.success(
-  `${formData.uploadedImages.length} image(s) processed and saved!`
-);
+      toast.success(
+        `${formData.uploadedImages.length} image(s) processed and saved!`
+      );
 
       next();
     } catch (error) {
       console.error("❌ Error:", error);
       toast.dismiss("processing");
-toast.error(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -144,8 +144,6 @@ toast.error(`Error: ${error.message}`);
 
   return (
     <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-10">
-      {/* <Toaster position="top-right" reverseOrder={false} /> */}
-
       <div className="flex items-center gap-3 text-gray-700">
         <div className="flex items-center gap-2">
           <button
@@ -169,16 +167,17 @@ toast.error(`Error: ${error.message}`);
       <h2 className="mt-4 sm:mt-6 lg:mt-9 mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[40px] font-semibold text-black">
         Edit Styles - {featureType}
       </h2>
-
-      <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-        {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
+      {formData.totalSteps > 0 && (
+        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+          {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#CFE8F2]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#D3E7F0]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#034F75]" /> */}
-        <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
-      </div>
+          <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
+        </div>
+      )}
 
       <div className="mt-6 sm:mt-8 grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
         {styles.map((item, index) => (
@@ -216,15 +215,12 @@ toast.error(`Error: ${error.message}`);
       </div>
 
       <div className="mt-8 sm:mt-12 lg:mt-16 flex justify-center lg:justify-end gap-4">
-        {/* Back Button */}
         <button
-          onClick={back} // ya router.back() agar browser history chahiye
+          onClick={back}
           className="flex items-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-gray-400 transition-colors"
         >
           Back
         </button>
-
-        {/* Generate Now Button */}
         <button
           onClick={handleGenerate}
           disabled={!selected || isSaving}

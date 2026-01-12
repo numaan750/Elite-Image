@@ -2,34 +2,63 @@
 import React, { useState, useContext } from "react";
 import { Eye, Pencil, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
-import { useRouter } from "next/navigation"; // ✅ ADD THIS
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { AppContext } from "@/context/AppContext";
 
 const History = () => {
-  const router = useRouter(); // ✅ ADD THIS
+  const router = useRouter();
   const { images, loading, error, getAiImages, deleteImages } =
     useContext(AppContext);
   const [deleteLoading, setDeleteLoading] = useState(null);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this image?")) return;
+  const handleDelete = (id) => {
+    toast.custom((t) => (
+      <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col gap-3 w-[300px]">
+        <p className="text-sm font-medium text-gray-800">
+          Are you sure you want to delete this image?
+        </p>
 
-    setDeleteLoading(id);
-    try {
-      await deleteImages(id);
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Failed to delete image");
-    } finally {
-      setDeleteLoading(null);
-    }
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300"
+          >
+            No
+          </button>
+
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+
+              const toastId = toast.loading("Deleting image...");
+              setDeleteLoading(id);
+
+              try {
+                await deleteImages(id);
+                toast.success("Image deleted successfully ✅", {
+                  id: toastId,
+                });
+              } catch (err) {
+                console.error(err);
+                toast.error("Failed to delete image ❌", {
+                  id: toastId,
+                });
+              } finally {
+                setDeleteLoading(null);
+              }
+            }}
+            className="px-3 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    ));
   };
-
-  // ✅ ADD THIS: View Results function
   const handleViewResults = (item) => {
-    // Step4 page par bhejne ke liye data prepare karo
     const queryParams = new URLSearchParams({
       projectId: item._id,
       featureType: item.featureType,
@@ -39,9 +68,7 @@ const History = () => {
     router.push(`/admin/step4?${queryParams}`);
   };
 
-  // ✅ ADD THIS: Re-edit function
   const handleReEdit = (item) => {
-    // UploadImageTabs par bhejo with edit mode
     const queryParams = new URLSearchParams({
       type: item.featureType,
       editMode: "true",
@@ -111,7 +138,7 @@ const History = () => {
                 <Image
                   src={
                     item.image ||
-                    item.uploadedImages?.[0] || // ✅ SKY REPLACEMENT FIX
+                    item.uploadedImages?.[0] ||
                     "/placeholder.png"
                   }
                   alt={item.title}
@@ -134,7 +161,6 @@ const History = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
-                    {/* ✅ View Results Button */}
                     <button
                       onClick={() => handleViewResults(item)}
                       className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
@@ -143,7 +169,6 @@ const History = () => {
                       <span className="whitespace-nowrap">View Results</span>
                     </button>
 
-                    {/* ✅ Re-Edit Button */}
                     <Link
                       href={`/admin/step4?mode=edit&projectId=${
                         item._id
@@ -154,7 +179,6 @@ const History = () => {
                       <span className="whitespace-nowrap">Re-Edit</span>
                     </Link>
 
-                    {/* ✅ Delete Button */}
                     <button
                       onClick={() => handleDelete(item._id)}
                       disabled={deleteLoading === item._id}

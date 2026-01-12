@@ -6,10 +6,9 @@ import ProgressBar from "./ProgressBar";
 import { useContext } from "react";
 import { AppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation"; // ✅ ADD THIS
-
+import { useRouter } from "next/navigation";
 const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
-  const router = useRouter(); // ✅ ADD THIS LINE
+  const router = useRouter();
   const { token, saveGeneratedImage, user } = useContext(AppContext);
 
   const [isDragging, setIsDragging] = useState(false);
@@ -27,8 +26,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const allImagesHaveSelection = formData.uploadedImages.every(
     (img, index) => selectedAreas[index] && selectedAreas[index].length > 0
   );
-
-  // Mouse down event - dragging shuru karna
   const handleMouseDown = (e) => {
     if (!imageRef.current) return;
 
@@ -41,7 +38,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     setDragEnd({ x, y });
   };
 
-  // Mouse move event - drag karte waqt
   const handleMouseMove = (e) => {
     if (!isDragging || !imageRef.current) return;
 
@@ -52,10 +48,8 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     setDragEnd({ x, y });
   };
 
-  // Mouse up event - dragging khatam
   const handleMouseUp = () => {
     if (isDragging && dragStart && dragEnd) {
-      // Selected area ko calculate karna
       const area = {
         x: Math.min(dragStart.x, dragEnd.x),
         y: Math.min(dragStart.y, dragEnd.y),
@@ -82,7 +76,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     setIsDragging(false);
   };
 
-  // Rectangle draw karne ke liye helper function
   const getSelectionStyle = () => {
     if (!dragStart || !dragEnd) return {};
 
@@ -106,15 +99,12 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     }
     next();
   };
-
-  // ✅ UPDATED: Complete backend integration
   const handleRemoveObject = async () => {
     if (!token) {
       toast.error("Please login first");
       return;
     }
 
-    // ✅ Validate selections
     if (!allImagesHaveSelection) {
       toast.error("Please select objects in all images first");
       return;
@@ -126,8 +116,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
       const allBackendPayloads = [];
       const CLOUD_NAME = "dhtpqla2b";
       const UPLOAD_PRESET = "unsigned_preset";
-
-      // ✅ Cloudinary upload function
       const uploadToCloudinary = async (img) => {
         const fd = new FormData();
         const blob = await fetch(img).then((r) => r.blob());
@@ -142,16 +130,13 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         return data.secure_url;
       };
 
-      // ✅ Process each uploaded image
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const originalUrl = await uploadToCloudinary(
           formData.uploadedImages[i]
         );
 
-        // ⚠ Future: AI object removal API will be called here
         const processedUrl = originalUrl;
 
-        // ✅ Create backend payload
         allBackendPayloads.push({
           userid: user?._id || formData.userId,
           title: `Object Removal - Image ${
@@ -177,10 +162,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         });
       }
 
-      // ✅ Save to backend
       const savedData = await saveGeneratedImage(allBackendPayloads, token);
-
-      // ✅ CRITICAL: Update formData with response
       const normalizedBeforeAfter = Array.isArray(savedData)
         ? savedData.flatMap((item) => item.beforeAfterData || [])
         : savedData.beforeAfterData || [];
@@ -193,7 +175,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
       toast.dismiss("remove");
       toast.success("Objects removed & saved successfully!");
 
-      
       next();
     } catch (err) {
       console.error(err);
@@ -204,7 +185,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
   return (
     <div className="w-full min-h-screen bg-white px-4 sm:px-6 lg:px-12 py-4 sm:py-6 lg:py-8">
-      {/* Header */}
       <div className="flex items-center gap-3 text-gray-700">
         <div className="flex items-center gap-2">
           <button
@@ -225,20 +205,18 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         </span>
       </div>
 
-      {/* Title */}
       <h2 className="mt-4 sm:mt-5 mb-2 text-[24px] sm:text-[30px] lg:text-[40px] font-semibold text-gray-900">
         Object Removal Options
       </h2>
 
-      {/* Progress Bar */}
-      <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-        <ProgressBar currentStep={2} totalSteps={formData.totalSteps} />
-      </div>
+      {formData.totalSteps > 0 && (
+        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+          <ProgressBar currentStep={2} totalSteps={formData.totalSteps} />
+        </div>
+      )}
 
-      {/* Image Container with Selection */}
-      <div className="mt-6 sm:mt-8 lg:mt-10 max-w-4xl mx-auto">
+      <div className="mt-6 sm:mt-8 lg:mt-10 ">
         <div className="bg-[#D3E7F0] border-2 border-[#6FB6D6] rounded-2xl p-4 sm:p-6">
-          {/* Instructions */}
           <div className="mt-4 text-start">
             <p
               className="text-[20px] sm:text-[30px] text-black
@@ -257,7 +235,11 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
                 src={typeof img === "string" ? img : URL.createObjectURL(img)}
                 onClick={() => setActiveImageIndex(index)}
                 className={`h-20 w-28 object-cover rounded cursor-pointer border-2
-        ${activeImageIndex === index ? "border-[#034F75]" : "border-gray-300"}`}
+                ${
+                  activeImageIndex === index
+                    ? "border-[#034F75]"
+                    : "border-gray-300"
+                }`}
               />
             ))}
           </div>
@@ -269,7 +251,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
           >
-            {/* Image */}
             <Image
               ref={imageRef}
               src={
@@ -287,8 +268,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               draggable={false}
               priority
             />
-
-            {/* Selection Rectangle (while dragging) */}
             {isDragging && dragStart && dragEnd && (
               <div
                 className="absolute border-2 border-dashed border-[#034F75] bg-[#034F75]/10"
@@ -316,9 +295,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="mt-8 sm:mt-10 lg:mt-12 flex justify-center lg:justify-end gap-3 max-w-4xl mx-auto">
-        {/* Back Button */}
         <button
           onClick={back}
           className="px-6 sm:px-8 py-2.5 sm:py-3 text-[16px] sm:text-[20px] border-2 border-gray-400 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
@@ -326,7 +303,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           Back
         </button>
 
-        {/* Clear Selections Button */}
         {selectedAreas[activeImageIndex] &&
           selectedAreas[activeImageIndex].length > 0 && (
             <button
@@ -348,8 +324,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               Clear All Selections
             </button>
           )}
-
-        {/* Remove Object Button */}
         <button
           onClick={handleRemoveObject}
           disabled={!allImagesHaveSelection}

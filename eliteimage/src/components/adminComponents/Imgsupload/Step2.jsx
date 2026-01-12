@@ -17,8 +17,6 @@ const handleContinue = async () => {
     ...prev,
     selectedFeatures: selected,
   }));
-
-  // ✅ SIRF SKY REPLACEMENT KE LIYE BACKEND SAVE
   if (featureType === "Sky Replacement") {
     try {
       const token = localStorage.getItem("token");
@@ -42,8 +40,6 @@ const handleContinue = async () => {
         beforeAfterData: [],
         finalNotes: "",
       };
-
-      // ✅ CORRECT API URL - AppContext se API_URL use karo
       const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://elite-image.vercel.app";
       
       const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
@@ -63,31 +59,27 @@ const handleContinue = async () => {
       const data = await response.json();
       
       toast.success("Selection saved!", { id: "save-sky" });
-      
-      // Save project ID in formData
       setFormData((prev) => ({
         ...prev,
-        projectId: data._id, // ✅ Backend se _id milegi
+        projectId: data._id,
       }));
 
     } catch (error) {
       console.error("Save error:", error);
       toast.error(`Failed: ${error.message}`, { id: "save-sky" });
-      return; // Don't proceed if save fails
+      return;
     }
   }
-
-  // ✅ SKY REPLACEMENT TEMP FIX – images show karne ke liye
 if (featureType === "Sky Replacement") {
   setFormData((prev) => ({
     ...prev,
     beforeAfterData: prev.uploadedImages.map((img) => ({
-      processedImage: img, // 👈 same image use karo
+      processedImage: img,
     })),
   }));
 }
 
-  next(); // Ab next step par jao
+  next();
 };
 
   return (
@@ -115,6 +107,7 @@ if (featureType === "Sky Replacement") {
       <h2 className="mt-4 sm:mt-5 mb-4 sm:mb-6 text-[20px] sm:text-[24px] lg:text-[40px] font-semibold text-gray-900">
         {featureData.title}
       </h2>
+       {formData.totalSteps > 0 && (
 
       <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
         {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
@@ -124,13 +117,14 @@ if (featureType === "Sky Replacement") {
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" /> */}
         <ProgressBar currentStep={2} totalSteps={formData.totalSteps} />
       </div>
+      )}
 
       <div className="mt-6 sm:mt-8 lg:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-7xl mx-auto">
         {featureData.options.map((item) => (
           <div
             key={item.name}
             onClick={() => {
-              setSelected([item.name]); // 🔥 sirf ek hi select hoga
+              setSelected([item.name]);
             }}
             className={`rounded-xl cursor-pointer border-2 overflow-hidden transition-all hover:shadow-lg ${
               selected.includes(item.name)
@@ -166,7 +160,7 @@ if (featureType === "Sky Replacement") {
 
       <div className="mt-8 sm:mt-10 lg:mt-12 flex justify-center lg:justify-end gap-4 max-w-7xl mx-auto">
         <button
-          onClick={back} // or router.back() if you want browser back
+          onClick={back}
           className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-black text-[16px] sm:text-[20px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors"
         >
           Back
