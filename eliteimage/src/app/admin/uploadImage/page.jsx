@@ -163,7 +163,7 @@ const UploadImageTabs = () => {
     setFormData((prev) => ({
       ...prev,
       featureType: featureType,
-      totalSteps: currentConfig.totalSteps, 
+      totalSteps: currentConfig.totalSteps,
     }));
     setActiveStep(1);
   }, [featureType, currentConfig.totalSteps]);
@@ -200,7 +200,7 @@ const UploadImageTabs = () => {
             )}
           </div>
           <div>
-            {activeStep < maxSteps && ( 
+            {activeStep < maxSteps && (
               <span>Next: {stepsConfig[activeStep]?.name} →</span>
             )}
           </div>

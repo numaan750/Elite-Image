@@ -268,24 +268,25 @@ const Step5 = ({ formData, setFormData, back }) => {
           />
         </div>
 
-        <div className="flex justify-center sm:justify-end mt-4 sm:mt-5 gap-3 w-full sm:w-auto">
-          {/* Back Button */}
+        <div className="flex justify-between mt-4 sm:mt-5 gap-3 w-full">
+          {/* Back Button (LEFT) */}
           <button
-            onClick={back} // ya router.back() agar browser history chahiye
-            className="flex items-center justify-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-gray-400 transition-colors w-full sm:w-auto"
+            onClick={back}
+            className="flex items-center justify-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-gray-400 transition-colors"
           >
+            <ChevronRight size={15} className="rotate-180" />
             Back
           </button>
 
-          {/* Generate Button */}
+          {/* Generate Button (RIGHT) */}
           <button
             onClick={handleGenerate}
             disabled={isSaving}
-            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors w-full sm:w-auto
-    ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-[#023d5c]"}
-  `}
+            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors
+              ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-[#023d5c]"}
+            `}
           >
-            <FaMagic size={15} className="sm:w-4 sm:h-4" />
+            <FaMagic size={15} />
             <span>{isSaving ? "Saving..." : "Generate"}</span>
           </button>
         </div>

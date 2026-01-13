@@ -194,96 +194,6 @@ const Step4Page = () => {
     };
   }, [isDragging]);
 
-  // const handleGenerate = async () => {
-  //   if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
-  //     toast.error("Please upload at least one image first!");
-  //     return;
-  //   }
-
-  //   if (!token) {
-  //     toast.error("Please login to save images");
-  //     return;
-  //   }
-
-  //   setIsSaving(true);
-  //   toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
-  //     id: "processing",
-  //   });
-
-  //   try {
-  //     const allProcessedData = [];
-  //     const allBackendPayloads = [];
-
-  //     for (let i = 0; i < formData.uploadedImages.length; i++) {
-  //       const uploadedImage = formData.uploadedImages[i];
-
-  //       const originalCloudinaryUrl = await uploadToCloudinary(uploadedImage);
-  //       const processedImageUrl = await processImage(originalCloudinaryUrl, {
-  //         userId: formData.userId,
-  //         featureType: formData.featureType,
-  //         selectedFeature: formData.selectedFeature,
-  //         selectedStyle: formData.selectedStyle,
-  //       });
-  //       const processedCloudinaryUrl = await uploadToCloudinary(processedImageUrl);
-
-  //       const processedData = {
-  //         originalImage: originalCloudinaryUrl,
-  //         processedImage: processedCloudinaryUrl,
-  //         processedAt: new Date().toISOString(),
-  //         status: "completed",
-  //         userId: formData.userId,
-  //         featureType: formData.featureType,
-  //         selectedOptions: {
-  //           feature: formData.selectedFeature,
-  //           style: formData.selectedStyle,
-  //         },
-  //       };
-  //       allProcessedData.push(processedData);
-
-  //       const backendPayload = {
-  //         userid: formData.userId,
-  //         title: `${formData.featureType} - Image ${i + 1} - ${new Date().toLocaleDateString()}`,
-  //         description: formData.finalNotes || `Generated image ${i + 1}`,
-  //         featureType: formData.featureType,
-  //         uploadedImages: [originalCloudinaryUrl],
-  //         selectedFeature: formData.selectedFeature ? [formData.selectedFeature] : [],
-  //         selectedStyle: formData.selectedStyle ? [formData.selectedStyle] : [],
-  //         beforeAfterData: [processedData],
-  //         finalNotes: formData.finalNotes || "",
-  //         image: processedCloudinaryUrl,
-  //       };
-  //       allBackendPayloads.push(backendPayload);
-  //     }
-
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       beforeAfterData: allProcessedData,
-  //     }));
-
-  //     if (isEditMode && projectId) {
-  //       await saveGeneratedImage(allBackendPayloads[0], token, true, projectId);
-  //       toast.success("Project updated successfully!", { id: "processing" });
-  //     } else {
-  //       await saveGeneratedImage(allBackendPayloads, token);
-  //       toast.success(`${formData.uploadedImages.length} image(s) saved!`, { id: "processing" });
-  //     }
-
-  //     for (let i = 0; i < allProcessedData.length; i++) {
-  //       await downloadImage(
-  //         allProcessedData[i].processedImage,
-  //         `elite-image-ai-${i + 1}.jpg`
-  //       );
-  //     }
-
-  //     router.push("/admin/dashboard");
-  //   } catch (error) {
-  //     console.error("❌ Error:", error);
-  //     toast.error(`Error: ${error.message}`, { id: "processing" });
-  //   } finally {
-  //     setIsSaving(false);
-  //   }
-  // };
-
   const showDownloadConfirmToast = () => {
     toast(
       (t) => (
@@ -466,6 +376,10 @@ const Step4Page = () => {
             ? "Edit Project"
             : "Processing Complete"}
         </h2>
+        {/* ✅ ADD THIS NEW LINE */}
+        <p className="text-sm sm:text-base text-gray-600 mt-2">
+          Total Images: {formData.uploadedImages.length}
+        </p>
       </div>
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
@@ -481,7 +395,7 @@ const Step4Page = () => {
             className={`w-full ${
               formData.uploadedImages.length === 1
                 ? "flex flex-col gap-4 sm:gap-6"
-                : "grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6"
+                : "grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
             }`}
           >
             {formData.uploadedImages.map((img, index) => (
@@ -523,7 +437,7 @@ const Step4Page = () => {
                         alt={`Before ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-cover"
+                        className="object-contain"
                         priority
                       />
                     </div>
@@ -544,7 +458,7 @@ const Step4Page = () => {
                         alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-cover"
+                        className="object-contain"
                         priority
                       />
                     </div>
@@ -680,7 +594,12 @@ const Step4Page = () => {
   }`}
         >
           <PiDownload size={20} />
-          <span>Download</span>
+          <span>
+            Download{" "}
+            {formData.uploadedImages.length > 1
+              ? `(${formData.uploadedImages.length} images)`
+              : ""}
+          </span>
         </button>
       </div>
     </div>

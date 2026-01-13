@@ -783,18 +783,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
           </span>
         </button>
         {/* Bottom Back Button */}
-        <div className="w-full flex justify-start mt-6 sm:mt-8">
-          <button
-            onClick={back}
-            className="flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 
-    border border-[#034F75] rounded-lg 
-    text-[14px] sm:text-[16px] text-[#034F75]
-    hover:bg-[#034F75] hover:text-white transition-colors"
-          >
-            <ChevronLeft size={18} />
-            <span>Back</span>
-          </button>
-        </div>
       </div>
     </div>
   );

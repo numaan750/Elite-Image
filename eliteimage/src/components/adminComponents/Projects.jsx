@@ -127,7 +127,7 @@ const Projects = () => {
                   </span>
                 </div>
                 <p className="text-[16px] sm:text-[18px] text-gray-600 mb-2">
-                  Image ({project.uploadedImages?.length || 1})
+                  Images ({project.uploadedImages?.length || 1})
                 </p>
 
                 <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
@@ -194,18 +194,17 @@ const Projects = () => {
             </div>
 
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-              <div className="flex justify-center bg-gray-100 rounded-lg p-3 sm:p-4">
-                <Image
-                  src={
-                    selectedProject.image ||
-                    selectedProject.uploadedImages?.[0] ||
-                    "/placeholder.png"
-                  }
-                  alt={selectedProject.title}
-                  width={400}
-                  height={400}
-                  className="max-w-full max-h-[300px] sm:max-h-[400px] object-contain rounded-lg"
-                />
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 bg-gray-100 rounded-lg p-3 sm:p-4">
+                {selectedProject.uploadedImages?.map((img, idx) => (
+                  <Image
+                    key={idx}
+                    src={img}
+                    alt={`Image ${idx + 1}`}
+                    width={200}
+                    height={200}
+                    className="w-full h-32 sm:h-40 object-cover rounded-lg"
+                  />
+                ))}
               </div>
 
               <div className="space-y-3 sm:space-y-4">

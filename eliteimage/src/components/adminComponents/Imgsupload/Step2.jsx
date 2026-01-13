@@ -156,23 +156,29 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         ))}
       </div>
 
-      <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col sm:flex-row justify-center lg:justify-end gap-3 sm:gap-4 max-w-7xl mx-auto">
-        <button
-          onClick={back}
-          className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-black text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors"
-        >
-          Back
-        </button>
-        <button
-          onClick={handleContinue}
-          disabled={selected.length === 0}
-          className={`flex items-center gap-2 bg-[#034F75] hover:bg-[#023a5c] text-white text-[16px] sm:text-[18px] px-6 sm:px-10 py-2.5 sm:py-3 rounded-lg transition-colors ${
-            selected.length === 0 ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          Generate Now
-        </button>
-      </div>
+      <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 max-w-7xl mx-auto">
+  
+  {/* Back Button */}
+  <button
+    onClick={back}
+    className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-black text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors"
+  >
+    <ChevronRight size={17} className="rotate-180" /> {/* Left arrow */}
+    Back
+  </button>
+
+  {/* Generate Button */}
+  <button
+    onClick={handleContinue}
+    disabled={selected.length === 0}
+    className={`flex items-center gap-2 bg-[#034F75] hover:bg-[#023a5c] text-white text-[16px] sm:text-[18px] px-6 sm:px-10 py-2.5 sm:py-3 rounded-lg transition-colors ${
+      selected.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+    }`}
+  >
+    Generate Now
+  </button>
+
+</div>
     </div>
   );
 };

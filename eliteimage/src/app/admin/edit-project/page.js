@@ -112,9 +112,8 @@ const EditProjectPage = () => {
         ? [finalData.selectedFeature]
         : [],
       selectedStyle: finalData.selectedStyle ? [finalData.selectedStyle] : [],
-      beforeAfterData: finalData.beforeAfterData
-        ? [finalData.beforeAfterData]
-        : [],
+      beforeAfterData: finalData.beforeAfterData || [],
+
       finalNotes: finalData.finalNotes || "",
       image:
         finalData.beforeAfterData?.processedImage ||
@@ -239,7 +238,7 @@ const EditProjectPage = () => {
                         alt={`Before ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-cover"
+                        className="object-contain"
                         priority
                       />
                     </div>
@@ -253,11 +252,14 @@ const EditProjectPage = () => {
                       }}
                     >
                       <Image
-                        src={formData.beforeAfterData?.processedImage || img}
+                        src={
+                          formData.beforeAfterData?.[index]?.processedImage ||
+                          img
+                        }
                         alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-cover"
+                        className="object-contain"
                         priority
                       />
                     </div>

@@ -40,7 +40,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
     try {
       const allProcessedData = [];
-      const allBackendPayloads = [];
+      // const allBackendPayloads = [];
 
       const CLOUD_NAME = "dhtpqla2b";
       const UPLOAD_PRESET = "unsigned_preset";
@@ -99,24 +99,42 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         };
         allProcessedData.push(processedData);
 
-        const backendPayload = {
-          userid: user?._id || formData.userId,
-          title: `${formData.featureType} - Image ${
-            i + 1
-          } - ${new Date().toLocaleDateString()}`,
-          description: formData.finalNotes || `Generated image ${i + 1}`,
-          featureType: formData.featureType,
-          uploadedImages: [originalCloudinaryUrl],
-          selectedFeature: formData.selectedFeature
-            ? [formData.selectedFeature]
-            : [],
-          selectedStyle: [selected],
-          beforeAfterData: [processedData],
-          finalNotes: formData.finalNotes || "",
-          image: processedCloudinaryUrl,
-        };
-        allBackendPayloads.push(backendPayload);
+        // const backendPayload = {
+        //   userid: user?._id || formData.userId,
+        //   title: `${formData.featureType} - Image ${
+        //     i + 1
+        //   } - ${new Date().toLocaleDateString()}`,
+        //   description: formData.finalNotes || `Generated image ${i + 1}`,
+        //   featureType: formData.featureType,
+        //   uploadedImages: [originalCloudinaryUrl],
+        //   selectedFeature: formData.selectedFeature
+        //     ? [formData.selectedFeature]
+        //     : [],
+        //   selectedStyle: [selected],
+        //   beforeAfterData: [processedData],
+        //   finalNotes: formData.finalNotes || "",
+        //   image: processedCloudinaryUrl,
+        // };
+        // allBackendPayloads.push(backendPayload);
       }
+
+      // ✅ NOW create backendPayload AFTER allProcessedData is ready
+      const backendPayload = {
+        userid: user?._id || formData.userId,
+        title: `${formData.featureType} - ${
+          formData.uploadedImages.length
+        } Images - ${new Date().toLocaleDateString()}`,
+        description: `Project with ${formData.uploadedImages.length} image(s)`,
+        featureType: formData.featureType,
+        uploadedImages: allProcessedData.map((data) => data.originalImage),
+        selectedFeature: formData.selectedFeature
+          ? [formData.selectedFeature]
+          : [],
+        selectedStyle: [selected],
+        beforeAfterData: allProcessedData,
+        finalNotes: formData.finalNotes || "",
+        image: allProcessedData[0].processedImage,
+      };
 
       setFormData((prev) => ({
         ...prev,
@@ -124,7 +142,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         selectedStyle: selected,
       }));
 
-      await saveGeneratedImage(allBackendPayloads, token);
+      await saveGeneratedImage(backendPayload, token);
 
       toast.dismiss("processing");
 
@@ -214,13 +232,17 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         ))}
       </div>
 
-      <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-center lg:justify-end gap-3 sm:gap-4">
+      <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
+        {/* Back Button (Left) */}
         <button
           onClick={back}
           className="flex items-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-gray-400 transition-colors"
         >
+          <ChevronRight size={17} className="rotate-180" />
           Back
         </button>
+
+        {/* Generate Button (Right) */}
         <button
           onClick={handleGenerate}
           disabled={!selected || isSaving}

@@ -113,7 +113,8 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     toast.loading("Removing objects & saving...", { id: "remove" });
 
     try {
-      const allBackendPayloads = [];
+      const allUploadedImages = [];
+      const allBeforeAfterData = [];
       const CLOUD_NAME = "dhtpqla2b";
       const UPLOAD_PRESET = "unsigned_preset";
       const uploadToCloudinary = async (img) => {
@@ -130,6 +131,8 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         return data.secure_url;
       };
 
+      // PURANI LINES DELETE KAREN (152-177) aur NAYE LINES likhein:
+
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const originalUrl = await uploadToCloudinary(
           formData.uploadedImages[i]
@@ -137,32 +140,29 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
         const processedUrl = originalUrl;
 
-        allBackendPayloads.push({
-          userid: user?._id || formData.userId,
-          title: `Object Removal - Image ${
-            i + 1
-          } - ${new Date().toLocaleDateString()}`,
-          description: `Object removal with ${
-            selectedAreas[i]?.length || 0
-          } selected area(s)`,
-          featureType: "object-removal",
-          uploadedImages: [originalUrl],
-          selectedFeature: ["object-removal"],
-          beforeAfterData: [
-            {
-              originalImage: originalUrl,
-              processedImage: processedUrl,
-              removedAreas: selectedAreas[i] || [],
-              processedAt: new Date().toISOString(),
-              status: "completed",
-            },
-          ],
-          finalNotes: `Removed ${selectedAreas[i]?.length || 0} object(s)`,
-          image: processedUrl,
+        allUploadedImages.push(originalUrl);
+        allBeforeAfterData.push({
+          originalImage: originalUrl,
+          processedImage: processedUrl,
+          removedAreas: selectedAreas[i] || [],
+          processedAt: new Date().toISOString(),
+          status: "completed",
         });
       }
 
-      const savedData = await saveGeneratedImage(allBackendPayloads, token);
+      const singlePayload = {
+        userid: user?._id || formData.userId,
+        title: `Object Removal - ${new Date().toLocaleDateString()}`,
+        description: `Object removal with ${totalSelectedObjects} selected area(s) across ${formData.uploadedImages.length} image(s)`,
+        featureType: "object-removal",
+        uploadedImages: allUploadedImages,
+        selectedFeature: ["object-removal"],
+        beforeAfterData: allBeforeAfterData,
+        finalNotes: `Removed ${totalSelectedObjects} object(s) from ${formData.uploadedImages.length} image(s)`,
+        image: allUploadedImages[0],
+      };
+
+      const savedData = await saveGeneratedImage([singlePayload], token);
       const normalizedBeforeAfter = Array.isArray(savedData)
         ? savedData.flatMap((item) => item.beforeAfterData || [])
         : savedData.beforeAfterData || [];

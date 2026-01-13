@@ -24,86 +24,87 @@ const Step1 = ({ formData, setFormData, next }) => {
   //   error: (msg) => console.error(msg),
   // };
 
-  const handleGenerateAndSave = async () => {
-    if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
-      toast.error("Please upload at least one image first!");
-      return;
+// PURANE LINES 51-88 DELETE karen aur NAYE lines likhein:
+
+const handleGenerateAndSave = async () => {
+  if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
+    toast.error("Please upload at least one image first!");
+    return;
+  }
+
+  if (!token) {
+    toast.error("Please login to save images");
+    return;
+  }
+
+  setIsSaving(true);
+  toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
+    id: "processing",
+  });
+
+  try {
+    const allProcessedData = [];
+    const allUploadedImages = [];
+
+    for (let i = 0; i < formData.uploadedImages.length; i++) {
+      const uploadedImage = formData.uploadedImages[i];
+
+      console.log(`📤 [${i + 1}] Processing ${formData.featureType}...`);
+
+      const processedImageUrl = uploadedImage;
+
+      const processedData = {
+        originalImage: uploadedImage,
+        processedImage: processedImageUrl,
+        processedAt: new Date().toISOString(),
+        status: "completed",
+        userId: formData.userId,
+        featureType: formData.featureType,
+      };
+      allProcessedData.push(processedData);
+      allUploadedImages.push(uploadedImage);
     }
 
-    if (!token) {
-      toast.error("Please login to save images");
-      return;
+    const singlePayload = {
+      userid: formData.userId,
+      title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
+      description: formData.finalNotes || `${formData.featureType} applied to ${formData.uploadedImages.length} image(s)`,
+      featureType: formData.featureType,
+      uploadedImages: allUploadedImages,
+      selectedFeature: [],
+      selectedStyle: [],
+      beforeAfterData: allProcessedData,
+      finalNotes: formData.finalNotes || "",
+      image: allUploadedImages[0],
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      beforeAfterData: allProcessedData,
+    }));
+
+    if (formData.projectId) {
+      await saveGeneratedImage(
+        singlePayload,
+        token,
+        true,
+        formData.projectId
+      );
+      toast.success("Project updated successfully!", { id: "processing" });
+    } else {
+      await saveGeneratedImage([singlePayload], token);
+      toast.success(`${formData.uploadedImages.length} image(s) saved in 1 project!`, {
+        id: "processing",
+      });
     }
-
-    setIsSaving(true);
-    toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
-      id: "processing",
-    });
-
-    try {
-      const allProcessedData = [];
-      const allBackendPayloads = [];
-
-      for (let i = 0; i < formData.uploadedImages.length; i++) {
-        const uploadedImage = formData.uploadedImages[i];
-
-        console.log(`📤 [${i + 1}] Processing ${formData.featureType}...`);
-
-        const processedImageUrl = uploadedImage;
-
-        const processedData = {
-          originalImage: uploadedImage,
-          processedImage: processedImageUrl,
-          processedAt: new Date().toISOString(),
-          status: "completed",
-          userId: formData.userId,
-          featureType: formData.featureType,
-        };
-        allProcessedData.push(processedData);
-
-        const backendPayload = {
-          userid: formData.userId,
-          title: `${formData.featureType} - Image ${
-            i + 1
-          } - ${new Date().toLocaleDateString()}`,
-          description: formData.finalNotes || `${formData.featureType} applied`,
-          featureType: formData.featureType,
-          uploadedImages: [uploadedImage],
-          selectedFeature: [],
-          selectedStyle: [],
-          beforeAfterData: [processedData],
-          finalNotes: formData.finalNotes || "",
-          image: processedImageUrl,
-        };
-        allBackendPayloads.push(backendPayload);
-      }
-      setFormData((prev) => ({
-        ...prev,
-        beforeAfterData: allProcessedData,
-      }));
-
-      if (formData.projectId) {
-        await saveGeneratedImage(
-          allBackendPayloads[0],
-          token,
-          true,
-          formData.projectId
-        );
-        toast.success("Project updated successfully!", { id: "processing" });
-      } else {
-        await saveGeneratedImage(allBackendPayloads, token);
-        toast.success(`${formData.uploadedImages.length} image(s) saved!`, {
-          id: "processing",
-        });
-      }
-      next();
-    } catch (error) {
-      console.error("❌ Error:", error);
-      toast.error(`Error: ${error.message}`, { id: "processing" });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    next();
+  } catch (error) {
+    console.error("❌ Error:", error);
+    toast.error(`Error: ${error.message}`, { id: "processing" });
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
