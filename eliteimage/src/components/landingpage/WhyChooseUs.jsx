@@ -19,7 +19,7 @@ const WhyChooseUs = () => {
     }
   };
   return (
-    <div id="about-us" className="py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-0">
+    <div id="about-us" className="py-10">
       <div className="mycontainer">
         <div className="text-center w-full bg-[#034F75] py-12 sm:py-16 lg:py-20 rounded-2xl sm:rounded-3xl lg:rounded-4xl px-4 sm:px-8 lg:px-12 xl:px-16">
           <h2 className="text-[#D3E7F0] text-2xl sm:text-3xl lg:text-4xl xl:text-[40px] font-bold pb-3 sm:pb-4 lg:pb-6">
