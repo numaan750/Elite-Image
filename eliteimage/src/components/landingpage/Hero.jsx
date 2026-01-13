@@ -205,7 +205,7 @@ const Hero = () => {
             onMouseDown={handleMouseDown}
             onTouchStart={handleMouseDown}
           >
-            <span className="text-white text-[20px] sm:text-[24px] lg:text-[30px] pb-1">{`<>`}</span>
+            <span className="text-white text-[20px] sm:text-[24px] lg:text-[30px] pb-0.5">{`<>`}</span>
           </div>
         </div>
       </div>
