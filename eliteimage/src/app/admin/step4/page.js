@@ -511,28 +511,25 @@ const Step4Page = () => {
   gap-2 sm:gap-3
 "
         >
-          {" "}
-          {!isViewMode && (
-            <button
-              onClick={() => {
-                router.push(`/admin/edit-project?projectId=${projectId}`);
-              }}
-              className="
+          <button
+            onClick={() => {
+              router.push(`/admin/edit-project?projectId=${projectId}`);
+            }}
+            className="
   w-full sm:w-auto
   flex items-center justify-center gap-2
   border border-[#034F75]
   text-[16px] sm:text-[16px] lg:text-[18px]
-  px-4 sm:px-5
+  px-4 sm:px-6
   py-2.5 sm:py-3
   rounded-lg
   hover:bg-[#034F75] hover:text-white
   transition-colors
 "
-            >
-              <TbEdit size={17} />
-              Edit
-            </button>
-          )}
+          >
+            <TbEdit size={17} />
+            Edit
+          </button>
           <button
             onClick={() => alert("Share functionality coming soon!")}
             className="
@@ -540,7 +537,7 @@ const Step4Page = () => {
   flex items-center justify-center gap-2
   border border-[#034F75]
   text-[16px] sm:text-[16px] lg:text-[18px]
-  px-4 sm:px-5
+  px-4 sm:px-6
   py-2.5 sm:py-3
   rounded-lg
   hover:bg-[#034F75] hover:text-white
