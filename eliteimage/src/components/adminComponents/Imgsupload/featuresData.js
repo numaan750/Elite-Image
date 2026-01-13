@@ -157,13 +157,13 @@ export const STYLES_DATA = {
     // { name: "Natural Enhancement", img: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=250&fit=crop" }
   ],
   HDR: [
-    { name: "Natural HDR", img: "/projects/HDR/HDR-Option-5.webp" },
-    { name: "Dramatic HDR", img: "/projects/HDR/HDR-Option-6.webp" },
+    { name: "Vibrant Edit", img: "/projects/HDR/HDR-Option-5.webp" },
+    { name: "Soft Edit", img: "/projects/HDR/HDR-Option-6.webp" },
     // { name: "Balanced HDR", img: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=250&fit=crop" }
   ],
   "Grass Replacement": [
-    { name: "Lush Green", img: "/projects/Grass/Grass-option-7.webp" },
-    { name: "Natural Lawn", img: "/projects/Grass/Grass-option-8.webp" },
+    { name: "Vibrant Edit", img: "/projects/Grass/Grass-option-7.webp" },
+    { name: "Soft Edit", img: "/projects/Grass/Grass-option-8.webp" },
     // { name: "Spring Fresh", img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=250&fit=crop" }
   ],
   "Object Removal": [
@@ -215,8 +215,8 @@ export const STYLES_DATA = {
     // },
   ],
   "Day to Dusk": [
-    { name: "Golden Hour", img: "/projects/DUSK/DUST-7.webp" },
-    { name: "Twilight Glow", img: "/projects/DUSK/DUST-8.webp" },
+    { name: "Vibrant Edit", img: "/projects/DUSK/DUST-7.webp" },
+    { name: "Soft Edit", img: "/projects/DUSK/DUST-8.webp" },
     // { name: "Sunset Magic", img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop" }
   ],
   Straighten: [
