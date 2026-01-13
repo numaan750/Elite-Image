@@ -216,6 +216,12 @@ const Step1 = ({ formData, setFormData, next }) => {
 
       <h2 className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[32px] font-semibold text-black">
         Upload Images
+        {formData.featureType && (
+          <span className="text-black font-medium">
+            {" "}
+            – {formData.featureType}
+          </span>
+        )}
       </h2>
       {formData.totalSteps > 0 && (
         <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">

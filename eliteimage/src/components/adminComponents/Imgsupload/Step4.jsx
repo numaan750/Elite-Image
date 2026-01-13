@@ -571,6 +571,12 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
           Processing Complete
+          {formData.featureType && (
+            <span className="text-black font-medium">
+              {" "}
+              – {formData.featureType}
+            </span>
+          )}
         </h2>
       </div>
 
