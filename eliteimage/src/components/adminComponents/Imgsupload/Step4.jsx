@@ -581,7 +581,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       </div>
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
-        <h3 className="text-[18px] sm:text-[24px] lg:text-[28px] font-semibold text-black mb-1">
+        <h3 className="text-[18px] sm:text-[24px] lg:text-[24px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
         <p className="text-[12px] sm:text-[16px] lg:text-[20px] text-black mb-3 sm:mb-4">
