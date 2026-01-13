@@ -5,11 +5,14 @@ import Image from "next/image";
 import ProgressBar from "./ProgressBar";
 import { AppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation"; // ✅ ADD THIS
 
 const CLOUD_NAME = "dhtpqla2b";
 const UPLOAD_PRESET = "unsigned_preset";
 
 const Step1 = ({ formData, setFormData, next }) => {
+  const router = useRouter();
+
   const { token, saveGeneratedImage } = useContext(AppContext);
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -191,6 +194,11 @@ const Step1 = ({ formData, setFormData, next }) => {
     }));
   };
 
+  // ✅ ADD THIS
+  const handleBack = () => {
+    router.back();
+  };
+
   const isSpecialFeature =
     formData.featureType === "Straighten" ||
     formData.featureType === "Watermark Remove";
@@ -210,16 +218,16 @@ const Step1 = ({ formData, setFormData, next }) => {
         Upload Images
       </h2>
       {formData.totalSteps > 0 && (
-      <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-        {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
+        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+          {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#034F75]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#CFE8F2]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#D3E7F0]" /> */}
 
-        <ProgressBar currentStep={1} totalSteps={formData.totalSteps} />
-      </div>
+          <ProgressBar currentStep={1} totalSteps={formData.totalSteps} />
+        </div>
       )}
 
       <div className="mt-6 sm:mt-8 lg:mt-10 rounded-2xl border border-[#6FB6D6] bg-[#D3E7F0] p-3 sm:p-4 min-h-[250px] sm:min-h-[300px] lg:min-h-[400px]">
@@ -337,7 +345,14 @@ const Step1 = ({ formData, setFormData, next }) => {
           ))}
         </div>
       )} */}
-      <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-center sm:justify-end gap-3">
+      <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-between items-center gap-3">
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
+        >
+          <ChevronRight size={17} className="rotate-180" />
+          Back
+        </button>
         {isSpecialFeature ? (
           <button
             onClick={handleGenerateAndSave}

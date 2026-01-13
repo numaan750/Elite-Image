@@ -104,7 +104,7 @@ export default function Sidebar() {
     text-[16px]
     font-medium
     transition-colors
-    hover:bg-[#b00000]
+    cursor-pointer
   "
         >
           <LogOut size={18} />
