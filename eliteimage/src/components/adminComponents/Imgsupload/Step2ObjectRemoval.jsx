@@ -205,7 +205,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-5 mb-2 text-[20px] sm:text-[28px] lg:text-[32px] font-semibold text-gray-900">
+      <h2 className="mt-4 sm:mt-5 mb-2 text-[20px] sm:text-[28px] lg:text-[28px] font-semibold text-gray-900">
         Object Removal Options
       </h2>
 

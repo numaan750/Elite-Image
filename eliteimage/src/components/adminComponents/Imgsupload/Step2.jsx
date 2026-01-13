@@ -103,7 +103,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         </span>
       </div>
 
-      <h2 className="mt-5 sm:mt-6 mb-8 sm:mb-10 text-[18px] sm:text-[20px] lg:text-[32px] font-semibold text-gray-900">
+      <h2 className="mt-5 sm:mt-6 mb-8 sm:mb-10 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-gray-900">
         {featureData.title}
       </h2>
       {formData.totalSteps > 0 && (

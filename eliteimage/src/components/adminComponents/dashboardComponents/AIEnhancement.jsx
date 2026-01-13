@@ -77,7 +77,7 @@ const AIEnhancement = () => {
         </div>
 
         <section className="mt-8 sm:mt-12 lg:mt-16">
-          <h3 className="text-[20px] sm:text-[32px] font-semibold text-black">
+          <h3 className="text-[20px] sm:text-[28px] font-semibold text-black">
             AI Enhancement Features
           </h3>
         </section>

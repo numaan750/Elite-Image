@@ -569,7 +569,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       </div>
 
       <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
-        <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
+        <h2 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
           Processing Complete
           {formData.featureType && (
             <span className="text-black font-medium">
@@ -697,7 +697,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full sm:w-auto">
           <button
             onClick={next}
-            className="flex items-center justify-center gap-2 border border-[#034F75] text-[16px] sm:text-[18px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
+            className="flex items-center justify-center gap-2 border border-[#034F75] text-[16px] sm:text-[18px] px-4 sm:px-4 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
           >
             <TbEdit size={17} className="sm:w-[18px] sm:h-[18px]" />
             Edit
@@ -705,7 +705,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
           <button
             onClick={handleShare}
-            className="flex items-center justify-center gap-2 border border-[#034F75] text-[16px] sm:text-[18px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
+            className="flex items-center justify-center gap-2 border border-[#034F75] text-[16px] sm:text-[18px] px-4 sm:px-4 py-2 sm:py-2.5 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors flex-1 sm:flex-initial min-w-[120px]"
           >
             <IoShareSocial size={17} className="sm:w-[18px] sm:h-[18px]" />
             Share Link

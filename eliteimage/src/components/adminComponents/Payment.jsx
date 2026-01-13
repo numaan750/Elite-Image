@@ -95,7 +95,7 @@ export default function Payment() {
         <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium mb-6 sm:mb-6">
           Eliteimage Ai
         </h3>
-        <h2 className="text-[18px] sm:text-[20px] lg:text-[32px] font-semibold mb-6 sm:mb-10 lg:mb-12">
+        <h2 className="text-[18px] sm:text-[20px] lg:text-[28px] font-semibold mb-6 sm:mb-10 lg:mb-12">
           Final step, complete your payment
         </h2>
 

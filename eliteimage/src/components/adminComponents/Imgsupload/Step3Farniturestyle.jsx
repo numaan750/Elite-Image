@@ -68,7 +68,7 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
           Elite Image AI
         </span>
       </div>
-      <h2 className="mt-4 sm:mt-5 mb-4 sm:mb-6 text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-gray-900">
+      <h2 className="mt-4 sm:mt-5 mb-4 sm:mb-6 text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-gray-900">
         Select Furniture Type
       </h2>
       {formData.totalSteps > 0 && (

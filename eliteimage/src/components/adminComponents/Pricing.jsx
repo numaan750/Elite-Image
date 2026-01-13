@@ -13,7 +13,7 @@ const Pricing = () => {
         className=""
       >
         <div>
-          <h2 className="text-[20px] sm:text-[20px] lg:text-[32px] font-semibold mb-6">
+          <h2 className="text-[20px] sm:text-[20px] lg:text-[28px] font-semibold mb-6">
             Pricing
           </h2>
 

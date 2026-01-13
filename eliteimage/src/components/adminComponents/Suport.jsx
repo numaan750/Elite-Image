@@ -33,7 +33,7 @@ export default function Support() {
       <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium mb-6 sm:mb-14">
         Eliteimage Ai
       </h3>
-      <h2 className="text-[20px] sm:text-[32px] font-semibold mb-6 sm:mb-10">
+      <h2 className="text-[20px] sm:text-[28px] font-semibold mb-6 sm:mb-10">
         How Can We Help?
       </h2>
 

@@ -128,7 +128,7 @@ const Step5 = ({ formData, setFormData, back }) => {
       </div>
 
       <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
-        <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
+        <h2 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
           Processing Complete
           {formData.featureType && (
             <span className="text-black font-medium">
@@ -140,7 +140,7 @@ const Step5 = ({ formData, setFormData, back }) => {
       </div>
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
-        <h3 className="text-[20px] sm:text-[10px] lg:text-[28px] font-semibold text-black mb-1">
+        <h3 className="text-[20px] sm:text-[10px] lg:text-[24px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
         <p className="text-[12px] sm:text-[16px] lg:text-[18px] text-black mb-3 sm:mb-4">
@@ -283,7 +283,11 @@ const Step5 = ({ formData, setFormData, back }) => {
             onClick={handleGenerate}
             disabled={isSaving}
             className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors
-              ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-[#023d5c]"}
+              ${
+                isSaving
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-[#023d5c]"
+              }
             `}
           >
             <FaMagic size={15} />

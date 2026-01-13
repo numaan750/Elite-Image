@@ -182,7 +182,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-6 lg:mt-9 mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
+      <h2 className="mt-4 sm:mt-6 lg:mt-9 mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
         Edit Styles - {featureType}
       </h2>
       {formData.totalSteps > 0 && (

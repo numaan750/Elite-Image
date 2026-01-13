@@ -215,7 +215,7 @@ const handleGenerateAndSave = async () => {
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[32px] font-semibold text-black">
+      <h2 className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-black">
         Upload Images
         {formData.featureType && (
           <span className="text-black font-medium">
@@ -262,16 +262,16 @@ const handleGenerateAndSave = async () => {
                 size={32}
                 className="text-[#034F75] sm:w-10 sm:h-10 lg:w-[50px] lg:h-[50px]"
               />
-              <p className="mt-3 sm:mt-4 text-[16px] sm:text-[20px] lg:text-[24px] font-medium text-[#034F75] px-2">
+              <p className="mt-3 sm:mt-4 text-[12px] sm:text-[20px] lg:text-[20px] font-medium text-[#034F75] px-2">
                 Drag and drop your images here
               </p>
-              <span className="my-2 sm:my-3 text-[12px] sm:text-[16px] lg:text-[24px] text-[#034F75]">
+              <span className="my-2 sm:my-3 text-[12px] sm:text-[16px] lg:text-[20px] text-[#034F75]">
                 Or
               </span>
               <label className="rounded-lg bg-[#034F75] px-4 sm:px-5 lg:px-6 py-2 text-white text-[16px] sm:text-[18px] cursor-pointer hover:bg-[#023d5c] transition-colors">
                 {uploadingImage ? "Uploading..." : "Browse File"}
               </label>
-              <p className="mt-3 sm:mt-4 text-[12px] sm:text-[24px] text-[#034F75] px-2">
+              <p className="mt-3 sm:mt-4 text-[12px] sm:text-[20px] text-[#034F75] px-2">
                 Supports: JPG, PNG, HEIC • Max 5MB per file
               </p>
             </>
@@ -302,7 +302,7 @@ const handleGenerateAndSave = async () => {
                       formData.uploadedImages.length === 1
                         ? "h-full min-h-[250px] sm:min-h-[300px] lg:min-h-[350px]"
                         : "h-32 sm:h-36 lg:h-40"
-                    } object-cover`}
+                    } object-contain`}
                     priority={idx === 0}
                   />
                   <button

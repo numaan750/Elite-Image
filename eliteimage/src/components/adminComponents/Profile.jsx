@@ -96,7 +96,7 @@ export default function Profile() {
       <h3 className="text-[16px] sm:text-[20px] font-semibold mb-6 sm:mb-15">
         Eliteimage Ai
       </h3>
-      <h2 className="text-[20px] sm:text-[32px] font-semibold mb-6 sm:mb-8">
+      <h2 className="text-[20px] sm:text-[28px] font-semibold mb-6 sm:mb-8">
         Account Settings
       </h2>
       <div className="max-w-full sm:max-w-3xl space-y-6 sm:space-y-10">

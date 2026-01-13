@@ -87,7 +87,7 @@ const Projects = () => {
 
       <div className="py-4 sm:py-6 lg:py-8 w-full">
         <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <h2 className="text-[20px] sm:text-[32px] lg:text-[32px] font-medium text-black">
+          <h2 className="text-[20px] sm:text-[32px] lg:text-[28px] font-medium text-black">
             My Projects
           </h2>
 
