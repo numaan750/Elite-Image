@@ -93,18 +93,21 @@ const RecentProjects = () => {
               alt="project"
               width={112}
               height={112}
-              className="h-24 w-25 sm:h-30 sm:w-30 rounded-lg object-cover flex-shrink-0"
+              className="h-30 w-30 sm:h-35 sm:w-35 rounded-lg object-cover flex-shrink-0"
             />
 
             <div className="flex flex-1 flex-col justify-between gap-3">
-              <div>
+              <div className="flex items-center justify-between gap-3">
                 <p className="text-[16px] sm:text-[24px] font-medium text-black">
-                  Project: {new Date(project.createdAt).toLocaleDateString()}
+                  {project.featureType || "Unknown Feature"}
                 </p>
-                <p className="text-[16px] sm:text-[18px] text-gray-600">
-                  Multiple Image
-                </p>
+                <span className="text-sm sm:text-base text-gray-600 whitespace-nowrap">
+                  {new Date(project.createdAt).toLocaleDateString()}
+                </span>
               </div>
+              <p className="text-[16px] sm:text-[18px] text-gray-600 mb-2">
+                Image ({project.uploadedImages?.length || 1})
+              </p>
 
               <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
                 <Link
