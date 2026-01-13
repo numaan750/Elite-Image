@@ -37,9 +37,11 @@ const Navbar = () => {
             width={40}
             height={40}
           /> */}
-          <h2 className="text-base sm:text-lg lg:text-xl font-semibold">
-            Eliteimage Ai
-          </h2>
+          <a href="#" onClick={(e) => handleScroll(e, "home")}>
+            <h2 className="text-base sm:text-lg lg:text-xl font-semibold cursor-pointer">
+              Eliteimage Ai
+            </h2>
+          </a>
 
           <nav className="hidden md:flex gap-6 lg:gap-10 xl:gap-14 text-black font-medium text-sm lg:text-base xl:text-lg">
             <a
