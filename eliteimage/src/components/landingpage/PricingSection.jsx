@@ -18,7 +18,7 @@ export default function PricingSection() {
     <div id="pricing" className="py-10">
       <div className="mycontainer">
         <div className="text-center mb-16">
-          <h2 className="text-[24px] md:text-[38px] font-bold text-gray-900 mb-4">
+          <h2 className="text-[24px] md:text-[36px] font-bold text-gray-900 mb-4">
             Flexible Pricing
           </h2>
           <p className="text-gray-600 text-[18px] max-w-3xl mx-auto">

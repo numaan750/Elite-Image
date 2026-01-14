@@ -81,7 +81,7 @@ export default function ContactSection() {
     <div id="contact" className="py-8 lg:py-10">
       <div className="mycontainer grid lg:grid-cols-[1fr_1.5fr] gap-8">
         <div className="w-full h-full flex flex-col justify-center gap-6">
-          <h2 className="lg:text-[42px] text-[36px] font-semibold">
+          <h2 className="lg:text-[36px] text-[36px] font-semibold">
             Contact Us
           </h2>
           <p className="lg:text-[18px] text-[16px] max-w-md">

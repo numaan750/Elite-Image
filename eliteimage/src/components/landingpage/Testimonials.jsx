@@ -7,10 +7,10 @@ const Testimonials = () => {
       <div className="mycontainer">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-1">
-            <h2 className="text-[38px] md:text-[48px] font-bold text-gray-900 mb-2">
+            <h2 className="text-[38px] md:text-[36px] font-bold text-gray-900 mb-2">
               Client Trust
             </h2>
-            <p className="text-black text-[16px] leading-relaxed">
+            <p className="text-black text-[18px] leading-relaxed">
               Real estate agents and photographers rely on EliteImage AI to
               enhance images instantly, reduce editing time, improve listing
               quality, and attract more buyers with consistent, professional
