@@ -140,7 +140,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold mb-3">Newsletter</h3>
+              <h3 className="text-xl font-semibold mb-3">News letter</h3>
               <div className="relative">
                 <input
                   type="email"
