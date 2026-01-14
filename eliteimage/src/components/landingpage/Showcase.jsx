@@ -439,7 +439,7 @@ const Showcase = () => {
   return (
     <div className="py-10">
       <div className="mycontainer">
-        <div className="text-center mb-12 max-w-[900px] mx-auto">
+        <div className="text-center mb-8 max-w-[900px] mx-auto">
           <h2 className="text-[24px] md:text-[36px] font-semibold mb-3">
             Showcase Real Transformations
           </h2>

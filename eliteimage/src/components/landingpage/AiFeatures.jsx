@@ -77,7 +77,7 @@ const AiFeatures = () => {
   return (
     <div id="features" className="py-10 bg-white">
       <div className="mycontainer">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-[24px] md:text-[36px] font-semibold mb-3">
             Powerful AI Features
           </h2>
