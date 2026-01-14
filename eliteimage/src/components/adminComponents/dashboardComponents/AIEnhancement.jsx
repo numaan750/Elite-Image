@@ -61,7 +61,7 @@ const AIEnhancement = () => {
               Eliteimage Ai
             </h1>
 
-            <h2 className="mt-4 sm:mt-6 lg:mt-10 text-[22px] sm:text-[26px] lg:text-[32px] font-semibold text-black leading-tight">
+            <h2 className="mt-4 sm:mt-6 lg:mt-10 text-[22px] sm:text-[24px] lg:text-[28px] font-semibold text-black leading-tight">
               Welcome Back, Google  User
             </h2>
 
@@ -76,14 +76,14 @@ const AIEnhancement = () => {
           </button>
         </div>
 
-        <section className="mt-8 sm:mt-12 lg:mt-16">
+        <section className="mt-8 sm:mt-12 lg:mt-14">
           <h3 className="text-[20px] sm:text-[28px] font-semibold text-black">
             AI Enhancement Features
           </h3>
         </section>
       </main>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mt-6 sm:mt-8  pb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 pb-2">
         {features.map((item, index) => (
           <Link
             key={index}

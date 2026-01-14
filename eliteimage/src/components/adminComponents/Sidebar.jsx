@@ -26,7 +26,7 @@ export default function Sidebar() {
 
   const menu = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Upload Image", href: "/admin/uploadImage", icon: Upload },
+    // { name: "Upload Image", href: "/admin/uploadImage", icon: Upload },
     { name: "Projects", href: "/admin/projects", icon: Folder },
     { name: "Pricing", href: "/admin/pricing", icon: CreditCard },
     { name: "Support", href: "/admin/support", icon: HelpCircle },
@@ -38,9 +38,10 @@ export default function Sidebar() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden fixed z-50 p-3 bg-[#D3E7F0] w-full"
+        className="lg:hidden fixed z-50 p-3 bg-[#D3E7F0] w-full flex items-center gap-5"
       >
         <Menu size={24} />
+        <span className="text-black font-semibold text-[18px]">EliteImage</span>
       </button>
 
       {open && (
@@ -61,29 +62,37 @@ export default function Sidebar() {
   `}
       >
         <div className="flex items-center justify-between mb-12">
-          <h2 className="text-[24px] font-semibold">Logo</h2>
+          <h2 className="text-[24px] font-semibold">Eliteimage</h2>
           <button className="lg:hidden" onClick={() => setOpen(false)}>
             <X />
           </button>
         </div>
 
         <nav className="flex flex-col gap-2">
-          {menu.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[16px]
-                ${
-                  pathname === item.href
-                    ? "bg-[#034F75] text-white"
-                    : "hover:bg-[#034F75] hover:text-white"
-                }`}
-            >
-              <item.icon size={18} />
-              <span>{item.name}</span>
-            </Link>
-          ))}
+          {menu.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href === "/admin/dashboard" &&
+                pathname.startsWith("/admin/uploadImage"));
+
+            return (
+              // <-- add return here
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[16px]
+        ${
+          isActive
+            ? "bg-[#034F75] text-white"
+            : "hover:bg-[#034F75] hover:text-white"
+        }`}
+              >
+                <item.icon size={18} />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
         </nav>
 
         <button

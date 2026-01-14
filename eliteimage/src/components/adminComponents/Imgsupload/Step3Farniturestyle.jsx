@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
+import { useRouter } from "next/navigation";
 
 const FURNITURE_TYPES = [
   { name: "Modern Furniture", img: "/projects/Visual/Furniture-Styles-1.webp" },
@@ -38,6 +39,15 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
   const [selectedFurniture, setSelectedFurniture] = useState(
     formData.selectedFurniture || FURNITURE_TYPES[0].name
   );
+  const router = useRouter();
+
+// ✅ ADD THIS:
+useEffect(() => {
+  if (!formData.featureType) {
+    toast.error("Please select a feature first");
+    router.push('/admin/dashboard');
+  }
+}, [formData.featureType, router]);
 
   const handleContinue = () => {
     setFormData((prev) => ({

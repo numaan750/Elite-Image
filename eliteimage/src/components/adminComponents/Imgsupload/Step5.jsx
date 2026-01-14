@@ -4,12 +4,22 @@ import React, { useState, useEffect, useContext } from "react";
 import { ChevronLeft, ChevronRight, MoveHorizontal } from "lucide-react";
 import { FaMagic } from "react-icons/fa";
 import { AppContext } from "@/context/AppContext";
+import { useRouter } from "next/navigation";
 
 const Step5 = ({ formData, setFormData, back }) => {
   const { token, saveGeneratedImage } = useContext(AppContext);
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
   const [isSaving, setIsSaving] = useState(false); // ✅ ADD THIS
+  const router = useRouter();
+
+useEffect(() => {
+  if (!formData.featureType) {
+    toast.error("Please select a feature first");
+    router.push('/admin/dashboard');
+  }
+}, [formData.featureType, router]);
+
 
   // Initialize slider positions for each image
   useEffect(() => {

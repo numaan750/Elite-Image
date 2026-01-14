@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
@@ -10,6 +10,14 @@ import { useRouter } from "next/navigation";
 const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
   const { token, saveGeneratedImage, user } = useContext(AppContext);
+
+// ✅ ADD THIS:
+useEffect(() => {
+  if (!formData.featureType) {
+    toast.error("Please select a feature first");
+    router.push('/admin/dashboard');
+  }
+}, [formData.featureType, router]);
 
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);

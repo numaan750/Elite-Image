@@ -182,17 +182,15 @@ export const STYLES_DATA = {
   ],
   "Sky Replacement": [
     {
-      name: "Blue Sky Style",
-      img: "https://images.unsplash.com/photo-1517685352821-92cf88aee5a5?w=400&h=250&fit=crop",
+      name: "Vibrant Edit", img: "/projects/Grass/Grass-option-7.webp" 
     },
     {
-      name: "Sunset Style",
-      img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop",
+      name: "Soft Edit", img: "/projects/Grass/Grass-option-8.webp" 
     },
-    {
-      name: "Dramatic Clouds",
-      img: "https://images.unsplash.com/photo-1500740516770-92bd004b996e?w=400&h=250&fit=crop",
-    },
+    // {
+    //   name: "Dramatic Clouds",
+    //   img: "https://images.unsplash.com/photo-1500740516770-92bd004b996e?w=400&h=250&fit=crop",
+    // },
   ],
   "Virtual Staging": [
     { name: "Vibrant Edit", img: "/projects/Enhancement-Options-2.webp" },
@@ -275,3 +273,17 @@ export const FURNITURE_TYPES_DATA = {
     },
   ],
 };
+
+
+// // ==================== Main features DATA ====================
+// export const MAIN_FEATURES_DATA = [
+//   {name:"Enhance", img:"/LandingPage/Enhance.webp"},
+//   {name:"HDR", img:"/LandingPage/HDR.webp"},
+//   {name:"Grass Replacement", img:"/LandingPage/Grass.webp"},
+//   {name:"Object Removal", img:"/LandingPage/Object-Removel.webp"},
+//   {name:"Sky Replacement", img:"/LandingPage/Sky.webp"},
+//   {name:"Virtual Staging", img:"/LandingPage/Virtual-Staging.webp"},  
+//   {name:"Day to Dusk", img:"/LandingPage/Day-to-Dusk.webp"},
+//   {name:"Straighten", img:"/LandingPage/Straighten.webp"},
+//   {name:"Watermark Remove", img:"/LandingPage/Watermark-Remove.webp"},
+// ];

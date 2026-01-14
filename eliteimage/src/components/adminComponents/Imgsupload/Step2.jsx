@@ -1,83 +1,103 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FEATURES_DATA } from "./featuresData";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
 import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Step2 = ({ formData, setFormData, next, back, featureType }) => {
+  const router = useRouter();
+
   const featureData = FEATURES_DATA[featureType];
 
   const [selected, setSelected] = useState(formData.selectedFeatures || []);
 
-  const handleContinue = async () => {
+  useEffect(() => {
+    if (!formData.featureType) {
+      toast.error("Please select a feature first");
+      router.push("/admin/dashboard");
+    }
+  }, [formData.featureType, router]);
+
+  // const handleContinue = async () => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     selectedFeatures: selected,
+  //   }));
+  //   // if (featureType === "Sky Replacement") {
+  //   //   try {
+  //   //     const token = localStorage.getItem("token");
+
+  //   //     if (!token) {
+  //   //       toast.error("Please login first");
+  //   //       return;
+  //   //     }
+
+  //   //     toast.loading("Saving your selection...", { id: "save-sky" });
+
+  //   //     const backendPayload = {
+  //   //       userid: formData.userId,
+  //   //       title: `Sky Replacement - ${new Date().toLocaleDateString()}`,
+  //   //       description: `Selected Sky: ${selected[0]}`,
+  //   //       featureType: "Sky Replacement",
+  //   //       uploadedImages: formData.uploadedImages,
+  //   //       selectedFeature: selected,
+  //   //       selectedStyle: [],
+  //   //       selectedFurniture: [],
+  //   //       beforeAfterData: [],
+  //   //       finalNotes: "",
+  //   //     };
+  //   //     const API_URL =
+  //   //       process.env.NEXT_PUBLIC_API_URL || "https://elite-image.vercel.app";
+
+  //   //     const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
+  //   //       method: "POST",
+  //   //       headers: {
+  //   //         "Content-Type": "application/json",
+  //   //         Authorization: `Bearer ${token}`,
+  //   //       },
+  //   //       body: JSON.stringify(backendPayload),
+  //   //     });
+
+  //   //     if (!response.ok) {
+  //   //       const errorData = await response.json();
+  //   //       throw new Error(errorData.message || "Failed to save");
+  //   //     }
+
+  //   //     const data = await response.json();
+
+  //   //     toast.success("Selection saved!", { id: "save-sky" });
+  //   //     setFormData((prev) => ({
+  //   //       ...prev,
+  //   //       projectId: data._id,
+  //   //     }));
+  //   //   } catch (error) {
+  //   //     console.error("Save error:", error);
+  //   //     toast.error(`Failed: ${error.message}`, { id: "save-sky" });
+  //   //     return;
+  //   //   }
+  //   // }
+  //   if (featureType === "Sky Replacement") {
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       beforeAfterData: prev.uploadedImages.map((img) => ({
+  //         processedImage: img,
+  //       })),
+  //     }));
+  //   }
+
+  //   next();
+  // };
+
+  const handleContinue = () => {
     setFormData((prev) => ({
       ...prev,
       selectedFeatures: selected,
     }));
-    if (featureType === "Sky Replacement") {
-      try {
-        const token = localStorage.getItem("token");
 
-        if (!token) {
-          toast.error("Please login first");
-          return;
-        }
-
-        toast.loading("Saving your selection...", { id: "save-sky" });
-
-        const backendPayload = {
-          userid: formData.userId,
-          title: `Sky Replacement - ${new Date().toLocaleDateString()}`,
-          description: `Selected Sky: ${selected[0]}`,
-          featureType: "Sky Replacement",
-          uploadedImages: formData.uploadedImages,
-          selectedFeature: selected,
-          selectedStyle: [],
-          selectedFurniture: [],
-          beforeAfterData: [],
-          finalNotes: "",
-        };
-        const API_URL =
-          process.env.NEXT_PUBLIC_API_URL || "https://elite-image.vercel.app";
-
-        const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(backendPayload),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to save");
-        }
-
-        const data = await response.json();
-
-        toast.success("Selection saved!", { id: "save-sky" });
-        setFormData((prev) => ({
-          ...prev,
-          projectId: data._id,
-        }));
-      } catch (error) {
-        console.error("Save error:", error);
-        toast.error(`Failed: ${error.message}`, { id: "save-sky" });
-        return;
-      }
-    }
-    if (featureType === "Sky Replacement") {
-      setFormData((prev) => ({
-        ...prev,
-        beforeAfterData: prev.uploadedImages.map((img) => ({
-          processedImage: img,
-        })),
-      }));
-    }
-
+    // Sirf next step par jao
     next();
   };
 
@@ -157,28 +177,26 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
       </div>
 
       <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 max-w-7xl mx-auto">
-  
-  {/* Back Button */}
-  <button
-    onClick={back}
-    className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-black text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors"
-  >
-    <ChevronRight size={17} className="rotate-180" /> {/* Left arrow */}
-    Back
-  </button>
+        {/* Back Button */}
+        <button
+          onClick={back}
+          className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-black text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors"
+        >
+          <ChevronRight size={17} className="rotate-180" /> {/* Left arrow */}
+          Back
+        </button>
 
-  {/* Generate Button */}
-  <button
-    onClick={handleContinue}
-    disabled={selected.length === 0}
-    className={`flex items-center gap-2 bg-[#034F75] hover:bg-[#023a5c] text-white text-[16px] sm:text-[18px] px-6 sm:px-10 py-2.5 sm:py-3 rounded-lg transition-colors ${
-      selected.length === 0 ? "opacity-50 cursor-not-allowed" : ""
-    }`}
-  >
-    Generate Now
-  </button>
-
-</div>
+        <button
+          onClick={handleContinue}
+          disabled={selected.length === 0}
+          className={`flex items-center gap-2 bg-[#034F75] hover:bg-[#023a5c] text-white text-[16px] sm:text-[18px] px-6 sm:px-10 py-2.5 sm:py-3 rounded-lg transition-colors ${
+            selected.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          Continue
+          <ChevronRight size={18} />
+        </button>
+      </div>
     </div>
   );
 };

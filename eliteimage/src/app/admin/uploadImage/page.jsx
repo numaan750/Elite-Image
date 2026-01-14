@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import AuthGuard from "@/components/AuthGuard";
+import AllFeatures from "@/components/adminComponents/Imgsupload/AllFeatures";
 
 import Step1 from "@/components/adminComponents/Imgsupload/Step1";
 import Step2 from "@/components/adminComponents/Imgsupload/Step2";
@@ -49,17 +50,18 @@ const FEATURE_STEPS_CONFIG = {
     totalSteps: 2,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
-      { id: 2, component: Step2ObjectRemoval, name: "Select Object" }, // ✅ CHANGED
+      { id: 2, component: Step2ObjectRemoval, name: "Select Object" },
       { id: 3, component: Step4, name: "Processing" },
       { id: 4, component: Step5, name: "Final Edit" },
     ],
   },
 
   "Sky Replacement": {
-    totalSteps: 2,
+    totalSteps: 3,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Sky Options" },
+      { id: 3, component: Step3, name: "Edit Styles" },
       { id: 3, component: Step4, name: "Processing" },
       { id: 4, component: Step5, name: "Final Edit" },
     ],
@@ -70,7 +72,7 @@ const FEATURE_STEPS_CONFIG = {
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Room Type" },
-      { id: 3, component: Step3Farniturestyle, name: "Furniture Type" }, // ✅ Naya component
+      { id: 3, component: Step3Farniturestyle, name: "Furniture Type" },
       { id: 4, component: Step3, name: "Edit Styles" },
       { id: 5, component: Step4, name: "Processing" },
       { id: 6, component: Step5, name: "Final Edit" },
@@ -109,10 +111,13 @@ const FEATURE_STEPS_CONFIG = {
 
 const UploadImageTabs = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const featureType = searchParams.get("type");
+  
   const [activeStep, setActiveStep] = useState(1);
   const [userId, setUserId] = useState(null);
-
-  const featureType = searchParams.get("type") || "Enhance";
+  const [showAllFeatures, setShowAllFeatures] = useState(!featureType);
 
   const currentConfig =
     FEATURE_STEPS_CONFIG[featureType] || FEATURE_STEPS_CONFIG.Enhance;
@@ -121,7 +126,7 @@ const UploadImageTabs = () => {
 
   const [formData, setFormData] = useState({
     userId: null,
-    featureType: featureType,
+    featureType: featureType || null,
     uploadedImages: [],
     selectedFeature: "",
     selectedFurniture: "",
@@ -131,15 +136,6 @@ const UploadImageTabs = () => {
     totalSteps: currentConfig.totalSteps,
     projectId: null,
   });
-
-  // useEffect(() => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     featureType: featureType,
-  //   }));
-  //   // Reset to step 1 when feature type changes
-  //   setActiveStep(1);
-  // }, [featureType]);
 
   useEffect(() => {
     let id = localStorage.getItem("userId");
@@ -160,19 +156,37 @@ const UploadImageTabs = () => {
   }, [userId]);
 
   useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      featureType: featureType,
-      totalSteps: currentConfig.totalSteps,
-    }));
-    setActiveStep(1);
+    // ✅ Jab featureType change ho, tab form update karo
+    if (featureType) {
+      setFormData((prev) => ({
+        ...prev,
+        featureType: featureType,
+        totalSteps: currentConfig.totalSteps,
+      }));
+      setShowAllFeatures(false);
+      setActiveStep(1);
+    } else {
+      setShowAllFeatures(true);
+    }
   }, [featureType, currentConfig.totalSteps]);
+
   const maxSteps = stepsConfig.length;
   const goNext = () => setActiveStep((prev) => Math.min(prev + 1, maxSteps));
   const goBack = () => setActiveStep((prev) => Math.max(prev - 1, 1));
 
   const currentStepConfig = stepsConfig[activeStep - 1];
   const CurrentStepComponent = currentStepConfig?.component;
+
+  // ✅ Agar feature select nahi hai, to AllFeatures page show karo
+  if (showAllFeatures) {
+    return (
+      <AuthGuard>
+        <div className="max-w-6xl mx-auto p-6">
+          <AllFeatures />
+        </div>
+      </AuthGuard>
+    );
+  }
 
   return (
     <AuthGuard>

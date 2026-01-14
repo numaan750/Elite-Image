@@ -22,12 +22,15 @@ const Footer = () => {
   };
 
   return (
-
     <div className="py-10 mt-10 bg-[#034F75] text-white">
       <div className="mycontainer ">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 pb-8 ">
           <div className="flex flex-col gap-4">
-            <h2 className="text-3xl md:text-4xl font-bold">LOGO</h2>
+            <h2 className="text-3xl md:text-4xl font-bold">EliteImage</h2>
+            <p className="text-sm leading-relaxed">
+              Lorem ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem ipsum has been the industry&apos;s standard dummy
+            </p>
           </div>
 
           <div className="flex flex-col gap-4">
@@ -57,7 +60,7 @@ const Footer = () => {
                   onClick={(e) => handleScroll(e, "growers")}
                   className="hover:text-gray-300 transition-colors cursor-pointer"
                 >
-                  privacy policy
+                  Privacy Policy
                 </a>
               </li>
               <li>
@@ -66,7 +69,7 @@ const Footer = () => {
                   onClick={(e) => handleScroll(e, "merchants")}
                   className="hover:text-gray-300 transition-colors cursor-pointer"
                 >
-                  terms and conditions
+                  Terms & Conditions
                 </a>
               </li>
               <li>
@@ -153,7 +156,7 @@ const Footer = () => {
         </div>
 
         <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-          <div className="flex flex-col md:flex-row gap-4 md:gap-90">
+          <div className="flex flex-col md:flex-row gap-5 md:gap-98">
             <a
               href="mailto:example@gmail.com"
               className="border-b border-white p-1 hover:text-gray-300 transition-colors"
@@ -168,7 +171,7 @@ const Footer = () => {
             </a>
           </div>
           <div>
-            <span>© 2021 Bike-mage. All rights reserved</span>
+            <span>© 2020 Elite Image. All rights reserved.</span>
           </div>
         </div>
       </div>

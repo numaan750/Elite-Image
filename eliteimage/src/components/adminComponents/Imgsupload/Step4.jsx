@@ -10,6 +10,7 @@ import toast, { Toaster } from "react-hot-toast";
 // import { useSearchParams } from "next/navigation"; // ✅ ADD THIS
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { useRouter } from "next/navigation";
 
 const CLOUD_NAME = "dhtpqla2b";
 const UPLOAD_PRESET = "unsigned_preset";
@@ -94,15 +95,27 @@ const downloadImagesAsZip = async (formData) => {
           const blob = await response.blob();
 
           if (window.showSaveFilePicker) {
-            const fileHandle = await window.showSaveFilePicker({
-              suggestedName: "sky-replacement-image.jpg",
-              types: [
-                {
-                  description: "Image",
-                  accept: { "image/jpeg": [".jpg"], "image/png": [".png"] },
-                },
-              ],
-            });
+            // Open save dialog first, immediately on click
+            let fileHandle;
+            try {
+              fileHandle = await window.showSaveFilePicker({
+                suggestedName: "Elite-Image-AI-Project.zip",
+                types: [
+                  {
+                    description: "ZIP Archive",
+                    accept: { "application/zip": [".zip"] },
+                  },
+                ],
+              });
+            } catch (error) {
+              if (error.name === "AbortError") {
+                toast.error("Download cancelled", { id: "zip" });
+                return; // stop execution if user cancels
+              } else {
+                console.error("Save dialog error:", error);
+                fileHandle = null; // fallback to saveAs
+              }
+            }
 
             const writable = await fileHandle.createWritable();
             await writable.write(blob);
@@ -158,9 +171,21 @@ const downloadImagesAsZip = async (formData) => {
             ],
           });
 
-          const writableStream = await fileHandle.createWritable();
-          await writableStream.write(zipBlob);
-          await writableStream.close();
+          // Only write if fileHandle exists
+          if (fileHandle) {
+            const writableStream = await fileHandle.createWritable();
+            await writableStream.write(zipBlob);
+            await writableStream.close();
+            toast.dismiss("zip");
+            toast.success(`${dataArray.length} image(s) downloaded!`);
+          } else {
+            // fallback for unsupported browsers
+            saveAs(zipBlob, "Elite-Image-AI-Project.zip");
+            toast.dismiss("zip");
+            toast.success(
+              `${dataArray.length} image(s) downloaded! (Default location used)`
+            );
+          }
 
           toast.success(
             `${formData.uploadedImages.length} image(s) downloaded!`,
@@ -241,19 +266,12 @@ const downloadImagesAsZip = async (formData) => {
     const zip = new JSZip();
     const folder = zip.folder("Elite-Image-AI");
 
-    // Add images to zip
+    // Fetch images and add to zip only after getting fileHandle
     for (let i = 0; i < dataArray.length; i++) {
       const imageUrl = dataArray[i].processedImage;
-
-      if (!imageUrl) {
-        console.warn(`Image ${i + 1} has no processedImage URL`);
-        continue;
-      }
-
       try {
         const response = await fetch(imageUrl);
         if (!response.ok) throw new Error(`Failed to fetch image ${i + 1}`);
-
         const blob = await response.blob();
         folder.file(`elite-image-${i + 1}.jpg`, blob);
       } catch (error) {
@@ -343,6 +361,14 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   const { token, saveGeneratedImage } = useContext(AppContext);
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!formData.featureType) {
+      toast.error("Please select a feature first");
+      router.push("/admin/dashboard");
+    }
+  }, [formData.featureType, router]);
 
   useEffect(() => {
     const initialPositions = {};

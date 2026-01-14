@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { STYLES_DATA } from "./featuresData";
@@ -7,9 +7,19 @@ import ProgressBar from "./ProgressBar";
 import { useContext } from "react";
 import { AppContext } from "@/context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   const { token, saveGeneratedImage, user } = useContext(AppContext);
+  const router = useRouter();
+
+// ✅ ADD THIS:
+useEffect(() => {
+  if (!formData.featureType) {
+    toast.error("Please select a feature first");
+    router.push('/admin/dashboard');
+  }
+}, [formData.featureType, router]);
   const styles = STYLES_DATA[featureType];
 
   const [selected, setSelected] = useState(

@@ -5,7 +5,7 @@ import Image from "next/image";
 import ProgressBar from "./ProgressBar";
 import { AppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation"; // ✅ ADD THIS
+import { useRouter } from "next/navigation";
 
 const CLOUD_NAME = "dhtpqla2b";
 const UPLOAD_PRESET = "unsigned_preset";
@@ -18,93 +18,94 @@ const Step1 = ({ formData, setFormData, next }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  // const toast = {
-  //   loading: (msg) => console.log(msg),
-  //   success: (msg) => console.log(msg),
-  //   error: (msg) => console.error(msg),
-  // };
+  // ✅ REMOVED useEffect - ab koi auto-redirect nahi hoga
 
-// PURANE LINES 51-88 DELETE karen aur NAYE lines likhein:
+  const handleGenerateAndSave = async () => {
+    // ✅ Check if feature is selected
+    if (!formData.featureType) {
+      toast.error("Please select a feature first");
+      router.push('/admin/dashboard');
+      return;
+    }
 
-const handleGenerateAndSave = async () => {
-  if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
-    toast.error("Please upload at least one image first!");
-    return;
-  }
+    if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
+      toast.error("Please upload at least one image first!");
+      return;
+    }
 
-  if (!token) {
-    toast.error("Please login to save images");
-    return;
-  }
+    if (!token) {
+      toast.error("Please login to save images");
+      return;
+    }
 
-  setIsSaving(true);
-  toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
-    id: "processing",
-  });
+    setIsSaving(true);
+    toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
+      id: "processing",
+    });
 
-  try {
-    const allProcessedData = [];
-    const allUploadedImages = [];
+    try {
+      const allProcessedData = [];
+      const allUploadedImages = [];
 
-    for (let i = 0; i < formData.uploadedImages.length; i++) {
-      const uploadedImage = formData.uploadedImages[i];
+      for (let i = 0; i < formData.uploadedImages.length; i++) {
+        const uploadedImage = formData.uploadedImages[i];
 
-      console.log(`📤 [${i + 1}] Processing ${formData.featureType}...`);
+        console.log(`📤 [${i + 1}] Processing ${formData.featureType}...`);
 
-      const processedImageUrl = uploadedImage;
+        const processedImageUrl = uploadedImage;
 
-      const processedData = {
-        originalImage: uploadedImage,
-        processedImage: processedImageUrl,
-        processedAt: new Date().toISOString(),
-        status: "completed",
-        userId: formData.userId,
+        const processedData = {
+          originalImage: uploadedImage,
+          processedImage: processedImageUrl,
+          processedAt: new Date().toISOString(),
+          status: "completed",
+          userId: formData.userId,
+          featureType: formData.featureType,
+        };
+        allProcessedData.push(processedData);
+        allUploadedImages.push(uploadedImage);
+      }
+
+      const singlePayload = {
+        userid: formData.userId,
+        title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
+        description: formData.finalNotes || `${formData.featureType} applied to ${formData.uploadedImages.length} image(s)`,
         featureType: formData.featureType,
+        uploadedImages: allUploadedImages,
+        selectedFeature: [],
+        selectedStyle: [],
+        beforeAfterData: allProcessedData,
+        finalNotes: formData.finalNotes || "",
+        image: allUploadedImages[0],
       };
-      allProcessedData.push(processedData);
-      allUploadedImages.push(uploadedImage);
+
+      setFormData((prev) => ({
+        ...prev,
+        beforeAfterData: allProcessedData,
+      }));
+
+      if (formData.projectId) {
+        await saveGeneratedImage(
+          singlePayload,
+          token,
+          true,
+          formData.projectId
+        );
+        toast.success("Project updated successfully!", { id: "processing" });
+      } else {
+        await saveGeneratedImage([singlePayload], token);
+        toast.success(`${formData.uploadedImages.length} image(s) saved in 1 project!`, {
+          id: "processing",
+        });
+      }
+      next();
+    } catch (error) {
+      console.error("❌ Error:", error);
+      toast.error(`Error: ${error.message}`, { id: "processing" });
+    } finally {
+      setIsSaving(false);
     }
-
-    const singlePayload = {
-      userid: formData.userId,
-      title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
-      description: formData.finalNotes || `${formData.featureType} applied to ${formData.uploadedImages.length} image(s)`,
-      featureType: formData.featureType,
-      uploadedImages: allUploadedImages,
-      selectedFeature: [],
-      selectedStyle: [],
-      beforeAfterData: allProcessedData,
-      finalNotes: formData.finalNotes || "",
-      image: allUploadedImages[0],
-    };
-
-    setFormData((prev) => ({
-      ...prev,
-      beforeAfterData: allProcessedData,
-    }));
-
-    if (formData.projectId) {
-      await saveGeneratedImage(
-        singlePayload,
-        token,
-        true,
-        formData.projectId
-      );
-      toast.success("Project updated successfully!", { id: "processing" });
-    } else {
-      await saveGeneratedImage([singlePayload], token);
-      toast.success(`${formData.uploadedImages.length} image(s) saved in 1 project!`, {
-        id: "processing",
-      });
-    }
-    next();
-  } catch (error) {
-    console.error("❌ Error:", error);
-    toast.error(`Error: ${error.message}`, { id: "processing" });
-  } finally {
-    setIsSaving(false);
-  }
-};
+  };
 
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
@@ -157,6 +158,7 @@ const handleGenerateAndSave = async () => {
 
     e.target.value = "";
   };
+
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -195,9 +197,25 @@ const handleGenerateAndSave = async () => {
     }));
   };
 
-  // ✅ ADD THIS
   const handleBack = () => {
     router.back();
+  };
+
+  // ✅ NEW: Handle Continue - check if feature is selected
+  const handleContinue = () => {
+    if (formData.uploadedImages.length === 0) {
+      toast.error("Please upload at least one image first!");
+      return;
+    }
+
+    // ✅ Agar feature select nahi hai, to AllFeatures page pe bhejo
+    if (!formData.featureType) {
+      router.push('/admin/uploadImage'); // This will show AllFeatures
+      return;
+    }
+
+    // ✅ Agar feature selected hai, to next step pe jao
+    next();
   };
 
   const isSpecialFeature =
@@ -207,9 +225,6 @@ const handleGenerateAndSave = async () => {
   return (
     <div className="bg-white py-10 sm:py-10 lg:py-10">
       <div className="flex items-center gap-3 text-gray-700">
-        {/* <button className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors">
-          <ChevronRight size={16} />
-        </button> */}
         <span className="font-medium text-black text-[16px] sm:text-[20px]">
           Elite Image Ai
         </span>
@@ -224,15 +239,9 @@ const handleGenerateAndSave = async () => {
           </span>
         )}
       </h2>
+
       {formData.totalSteps > 0 && (
         <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-          {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#034F75]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#CFE8F2]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#D3E7F0]" /> */}
-
           <ProgressBar currentStep={1} totalSteps={formData.totalSteps} />
         </div>
       )}
@@ -289,7 +298,6 @@ const handleGenerateAndSave = async () => {
                   className={`relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6] group ${
                     formData.uploadedImages.length === 1 ? "w-full h-full" : ""
                   }`}
-                  // onClick={(e) => e.stopPropagation()}
                 >
                   <Image
                     src={img}
@@ -330,28 +338,6 @@ const handleGenerateAndSave = async () => {
         </div>
       </div>
 
-      {/* {formData.uploadedImages.length > 0 && (
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {formData.uploadedImages.map((img, idx) => (
-            <div
-              key={idx}
-              className="relative rounded-lg overflow-hidden border border-[#6FB6D6] group"
-            >
-              <img
-                src={img}
-                alt={`Uploaded ${idx + 1}`}
-                className="w-full h-40 object-cover"
-              />
-              <button
-                onClick={() => handleRemoveImage(idx)}
-                className="absolute top-2 right-2 bg-black/50 cursor-pointer text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )} */}
       <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-between items-center gap-3">
         <button
           onClick={handleBack}
@@ -360,6 +346,7 @@ const handleGenerateAndSave = async () => {
           <ChevronRight size={17} className="rotate-180" />
           Back
         </button>
+
         {isSpecialFeature ? (
           <button
             onClick={handleGenerateAndSave}
@@ -375,7 +362,7 @@ const handleGenerateAndSave = async () => {
           </button>
         ) : (
           <button
-            onClick={next}
+            onClick={handleContinue}
             disabled={formData.uploadedImages.length === 0}
             className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors ${
               formData.uploadedImages.length === 0
