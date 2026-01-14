@@ -192,7 +192,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white py-10 sm:py-10 lg:py-10">
+    <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <div className="flex items-center gap-3 text-gray-700">
         {/* <div className="flex items-center gap-2">
           <button
@@ -208,24 +208,24 @@ useEffect(() => {
             <ChevronRight size={16} />
           </button>
         </div> */}
-        <span className="font-medium text-black text-[18px] sm:text-[20px]">
+        <span className="font-medium text-black text-[18px] sm:text-[20px] mb-6 sm:mb-8">
           Elite Image AI
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-5 mb-2 text-[20px] sm:text-[28px] lg:text-[28px] font-semibold text-gray-900">
+      <h2 className="mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[28px] lg:text-[28px] font-semibold text-gray-900">
         Object Removal Options
       </h2>
 
       {formData.totalSteps > 0 && (
-        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+        <div className=" flex items-center justify-center gap-2 sm:gap-3 lg:gap-4 mb-4 sm:mb-5 lg:mb-6">
           <ProgressBar currentStep={2} totalSteps={formData.totalSteps} />
         </div>
       )}
 
-      <div className="mt-6 sm:mt-8 lg:mt-10 ">
+      <div className="mb-4 sm:mb-5 lg:mb-6">
         <div className="bg-[#D3E7F0] border-2 border-[#6FB6D6] rounded-2xl p-4 sm:p-6">
-          <div className="text-start mb-5">
+          <div className="text-start mb-4 sm:mb-5 lg:mb-6">
             <p
               className="text-[18px] sm:text-[20px] text-black
               font-medium mb-2"
@@ -236,7 +236,7 @@ useEffect(() => {
             </p>
           </div>
 
-          <div className="flex gap-3 mb-4 overflow-x-auto">
+          <div className="flex gap-3 mb-4 overflow-x-auto mb-4 sm:mb-5 lg:mb-6">
             {formData.uploadedImages.map((img, index) => (
               <img
                 key={index}
@@ -305,7 +305,7 @@ useEffect(() => {
 
       <div
         className="
-  mt-8 sm:mt-10 lg:mt-12 
+   
   flex flex-col sm:flex-row 
   items-stretch sm:items-center
   justify-center sm:justify-center lg:justify-end 

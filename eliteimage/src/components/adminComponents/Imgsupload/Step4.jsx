@@ -568,7 +568,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center py-10 sm:py-10 lg:py-10">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
       {/* <Toaster position="top-right" reverseOrder={false} /> */}
 
       <div className="w-full flex justify-start">
@@ -588,13 +588,13 @@ const Step4 = ({ formData, setFormData, next, back }) => {
             </button>
           </div> */}
 
-          <span className="font-medium text-black text-[16px] sm:text-[18px]">
+          <span className="font-medium text-black text-[16px] sm:text-[18px] mb-6 sm:mb-8">
             Elite Image Ai
           </span>
         </div>
       </div>
 
-      <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
+      <div className="w-full mb-4 sm:mb-5 lg:mb-6">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
           Processing Complete
           {formData.featureType && (
@@ -606,7 +606,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
         </h2>
       </div>
 
-      <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
+      <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]  mb-4 sm:mb-5 lg:mb-6">
         <h3 className="text-[18px] sm:text-[24px] lg:text-[24px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
@@ -719,7 +719,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
         </div>
       </div>
 
-      <div className="w-full max-w-full sm:max-w-[820px] flex flex-col items-center mt-6 sm:mt-8 gap-3 sm:gap-4">
+      <div className="w-full max-w-full sm:max-w-[820px] flex flex-col items-center gap-3 sm:gap-4">
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full sm:w-auto">
           <button
             onClick={next}

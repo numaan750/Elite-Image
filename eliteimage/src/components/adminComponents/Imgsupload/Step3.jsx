@@ -171,7 +171,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white py-10 sm:py-10 lg:py-10">
+    <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <div className="flex items-center gap-3 text-gray-700">
         {/* <div className="flex items-center gap-2">
           <button
@@ -187,16 +187,16 @@ useEffect(() => {
             <ChevronRight size={16} />
           </button>
         </div> */}
-        <span className="font-medium text-black text-[16px] sm:text-[18px]">
+        <span className="font-medium text-black text-[16px] sm:text-[18px] mb-6 sm:mb-8">
           Elite Image Ai
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-6 lg:mt-9 mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
+      <h2 className=" mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
         Edit Styles - {featureType}
       </h2>
       {formData.totalSteps > 0 && (
-        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+        <div className="mb-2 sm:mb-4 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
           {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#CFE8F2]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
@@ -207,7 +207,7 @@ useEffect(() => {
         </div>
       )}
 
-      <div className="mt-6 sm:mt-8 grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+      <div className="mb-2 sm:mb-4 lg:mb-6 grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
         {styles.map((item, index) => (
           <div
             key={`${item.name}-${index}`}
@@ -242,7 +242,7 @@ useEffect(() => {
         ))}
       </div>
 
-      <div className="mt-8 sm:mt-12 lg:mt-16 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
+      <div className=" flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
         {/* Back Button (Left) */}
         <button
           onClick={back}

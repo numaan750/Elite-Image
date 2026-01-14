@@ -81,13 +81,13 @@ const Projects = () => {
   }
   return (
     <>
-      <h2 className="text-base sm:text-[20px] font-medium text-black py-10 sm:py-10">
+      <h2 className="text-base sm:text-[20px] font-medium text-black mt-14 sm:mt-16 lg:mt-15">
         Eliteimage Ai
       </h2>
 
       <div className="py-4 sm:py-6 lg:py-8 w-full">
-        <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <h2 className="text-[20px] sm:text-[32px] lg:text-[28px] font-medium text-black">
+        <div className="mb-2 sm:mb-4 lg:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <h2 className="text-[20px] sm:text-[32px] lg:text-[28px] font-semibold text-black">
             My Projects
           </h2>
 
@@ -99,7 +99,7 @@ const Projects = () => {
           </button>
         </div>
 
-        <div className="space-y-4 sm:space-y-5">
+        <div className="space-y-4 sm:space-y-5 ">
           {images.map((project) => (
             <div
               key={project._id}

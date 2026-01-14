@@ -4,7 +4,7 @@ import React from "react";
 const Pricing = () => {
   return (
     <>
-      <h2 className="text-[18px] sm:text-[20px] font-medium text-black py-10 sm:py-10">
+      <h2 className="text-[18px] sm:text-[20px] font-medium text-black mt-14 sm:mt-16 lg:mt-15">
         Eliteimage Ai
       </h2>
 
@@ -13,7 +13,7 @@ const Pricing = () => {
         className=""
       >
         <div>
-          <h2 className="text-[20px] sm:text-[20px] lg:text-[28px] font-semibold mb-6">
+          <h2 className="text-[20px] sm:text-[20px] lg:text-[28px] font-semibold mb-2 sm:mb-4 lg:mb-6 mt-8">
             Pricing
           </h2>
 

@@ -102,7 +102,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white py-8 sm:py-10 lg:py-10">
+    <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <div className="flex items-center text-gray-700">
         {/* <div className="flex items-center gap-2">
           <button
@@ -118,16 +118,16 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
             <ChevronRight size={16} />
           </button>
         </div> */}
-        <span className="font-medium text-black text-[16px] sm:text-[18px]">
+        <span className="font-medium text-black text-[16px] sm:text-[18px] mb-6 sm:mb-8">
           Elite Image AI
         </span>
       </div>
 
-      <h2 className="mt-5 sm:mt-6 mb-8 sm:mb-10 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-gray-900">
+      <h2 className="mb-2 sm:mb-4 lg:mb-6 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-gray-900">
         {featureData.title}
       </h2>
       {formData.totalSteps > 0 && (
-        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+        <div className="mb-2 sm:mb-4 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
           {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-12 sm:w-16 lg:w-20 bg-[#CFE8F2]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
@@ -137,7 +137,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         </div>
       )}
 
-      <div className="mt-6 sm:mt-8 lg:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+      <div className="mb-2 sm:mb-4 lg:mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
         {featureData.options.map((item) => (
           <div
             key={item.name}
@@ -176,7 +176,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         ))}
       </div>
 
-      <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 max-w-7xl mx-auto">
+      <div className=" flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 max-w-7xl mx-auto">
         {/* Back Button */}
         <button
           onClick={back}

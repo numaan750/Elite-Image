@@ -29,15 +29,15 @@ export default function Support() {
   const [open, setOpen] = useState(0);
 
   return (
-    <div className="min-h-screen bg-white py-10 sm:py-10">
-      <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium mb-6 sm:mb-14">
+    <div className="min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
+      <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium mb-6 sm:mb-8">
         Eliteimage Ai
       </h3>
-      <h2 className="text-[20px] sm:text-[28px] font-semibold mb-6 sm:mb-10">
+      <h2 className="text-[20px] sm:text-[28px] font-semibold mb-2 sm:mb-4 lg:mb-6">
         How Can We Help?
       </h2>
 
-      <div className="max-w-full sm:max-w-3xl space-y-2 sm:space-y-3">
+      <div className="max-w-full sm:max-w-3xl space-y-2 sm:space-y-3 ">
         {faqs.map((item, i) => (
           <div
             key={i}

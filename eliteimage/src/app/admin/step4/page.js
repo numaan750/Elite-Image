@@ -343,7 +343,7 @@ const Step4Page = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center py-10 sm:py-10 lg:py-10">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
       <div className="w-full flex justify-start mb-4">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
           {/* <div className="flex items-center gap-2">
@@ -361,14 +361,14 @@ const Step4Page = () => {
             </button>
           </div> */}
 
-          <span className="font-medium text-black text-[16px] sm:text-[20px]">
+          <span className="font-medium text-black text-[16px] sm:text-[20px] mb-4 sm:mb-5 lg:mb-6 mt-8">
             Elite Image AI -{" "}
             {isViewMode ? "View" : isEditMode ? "Edit" : "Generate"} Mode
           </span>
         </div>
       </div>
 
-      <div className="w-full mb-4 sm:mb-6 lg:mb-8">
+      <div className="w-full mb-4 sm:mb-5 lg:mb-6">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
           {isViewMode
             ? "View Results"
@@ -377,12 +377,12 @@ const Step4Page = () => {
             : "Processing Complete"}
         </h2>
         {/* ✅ ADD THIS NEW LINE */}
-        <p className="text-sm sm:text-base text-gray-600 mt-2">
+        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-5 lg:mb-6 mt-6">
           Total Images: {formData.uploadedImages.length}
         </p>
       </div>
 
-      <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
+      <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0] mb-4 sm:mb-5 lg:mb-6">
         <h3 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
@@ -498,7 +498,6 @@ const Step4Page = () => {
   max-w-full sm:max-w-[820px]
   flex flex-col
   items-center
-  mt-6 sm:mt-8
   gap-4 sm:gap-5
 "
       >

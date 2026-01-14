@@ -153,9 +153,9 @@ const EditProjectPage = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center py-10 sm:py-10 lg:py-10">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
       <div className="w-full flex justify-start">
-        <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
+        <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700 mb-6 sm:mb-8">
           {/* <div className="flex items-center gap-2">
             <button
               onClick={() => router.back()}
@@ -171,19 +171,19 @@ const EditProjectPage = () => {
             </button>
           </div> */}
 
-          <span className="font-medium text-black text-[16px] sm:text-[20px]">
+          <span className="font-medium text-black text-[16px] sm:text-[20px]  ">
             Elite Image AI - Edit Mode
           </span>
         </div>
       </div>
 
-      <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
+      <div className="w-full mb-2 sm:mb-4 lg:mb-6">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
           Edit Project
         </h2>
       </div>
 
-      <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
+      <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0] mb-2 sm:mb-4 lg:mb-6">
         <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
@@ -293,12 +293,12 @@ const EditProjectPage = () => {
         </div>
       </div>
 
-      <div className="w-full mt-6 sm:mt-8 lg:mt-10">
-        <label className="block text-[14px] sm:text-[18px] lg:text-[20px] font-medium text-black mb-2">
+      <div className="w-full">
+        <label className="block text-[18px] sm:text-[24px] lg:text-[32px] font-semibold text-black mb-2 sm:mb-4 lg:mb-6">
           Describe What You Can Edit
         </label>
 
-        <div className="w-full rounded-lg border border-dashed border-[#034F75] bg-[#DFF0F7] p-3 sm:p-4">
+        <div className="w-full rounded-lg border border-dashed border-[#034F75] bg-[#DFF0F7] p-3 sm:p-4 mb-2 sm:mb-4 lg:mb-6">
           <textarea
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
@@ -316,7 +316,7 @@ const EditProjectPage = () => {
   justify-center sm:justify-end
   items-stretch sm:items-center
   gap-3 sm:gap-4
-  mt-4 sm:mt-6
+  
 "
         >
           <button

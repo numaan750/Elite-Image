@@ -58,7 +58,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white py-10 sm:py-10 lg:py-10">
+    <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <div className="flex items-center gap-3 text-gray-700">
         {/* <div className="flex items-center gap-2">
           <button
@@ -74,15 +74,15 @@ useEffect(() => {
             <ChevronRight size={16} />
           </button>
         </div> */}
-        <span className="font-medium text-black text-[16px] sm:text-[20px]">
+        <span className="font-medium text-black text-[16px] sm:text-[20px] mb-6 sm:mb-8">
           Elite Image AI
         </span>
       </div>
-      <h2 className="mt-4 sm:mt-5 mb-4 sm:mb-6 text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-gray-900">
+      <h2 className="mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-gray-900">
         Select Furniture Type
       </h2>
       {formData.totalSteps > 0 && (
-        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+        <div className="mb-4 sm:mb-5 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
           {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
         <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#CFE8F2]" />
         <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
@@ -99,7 +99,7 @@ useEffect(() => {
       )}
 
       {/* Furniture Options Grid */}
-      <div className="mt-6 sm:mt-8 lg:mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 max-w-7xl mx-auto">
+      <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 mb-4 sm:mb-5 lg:mb-6">
         {FURNITURE_TYPES.map((item) => (
           <div
             key={item.name}
@@ -138,7 +138,7 @@ useEffect(() => {
 
       <div
         className="
-    mt-8 sm:mt-10 lg:mt-12
+    
     flex flex-col sm:flex-row
     items-stretch sm:items-center
     justify-center sm:justify-center lg:justify-end

@@ -13,13 +13,12 @@ const Step5 = ({ formData, setFormData, back }) => {
   const [isSaving, setIsSaving] = useState(false); // ✅ ADD THIS
   const router = useRouter();
 
-useEffect(() => {
-  if (!formData.featureType) {
-    toast.error("Please select a feature first");
-    router.push('/admin/dashboard');
-  }
-}, [formData.featureType, router]);
-
+  useEffect(() => {
+    if (!formData.featureType) {
+      toast.error("Please select a feature first");
+      router.push("/admin/dashboard");
+    }
+  }, [formData.featureType, router]);
 
   // Initialize slider positions for each image
   useEffect(() => {
@@ -116,7 +115,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center py-10 sm:py-10 lg:py-10">
+    <div className="w-full bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
       <div className="w-full flex justify-start">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
           {/* <div className="flex items-center gap-2">
@@ -131,13 +130,13 @@ useEffect(() => {
             </button>
           </div> */}
 
-          <span className="font-medium text-black text-[16px] sm:text-[20px]">
+          <span className="font-medium text-black text-[16px] sm:text-[20px] mb-6 sm:mb-8">
             Elite Image Ai
           </span>
         </div>
       </div>
 
-      <div className="w-full mb-4 sm:mb-6 lg:mb-8 mt-4 sm:mt-6 lg:mt-10">
+      <div className="w-full mb-2 sm:mb-4 lg:mb-6 ">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
           Processing Complete
           {formData.featureType && (
@@ -149,7 +148,7 @@ useEffect(() => {
         </h2>
       </div>
 
-      <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0]">
+      <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0] mb-2 sm:mb-4 lg:mb-6">
         <h3 className="text-[20px] sm:text-[10px] lg:text-[24px] font-semibold text-black mb-1">
           Before / After Comparison
         </h3>
@@ -157,7 +156,7 @@ useEffect(() => {
           Drag the slider to compare original and enhanced versions
         </p>
 
-        <div className="relative w-full rounded-xl overflow-hidden flex items-center justify-center">
+        <div className="relative w-full rounded-xl overflow-hidden flex items-center justify-center ">
           <div
             className={`w-full ${
               formData.uploadedImages.length === 1
@@ -262,12 +261,12 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="w-full mt-6 sm:mt-8 lg:mt-10">
-        <label className="block text-[16px] sm:text-[20px] lg:text-[20px] font-medium text-black mb-2">
+      <div className="w-full ">
+        <label className="block text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black mb-2 sm:mb-4 lg:mb-6 ">
           Describe What You Can Edit
         </label>
 
-        <div className="w-full rounded-lg border border-dashed border-[#034F75] bg-[#DFF0F7] p-3 sm:p-4">
+        <div className="w-full rounded-lg border border-dashed border-[#034F75] bg-[#DFF0F7] p-3 sm:p-4 mb-2 sm:mb-4 lg:mb-6">
           <textarea
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
@@ -278,7 +277,7 @@ useEffect(() => {
           />
         </div>
 
-        <div className="flex justify-between mt-4 sm:mt-5 gap-3 w-full">
+        <div className="flex justify-between gap-3 w-full">
           {/* Back Button (LEFT) */}
           <button
             onClick={back}

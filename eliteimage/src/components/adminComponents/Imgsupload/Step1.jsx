@@ -24,7 +24,7 @@ const Step1 = ({ formData, setFormData, next }) => {
     // ✅ Check if feature is selected
     if (!formData.featureType) {
       toast.error("Please select a feature first");
-      router.push('/admin/dashboard');
+      router.push("/admin/dashboard");
       return;
     }
 
@@ -69,7 +69,9 @@ const Step1 = ({ formData, setFormData, next }) => {
       const singlePayload = {
         userid: formData.userId,
         title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
-        description: formData.finalNotes || `${formData.featureType} applied to ${formData.uploadedImages.length} image(s)`,
+        description:
+          formData.finalNotes ||
+          `${formData.featureType} applied to ${formData.uploadedImages.length} image(s)`,
         featureType: formData.featureType,
         uploadedImages: allUploadedImages,
         selectedFeature: [],
@@ -94,9 +96,12 @@ const Step1 = ({ formData, setFormData, next }) => {
         toast.success("Project updated successfully!", { id: "processing" });
       } else {
         await saveGeneratedImage([singlePayload], token);
-        toast.success(`${formData.uploadedImages.length} image(s) saved in 1 project!`, {
-          id: "processing",
-        });
+        toast.success(
+          `${formData.uploadedImages.length} image(s) saved in 1 project!`,
+          {
+            id: "processing",
+          }
+        );
       }
       next();
     } catch (error) {
@@ -210,7 +215,7 @@ const Step1 = ({ formData, setFormData, next }) => {
 
     // ✅ Agar feature select nahi hai, to AllFeatures page pe bhejo
     if (!formData.featureType) {
-      router.push('/admin/uploadImage'); // This will show AllFeatures
+      router.push("/admin/uploadImage"); // This will show AllFeatures
       return;
     }
 
@@ -223,14 +228,14 @@ const Step1 = ({ formData, setFormData, next }) => {
     formData.featureType === "Watermark Remove";
 
   return (
-    <div className="bg-white py-10 sm:py-10 lg:py-10">
-      <div className="flex items-center gap-3 text-gray-700">
-        <span className="font-medium text-black text-[16px] sm:text-[20px]">
+    <div className="bg-white mt-14 sm:mt-16 lg:mt-15">
+      <div className="flex items-center text-gray-700">
+        <span className="font-medium text-black text-[16px] sm:text-[20px] mb-6 sm:mb-8 ">
           Elite Image Ai
         </span>
       </div>
 
-      <h2 className="mt-4 sm:mt-6 lg:mt-8 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-black">
+      <h2 className="mb-2 sm:mb-4 lg:mb-6 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-black">
         Upload Images
         {formData.featureType && (
           <span className="text-black font-medium">
@@ -241,12 +246,12 @@ const Step1 = ({ formData, setFormData, next }) => {
       </h2>
 
       {formData.totalSteps > 0 && (
-        <div className="mt-4 sm:mt-6 lg:mt-8 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
+        <div className="mb-2 sm:mb-4 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
           <ProgressBar currentStep={1} totalSteps={formData.totalSteps} />
         </div>
       )}
 
-      <div className="mt-6 sm:mt-8 lg:mt-10 rounded-2xl border border-[#6FB6D6] bg-[#D3E7F0] p-3 sm:p-4 min-h-[250px] sm:min-h-[300px] lg:min-h-[400px]">
+      <div className="mb-2 sm:mb-4 lg:mb-6 rounded-2xl border border-[#6FB6D6] bg-[#D3E7F0] p-3 sm:p-4 min-h-[250px] sm:min-h-[300px] lg:min-h-[400px]">
         <div
           className={`relative flex flex-col ${
             formData.uploadedImages.length === 0
@@ -338,7 +343,7 @@ const Step1 = ({ formData, setFormData, next }) => {
         </div>
       </div>
 
-      <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-between items-center gap-3">
+      <div className=" flex justify-between items-center gap-3">
         <button
           onClick={handleBack}
           className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"

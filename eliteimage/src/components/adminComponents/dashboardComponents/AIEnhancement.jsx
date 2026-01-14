@@ -54,7 +54,7 @@ const features = [
 const AIEnhancement = () => {
   return (
     <div className="w-auto">
-      <main className="bg-white py-10 sm:py-10">
+      <main className="bg-white mt-14 sm:mt-16 lg:mt-15">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
           <div className="w-full lg:w-auto">
             <h1 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium text-black">
@@ -70,13 +70,13 @@ const AIEnhancement = () => {
             </p>
           </div>
 
-          <button className="flex items-center gap-2 rounded-lg bg-[#034F75] px-4 py-2 text-white w-full sm:w-auto lg:mt-20 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start">
+          <button className="flex items-center gap-2 rounded-lg bg-[#034F75] px-4 py-2 text-white w-full sm:w-auto lg:mt-16 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start">
             <span className="text-base mb-1">💳</span>
             <span className="text-[18px] font-medium">Credits : 12</span>
           </button>
         </div>
 
-        <section className="mt-8 sm:mt-12 lg:mt-14">
+        <section className="mt-6 sm:mt-8 lg:mt-10 mb-6">
           <h3 className="text-[20px] sm:text-[28px] font-semibold text-black">
             AI Enhancement Features
           </h3>
