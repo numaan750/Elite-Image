@@ -79,7 +79,11 @@ const RecentProjects = () => {
       </div>
 
       <div className="space-y-4 sm:space-y-5">
-        {images.slice(0, 5).map((project) => (
+        {images
+  .slice() // copy banayi (important)
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // newest first
+  .slice(0, 5) // sirf 5
+  .map((project) => (
           <div
             key={project._id}
             className="flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
