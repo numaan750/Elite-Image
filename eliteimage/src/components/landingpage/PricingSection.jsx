@@ -21,7 +21,7 @@ export default function PricingSection() {
           <h2 className="text-[24px] md:text-[36px] font-bold text-gray-900 mb-4">
             Flexible Pricing
           </h2>
-          <p className="text-gray-600 text-[18px] max-w-3xl mx-auto">
+          <p className="text-black text-[18px] max-w-3xl mx-auto">
             Choose a plan that fits your workflow—powerful AI tools, fast
             processing, and scalable plans for every stage.
           </p>
@@ -39,7 +39,7 @@ export default function PricingSection() {
               <div className="text-[40px] font-bold text-[#034F75] mb-2">
                 £22
               </div>
-              <div className="text-[#81A7BA]">User/Month</div>
+              <div className="text-[#034F75]">User/Month</div>
             </div>
 
             <ul className="space-y-4 mb-8">
@@ -271,7 +271,7 @@ export default function PricingSection() {
               <div className="text-[40px] font-bold text-[#034F75] mb-2">
                 £99.99
               </div>
-              <div className="text-[#81A7BA]">User/Month</div>
+              <div className="text-[#034F75]">User/Month</div>
             </div>
 
             <ul className="space-y-4 mb-8">
