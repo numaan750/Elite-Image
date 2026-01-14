@@ -155,23 +155,36 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
-          <div className="flex flex-col md:flex-row gap-5 md:gap-98">
-            <a
-              href="mailto:example@gmail.com"
-              className="border-b border-white p-1 hover:text-gray-300 transition-colors"
-            >
-              example@gmail.com
-            </a>
-            <a
-              href="tel:+11234567890"
-              className="border-b border-white p-1 hover:text-gray-300 transition-colors"
-            >
-              (123) 456-7890
-            </a>
-          </div>
-          <div>
-            <span>© 2020 Elite Image. All rights reserved.</span>
+        <div className="pt-6 text-sm">
+          <div
+            className="
+               grid grid-cols-1 md:grid-cols-3
+               gap-4 items-center"
+          >
+            {/* Email - Left */}
+            <div className="text-center md:text-left">
+              <a
+                href="mailto:example@gmail.com"
+                className="border-b border-white p-1 hover:text-gray-300 transition-colors inline-block"
+              >
+                example@gmail.com
+              </a>
+            </div>
+
+            {/* Phone - Center */}
+            <div className="text-center">
+              <a
+                href="tel:+11234567890"
+                className="border-b border-white p-1 hover:text-gray-300 transition-colors inline-block"
+              >
+                (123) 456-7890
+              </a>
+            </div>
+
+            {/* Copyright - Right */}
+            <div className="text-center md:text-right">
+              © 2020 Elite Image. All rights reserved.
+            </div>
           </div>
         </div>
       </div>
