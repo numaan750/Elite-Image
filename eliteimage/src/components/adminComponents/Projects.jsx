@@ -95,7 +95,7 @@ const Projects = () => {
             onClick={getAiImages}
             className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[18px] text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
           >
-            New Project
+            Reload
           </button>
         </div>
 
