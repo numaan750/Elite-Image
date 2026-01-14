@@ -25,7 +25,7 @@ const WhyChooseUs = () => {
           <h2 className="text-[#D3E7F0] text-2xl sm:text-3xl lg:text-4xl xl:text-[40px] font-bold pb-3 sm:pb-4 lg:pb-6">
             Why Choose EliteImage AI
           </h2>
-          <p className="text-white font-medium max-w-full sm:max-w-[600px] lg:max-w-[700px] mx-auto leading-relaxed sm:leading-7 lg:leading-8 pb-5 sm:pb-6 lg:pb-8 text-sm sm:text-base lg:text-lg xl:text-xl">
+          <p className="text-white max-w-full sm:max-w-[600px] lg:max-w-[700px] mx-auto leading-relaxed sm:leading-7 lg:leading-8 pb-5 sm:pb-6 lg:pb-8 text-sm sm:text-base lg:text-lg xl:text-xl">
             EliteImage AI delivers instant results with pro-level quality
             through fully automated, intelligent AI tools. Our platform ensures
             consistent, high-end real estate visuals while remaining affordable,
