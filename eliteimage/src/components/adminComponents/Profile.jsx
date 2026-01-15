@@ -93,7 +93,7 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <Toaster position="top-right" />
-      <h3 className="text-[16px] sm:text-[20px] font-semibold mb-6 sm:mb-8">
+      <h3 className="text-[16px] sm:text-[20px] font-medium mb-6 sm:mb-8">
         Eliteimage Ai
       </h3>
       <h2 className="text-[20px] sm:text-[28px] font-semibold mb-2 sm:mb-4 lg:mb-6">
