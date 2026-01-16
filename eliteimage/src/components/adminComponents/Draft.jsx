@@ -50,8 +50,6 @@ const Draft = () => {
   const handleEdit = (project) => {
     
     localStorage.setItem("editingDraft", JSON.stringify(project));
-    
-    // Redirect to the step where user left off
     const currentStep = project.currentStep || "step1";
     window.location.href = `/admin/${currentStep}?mode=draft&draftId=${project.id}`;
   };
