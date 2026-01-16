@@ -48,7 +48,7 @@ const Draft = () => {
   };
 
   const handleEdit = (project) => {
-    // Save current step and project data to localStorage for editing
+    
     localStorage.setItem("editingDraft", JSON.stringify(project));
     
     // Redirect to the step where user left off
