@@ -109,7 +109,9 @@ const Step4Page = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [projectId, setProjectId] = useState(null);
   const [isViewMode, setIsViewMode] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // ← true se false kiya
+
   const [confirmDownload, setConfirmDownload] = useState(false);
 
   // Load project data
@@ -133,7 +135,7 @@ const Step4Page = () => {
       }
 
       try {
-        const project = await getProjectById(pid);
+        const project = await getProjectById(pid, true);
 
         setFormData({
           uploadedImages: project.uploadedImages || [],
@@ -144,30 +146,20 @@ const Step4Page = () => {
             project.beforeAfterData && project.beforeAfterData.length > 0
               ? project.beforeAfterData
               : project.image
-              ? [
-                  {
-                    processedImage: project.image,
-                  },
-                ]
+              ? [{ processedImage: project.image }]
               : [],
           finalNotes: project.finalNotes || "",
           userId: project.userid || user?._id,
         });
-
-        toast.success("Project loaded successfully!", {
-          id: "project-loaded",
-          duration: 2000,
-        });
+        // ✅ Toast removed - no more "Project loaded successfully"
       } catch (error) {
         toast.error("Failed to load project");
         console.error(error);
-      } finally {
-        setLoading(false);
       }
     };
 
     loadProjectData();
-  }, []);
+  }, [searchParams]);
 
   // Initialize slider positions
   useEffect(() => {
@@ -334,13 +326,13 @@ const Step4Page = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#034F75]"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#034F75]"></div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
@@ -368,8 +360,8 @@ const Step4Page = () => {
         </div>
       </div>
 
-      <div className="w-full mb-4 sm:mb-5 lg:mb-6">
-        <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black">
+      <div className="w-full ">
+        <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black ">
           {isViewMode
             ? "View Results"
             : isEditMode
@@ -377,7 +369,7 @@ const Step4Page = () => {
             : "Processing Complete"}
         </h2>
         {/* ✅ ADD THIS NEW LINE */}
-        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-5 lg:mb-6 mt-6">
+        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-5 lg:mb-6 ">
           Total Images: {formData.uploadedImages.length}
         </p>
       </div>

@@ -12,53 +12,61 @@ const EditProjectPage = () => {
   const router = useRouter();
   const { token, saveGeneratedImage, getProjectById } = useContext(AppContext);
 
-  const [formData, setFormData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+  uploadedImages: [],
+  featureType: "",
+  selectedFeature: "",
+  selectedStyle: "",
+  beforeAfterData: {},
+  finalNotes: "",
+  userId: "",
+  projectId: "",
+}); // ← Initial empty state instead of null
+  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // ← true se false
+
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [editDescription, setEditDescription] = useState("");
 
   // Load project data
-  useEffect(() => {
-    const loadProject = async () => {
-      const projectId = searchParams.get("projectId");
+useEffect(() => {
+  const loadProject = async () => {
+    const projectId = searchParams.get("projectId");
 
-      if (!projectId) {
-        toast.error("Project ID missing!");
-        router.push("/admin/dashboard");
-        return;
-      }
+    if (!projectId) {
+      toast.error("Project ID missing!");
+      router.push("/admin/dashboard");
+      return;
+    }
 
-      try {
-        const project = await getProjectById(projectId);
+    try {
+      const project = await getProjectById(projectId, true);
 
-        const loadedFormData = {
-          uploadedImages: project.uploadedImages || [],
-          featureType: project.featureType || "",
-          selectedFeature: project.selectedFeature?.[0] || "",
-          selectedStyle: project.selectedStyle?.[0] || "",
-          beforeAfterData: project.beforeAfterData?.[0] || {},
-          finalNotes: project.finalNotes || "",
-          userId: project.userid,
-          projectId: projectId,
-        };
+      const loadedFormData = {
+        uploadedImages: project.uploadedImages || [],
+        featureType: project.featureType || "",
+        selectedFeature: project.selectedFeature?.[0] || "",
+        selectedStyle: project.selectedStyle?.[0] || "",
+        beforeAfterData: project.beforeAfterData?.[0] || {},
+        finalNotes: project.finalNotes || "",
+        userId: project.userid,
+        projectId: projectId,
+      };
 
-        setFormData(loadedFormData);
-        setEditDescription(project.finalNotes || "");
+      setFormData(loadedFormData);
+      setEditDescription(project.finalNotes || "");
+      // ✅ Toast removed - no more "Project loaded successfully"
+    } catch (error) {
+      console.error("Failed to load project:", error);
+      toast.error("Failed to load project");
+      router.push("/admin/dashboard");
+    }
+  };
 
-        toast.success("Project loaded successfully!");
-      } catch (error) {
-        console.error("Failed to load project:", error);
-        toast.error("Failed to load project");
-        router.push("/admin/dashboard");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProject();
-  }, []);
+  loadProject();
+}, []);
 
   // Initialize slider positions
   useEffect(() => {
@@ -136,21 +144,34 @@ const EditProjectPage = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#034F75]"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#034F75]"></div>
+  //     </div>
+  //   );
+  // }
 
-  if (!formData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Project not found</p>
+  // if (!formData) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <p>Project not found</p>
+  //     </div>
+  //   );
+  // }
+
+  // ✅ Show skeleton only if data is still loading
+if (!formData.projectId && loading) {
+  return (
+    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
+      <div className="w-full animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+        <div className="h-64 bg-gray-200 rounded w-full mb-4"></div>
+        <div className="h-32 bg-gray-200 rounded w-full"></div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">

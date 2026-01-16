@@ -15,46 +15,23 @@ const RecentProjects = () => {
 
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
 
-  const handleDelete = (id) => {
-    toast.custom((t) => (
-      <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col gap-3 w-[300px]">
-        <p className="text-sm font-medium text-gray-800">
-          Are you sure you want to delete this project?
-        </p>
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting project...");
+    setDeleteLoading(id);
 
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300"
-          >
-            No
-          </button>
-
-          <button
-            onClick={async () => {
-              toast.dismiss(t.id);
-              const toastId = toast.loading("Deleting project...");
-              setDeleteLoading(id);
-
-              try {
-                await deleteImages(id);
-                toast.success("Project deleted successfully ✅", {
-                  id: toastId,
-                });
-              } catch (err) {
-                toast.error("Delete failed ❌", { id: toastId });
-              } finally {
-                setDeleteLoading(null);
-              }
-            }}
-            className="px-3 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
-          >
-            Yes, Delete
-          </button>
-        </div>
-      </div>
-    ));
+    try {
+      await deleteImages(id);
+      toast.success("Project deleted successfully ✅", {
+        id: toastId,
+      });
+    } catch (err) {
+      toast.error("Delete failed ❌", { id: toastId });
+    } finally {
+      setDeleteLoading(null);
+    }
   };
 
   if (loading) {
@@ -123,7 +100,7 @@ const RecentProjects = () => {
                   </Link>
 
                   <Link
-                    href={`/admin/step4?mode=edit&projectId=${
+                    href={`/admin/edit-project?mode=edit&projectId=${
                       project._id
                     }&featureType=${encodeURIComponent(project.featureType)}`}
                     className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
@@ -133,7 +110,10 @@ const RecentProjects = () => {
                   </Link>
 
                   <button
-                    onClick={() => handleDelete(project._id)}
+                    onClick={() => {
+                      setProjectToDelete(project._id);
+                      setShowDeleteModal(true);
+                    }}
                     disabled={deleteLoading === project._id}
                     className="flex items-center gap-2 cursor-pointer rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -254,6 +234,46 @@ const RecentProjects = () => {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowDeleteModal(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Delete Project
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this project? This action cannot
+              be undone.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  handleDelete(projectToDelete);
+                }}
+                disabled={deleteLoading === projectToDelete}
+                className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+              >
+                {deleteLoading === projectToDelete ? "Deleting..." : "Delete"}
+              </button>
             </div>
           </div>
         </div>

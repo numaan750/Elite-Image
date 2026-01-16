@@ -11,6 +11,7 @@ const AppProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [images, setImages] = useState([]);
+  const [projectCache, setProjectCache] = useState({}); // ← YE LINE ADD KARO (Line 17)
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -108,83 +109,139 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  const deleteImages = async (id) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${API_URL}/api/aiImagesmodels/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+const deleteImages = async (id) => {
+  // UI se remove (optimistic)
+  setImages((prev) => prev.filter((img) => img._id !== id));
 
-      if (!res.ok) throw new Error("Failed to delete image");
-    } catch (err) {
-      setError(err.message);
-      console.error("Delete error:", err);
-    } finally {
-      setLoading(false);
-    }
-    setImages((prev) => prev.filter((img) => img._id !== id));
-  };
+  const res = await fetch(`${API_URL}/api/aiImagesmodels/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  // ✅ ADD THIS NEW FUNCTION
-const getProjectById = async (projectId) => {
-  try {
-    const res = await fetch(`${API_URL}/api/aiImagesmodels/${projectId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) throw new Error("Failed to fetch project");
-    return await res.json();
-  } catch (err) {
-    console.error("Fetch project error:", err);
-    throw err;
+  if (!res.ok) {
+    await getAiImages(); // restore list
+    throw new Error("Failed to delete project");
   }
 };
 
-// ✅ UPDATE THIS FUNCTION (modify existing saveGeneratedImage)
-const saveGeneratedImage = async (imageData, token, isUpdate = false, projectId = null) => {
-  try {
-    const isBulkSave = Array.isArray(imageData);
 
-    // ✅ NEW: Handle UPDATE mode
-    if (isUpdate && projectId) {
-      const response = await fetch(`${API_URL}/api/aiImagesmodels/${projectId}`, {
-        method: "PUT",
+  // ✅ ADD THIS NEW FUNCTION
+  // ✅ UPDATED getProjectById with CACHE
+  const getProjectById = async (projectId, useCache = true) => {
+    // ✅ STEP 1: Pehle cache check karo
+    if (useCache && projectCache[projectId]) {
+      console.log("✅ Loading from cache (instant)");
+      return projectCache[projectId];
+    }
+
+    // ✅ STEP 2: Cache mein nahi hai to API call karo
+    console.log("📡 Fetching from API...");
+    try {
+      const res = await fetch(`${API_URL}/api/aiImagesmodels/${projectId}`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(imageData),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to update image");
+      if (!res.ok) throw new Error("Failed to fetch project");
+
+      const project = await res.json();
+
+      // ✅ STEP 3: Cache mein save karo
+      setProjectCache((prev) => ({
+        ...prev,
+        [projectId]: project,
+      }));
+
+      return project;
+    } catch (err) {
+      console.error("Fetch project error:", err);
+      throw err;
+    }
+  };
+
+  // ✅ UPDATE THIS FUNCTION (modify existing saveGeneratedImage)
+  const saveGeneratedImage = async (
+    imageData,
+    token,
+    isUpdate = false,
+    projectId = null
+  ) => {
+    try {
+      const isBulkSave = Array.isArray(imageData);
+
+      // UPDATE mode
+      if (isUpdate && projectId) {
+        const response = await fetch(
+          `${API_URL}/api/aiImagesmodels/${projectId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(imageData),
+          }
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to update image");
+        }
+
+        const updatedProject = await response.json();
+
+        // ✅ YE NAYA CODE: Images state mein update karo
+        setImages((prevImages) =>
+          prevImages.map((img) =>
+            img._id === projectId ? updatedProject : img
+          )
+        );
+
+        toast.success("Project updated successfully!");
+        return updatedProject;
       }
 
-      toast.success("Project updated successfully!");
-      return await response.json();
-    }
+      // BULK SAVE mode
+      if (isBulkSave) {
+        const savedImages = [];
+        for (const data of imageData) {
+          const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+          });
 
-    // Existing save logic...
-    if (isBulkSave) {
-      const savedImages = [];
-      for (const data of imageData) {
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to save image");
+          }
+
+          const result = await response.json();
+          savedImages.push(result);
+        }
+
+        // ✅ YE NAYA CODE: Bulk save ke baad images state update karo
+        setImages((prevImages) => [...savedImages, ...prevImages]);
+
+        return savedImages;
+      } else {
+        // SINGLE SAVE mode
         const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(imageData),
         });
 
         if (!response.ok) {
@@ -192,32 +249,18 @@ const saveGeneratedImage = async (imageData, token, isUpdate = false, projectId 
           throw new Error(error.message || "Failed to save image");
         }
 
-        const result = await response.json();
-        savedImages.push(result);
-      }
-      return savedImages;
-    } else {
-      const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(imageData),
-      });
+        const savedProject = await response.json();
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to save image");
-      }
+        // ✅ YE NAYA CODE: Single save ke baad images state update karo
+        setImages((prevImages) => [savedProject, ...prevImages]);
 
-      return await response.json();
+        return savedProject;
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
     }
-  } catch (error) {
-    console.error("API Error:", error);
-    throw error;
-  }
-};
+  };
 
   //profile k liya
   const updateProfile = async (userId, userData) => {

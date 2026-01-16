@@ -17,11 +17,12 @@ const Step1 = ({ formData, setFormData, next }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [imageLoadedMap, setImageLoadedMap] = useState({});
 
-  // ✅ REMOVED useEffect - ab koi auto-redirect nahi hoga
+  // ✅ ADDED: Track loading images count
+  const [loadingCount, setLoadingCount] = useState(0);
 
   const handleGenerateAndSave = async () => {
-    // ✅ Check if feature is selected
     if (!formData.featureType) {
       toast.error("Please select a feature first");
       router.push("/admin/dashboard");
@@ -116,14 +117,31 @@ const Step1 = ({ formData, setFormData, next }) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    for (const file of files) {
+    setLoadingCount(files.length);
+    setUploadingImage(true);
+
+    const loadingPlaceholders = files.map(
+      (_, idx) => `loading-${Date.now()}-${idx}`
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      uploadedImages: [...prev.uploadedImages, ...loadingPlaceholders],
+    }));
+
+    const uploadedUrls = [];
+    let successCount = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+
       if (!file.type.startsWith("image/")) {
-        toast.error("Only image files allowed");
+        toast.error(`${file.name}: Only image files allowed`);
         continue;
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image must be under 5MB");
+        toast.error(`${file.name}: Image must be under 5MB`);
         continue;
       }
 
@@ -132,8 +150,6 @@ const Step1 = ({ formData, setFormData, next }) => {
       uploadForm.append("upload_preset", UPLOAD_PRESET);
 
       try {
-        setUploadingImage(true);
-
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
           {
@@ -149,16 +165,37 @@ const Step1 = ({ formData, setFormData, next }) => {
           "/upload/f_auto,q_auto,w_1200/"
         );
 
-        setFormData((prev) => ({
-          ...prev,
-          uploadedImages: [...prev.uploadedImages, optimizedUrl],
-          lastUploadedAt: new Date().toISOString(),
-        }));
+        // ✅ **YE NEW CODE HAI - IMAGE KO PRELOAD KAREIN**
+        await new Promise((resolve, reject) => {
+          const img = new window.Image();
+          img.onload = () => resolve();
+          img.onerror = () => reject();
+          img.src = optimizedUrl;
+        });
+
+        uploadedUrls.push(optimizedUrl);
+        successCount++;
       } catch (err) {
-        toast.error("Upload failed");
-      } finally {
-        setUploadingImage(false);
+        toast.error(`${file.name}: Upload failed`);
       }
+    }
+
+    setFormData((prev) => {
+      const withoutPlaceholders = prev.uploadedImages.filter(
+        (img) => !img.startsWith("loading-")
+      );
+      return {
+        ...prev,
+        uploadedImages: [...withoutPlaceholders, ...uploadedUrls],
+        lastUploadedAt: new Date().toISOString(),
+      };
+    });
+
+    setLoadingCount(0);
+    setUploadingImage(false);
+
+    if (successCount > 0) {
+      toast.success(`${successCount} image(s) uploaded successfully!`);
     }
 
     e.target.value = "";
@@ -187,8 +224,8 @@ const Step1 = ({ formData, setFormData, next }) => {
     setIsDragging(false);
 
     const files = e.dataTransfer.files;
-    if (files && files[0]) {
-      const fakeEvent = { target: { files: [files[0]] } };
+    if (files && files.length > 0) {
+      const fakeEvent = { target: { files: Array.from(files) } };
       await handleFileUpload(fakeEvent);
     }
   };
@@ -206,26 +243,29 @@ const Step1 = ({ formData, setFormData, next }) => {
     router.back();
   };
 
-  // ✅ NEW: Handle Continue - check if feature is selected
   const handleContinue = () => {
     if (formData.uploadedImages.length === 0) {
       toast.error("Please upload at least one image first!");
       return;
     }
 
-    // ✅ Agar feature select nahi hai, to AllFeatures page pe bhejo
     if (!formData.featureType) {
-      router.push("/admin/uploadImage"); // This will show AllFeatures
+      router.push("/admin/uploadImage");
       return;
     }
 
-    // ✅ Agar feature selected hai, to next step pe jao
     next();
   };
 
   const isSpecialFeature =
     formData.featureType === "Straighten" ||
     formData.featureType === "Watermark Remove";
+
+  // ✅ ADDED: Check if there are any real images (not loading placeholders)
+  const realImages = formData.uploadedImages.filter(
+    (img) => !img.startsWith("loading-")
+  );
+  const hasImages = realImages.length > 0 || loadingCount > 0;
 
   return (
     <div className="bg-white mt-14 sm:mt-16 lg:mt-15">
@@ -254,13 +294,11 @@ const Step1 = ({ formData, setFormData, next }) => {
       <div className="mb-2 sm:mb-4 lg:mb-6 rounded-2xl border border-[#6FB6D6] bg-[#D3E7F0] p-3 sm:p-4 min-h-[250px] sm:min-h-[300px] lg:min-h-[400px]">
         <div
           className={`relative flex flex-col ${
-            formData.uploadedImages.length === 0
+            !hasImages
               ? "items-center justify-center"
               : "items-start justify-start"
           } rounded-xl border-2 border-dashed border-[#034F75] px-3 sm:px-4 lg:px-6 ${
-            formData.uploadedImages.length === 0
-              ? "py-8 sm:py-10 lg:py-16"
-              : "py-3 sm:py-4"
+            !hasImages ? "py-8 sm:py-10 lg:py-16" : "py-3 sm:py-4"
           } text-center cursor-pointer min-h-[250px] sm:min-h-[300px] lg:min-h-[350px] ${
             isDragging ? "bg-blue-50 border-solid" : ""
           }`}
@@ -268,9 +306,11 @@ const Step1 = ({ formData, setFormData, next }) => {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => document.getElementById("file-input").click()}
+          onClick={() =>
+            !uploadingImage && document.getElementById("file-input").click()
+          }
         >
-          {formData.uploadedImages.length === 0 ? (
+          {!hasImages ? (
             <>
               <Upload
                 size={32}
@@ -290,45 +330,65 @@ const Step1 = ({ formData, setFormData, next }) => {
               </p>
             </>
           ) : (
-            <div
-              className={`w-full ${
-                formData.uploadedImages.length === 1
-                  ? "flex items-start justify-start"
-                  : "grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
-              }`}
-            >
-              {formData.uploadedImages.map((img, idx) => (
-                <div
-                  key={idx}
-                  className={`relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6] group ${
-                    formData.uploadedImages.length === 1 ? "w-full h-full" : ""
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`Uploaded ${idx + 1}`}
-                    width={400}
-                    height={350}
-                    quality={75}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className={`w-full ${
-                      formData.uploadedImages.length === 1
-                        ? "h-full min-h-[250px] sm:min-h-[300px] lg:min-h-[350px]"
-                        : "h-32 sm:h-36 lg:h-40"
-                    } object-contain`}
-                    priority={idx === 0}
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveImage(idx);
-                    }}
-                    className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 cursor-pointer text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            <div className="w-full grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+              {/* ✅ ADDED: Show skeleton loaders */}
+              {loadingCount > 0 &&
+                Array.from({ length: loadingCount }).map((_, idx) => (
+                  <div
+                    key={`skeleton-${idx}`}
+                    className="relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6] animate-none"
                   >
-                    <X size={14} className="sm:w-4 sm:h-4" />
-                  </button>
-                </div>
-              ))}
+                    <div className="w-full h-32 sm:h-36 lg:h-40 bg-gradient-to-r from-[#d3d3d3] via-[#d5d5d5] to-[#d7d7d7] bg-[length:200%_100%] animate-shimmer" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-[#034F75] text-sm">Loading...</div>
+                    </div>
+                  </div>
+                ))}
+
+              {/* ✅ CHANGED: Show real images after loading */}
+              {realImages.map((img, idx) => {
+                const loaded = imageLoadedMap[img];
+
+                return (
+                  <div
+                    key={img}
+                    className="relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6]"
+                  >
+                    {/* SHIMMER OVERLAY */}
+                    {!loaded && (
+                      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#d3d3d3] via-[#d5d5d5] to-[#d7d7d7] bg-[length:200%_100%] animate-shimmer" />
+                    )}
+
+                    {/* IMAGE */}
+                    <Image
+                      src={img}
+                      alt={`Uploaded ${idx + 1}`}
+                      width={400}
+                      height={350}
+                      quality={75}
+                      priority={idx < 4} // ✅ First 4 images ko priority dein
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className={`w-full h-32 sm:h-36 lg:h-40 object-contain transition-opacity duration-300 ${
+                        loaded ? "opacity-100" : "opacity-0"
+                      }`}
+                      onLoadingComplete={() =>
+                        setImageLoadedMap((prev) => ({ ...prev, [img]: true }))
+                      }
+                    />
+
+                    {/* REMOVE BUTTON */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveImage(idx);
+                      }}
+                      className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 cursor-pointer text-white rounded-full p-1"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
           <input
@@ -343,7 +403,7 @@ const Step1 = ({ formData, setFormData, next }) => {
         </div>
       </div>
 
-      <div className=" flex justify-between items-center gap-3">
+      <div className="flex justify-between items-center gap-3">
         <button
           onClick={handleBack}
           className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
@@ -355,9 +415,9 @@ const Step1 = ({ formData, setFormData, next }) => {
         {isSpecialFeature ? (
           <button
             onClick={handleGenerateAndSave}
-            disabled={formData.uploadedImages.length === 0 || isSaving}
+            disabled={realImages.length === 0 || isSaving || uploadingImage}
             className={`flex items-center gap-2 rounded-lg px-5 sm:px-6 py-2 text-[12px] sm:text-[20px] text-white transition-colors ${
-              formData.uploadedImages.length === 0 || isSaving
+              realImages.length === 0 || isSaving || uploadingImage
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-[#034F75]"
             }`}
@@ -368,9 +428,9 @@ const Step1 = ({ formData, setFormData, next }) => {
         ) : (
           <button
             onClick={handleContinue}
-            disabled={formData.uploadedImages.length === 0}
+            disabled={realImages.length === 0 || uploadingImage}
             className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors ${
-              formData.uploadedImages.length === 0
+              realImages.length === 0 || uploadingImage
                 ? "opacity-50 cursor-not-allowed"
                 : ""
             }`}
@@ -380,6 +440,21 @@ const Step1 = ({ formData, setFormData, next }) => {
           </button>
         )}
       </div>
+
+      <style jsx>{`
+        @keyframes shimmer {
+          0% {
+            background-position: 200% 200%;
+          }
+          100% {
+            background-position: -200% -200%;
+          }
+        }
+
+        .animate-shimmer {
+          animation: shimmer 1.5s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 };
