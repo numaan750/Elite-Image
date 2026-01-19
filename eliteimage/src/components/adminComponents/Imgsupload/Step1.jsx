@@ -27,7 +27,7 @@ const Step1 = ({ formData, setFormData, next }) => {
 
   useEffect(() => {
     const realImages = formData.uploadedImages.filter(
-      (img) => !img.startsWith("loading-")
+      (img) => !img.startsWith("loading-"),
     );
 
     // ✅ FIX: Sirf basic conditions check karo
@@ -49,7 +49,7 @@ const Step1 = ({ formData, setFormData, next }) => {
               uploadedImages: realImages,
               draftId: existingDraftId,
             },
-            "step1"
+            "step1",
           );
 
           if (draftId && draftId !== formData.draftId) {
@@ -73,6 +73,7 @@ const Step1 = ({ formData, setFormData, next }) => {
   ]);
 
   const handleGenerateAndSave = async () => {
+    // ✅ STEP 1: Validation (instant - 0ms)
     if (!formData.featureType) {
       toast.error("Please select a feature first");
       router.push("/admin/dashboard");
@@ -89,110 +90,109 @@ const Step1 = ({ formData, setFormData, next }) => {
       return;
     }
 
-    setIsSaving(true);
-    toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
-      id: "processing",
+    // ✅ STEP 2: Prepare data (instant - 5-10ms)
+    const allProcessedData = [];
+    const allUploadedImages = [];
+
+    formData.uploadedImages.forEach((uploadedImage) => {
+      const processedData = {
+        originalImage: uploadedImage,
+        processedImage: uploadedImage,
+        processedAt: new Date().toISOString(),
+        status: "completed",
+        userId: formData.userId,
+        featureType: formData.featureType,
+      };
+      allProcessedData.push(processedData);
+      allUploadedImages.push(uploadedImage);
     });
 
-    try {
-      const allProcessedData = [];
-      const allUploadedImages = [];
+    const singlePayload = {
+      userid: formData.userId,
+      title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
+      description:
+        formData.finalNotes ||
+        `${formData.featureType} applied to ${formData.uploadedImages.length} image(s)`,
+      featureType: formData.featureType,
+      uploadedImages: allUploadedImages,
+      selectedFeature: [],
+      selectedStyle: [],
+      beforeAfterData: allProcessedData,
+      finalNotes: formData.finalNotes || "",
+      image: allUploadedImages[0],
+    };
 
-      for (let i = 0; i < formData.uploadedImages.length; i++) {
-        const uploadedImage = formData.uploadedImages[i];
-        console.log(`📤 [${i + 1}] Processing ${formData.featureType}...`);
-        const processedImageUrl = uploadedImage;
+    // ✅ STEP 3: Update local state immediately (instant UI update)
+    setFormData((prev) => ({
+      ...prev,
+      beforeAfterData: allProcessedData,
+    }));
 
-        const processedData = {
-          originalImage: uploadedImage,
-          processedImage: processedImageUrl,
-          processedAt: new Date().toISOString(),
-          status: "completed",
-          userId: formData.userId,
-          featureType: formData.featureType,
-        };
-        allProcessedData.push(processedData);
-        allUploadedImages.push(uploadedImage);
-      }
+    // ✅ STEP 4: Show success toast INSTANTLY
+    toast.success(`Saving ${formData.uploadedImages.length} image(s)...`, {
+      id: "saving",
+      duration: 2000,
+    });
 
-      const singlePayload = {
-        userid: formData.userId,
-        title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
-        description:
-          formData.finalNotes ||
-          `${formData.featureType} applied to ${formData.uploadedImages.length} image(s)`,
-        featureType: formData.featureType,
-        uploadedImages: allUploadedImages,
-        selectedFeature: [],
-        selectedStyle: [],
-        beforeAfterData: allProcessedData,
-        finalNotes: formData.finalNotes || "",
-        image: allUploadedImages[0],
-      };
+    // ✅ STEP 5: Navigate to next page IMMEDIATELY (no waiting!)
+    next();
 
-      setFormData((prev) => ({
-        ...prev,
-        beforeAfterData: allProcessedData,
-      }));
+    // ✅ STEP 6: Save to database in BACKGROUND (async, non-blocking)
+    setIsSaving(true);
 
-      if (formData.projectId) {
-        await saveGeneratedImage(
-          singlePayload,
-          token,
-          true,
-          formData.projectId
-        );
-        toast.success("Project updated successfully!", { id: "processing" });
-      } else {
-        await saveGeneratedImage([singlePayload], token);
-        toast.success(
-          `${formData.uploadedImages.length} image(s) saved in 1 project!`,
-          { id: "processing" }
-        );
-      }
-
-      // ✅ FIX: Properly delete draft
+    (async () => {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const draftId = urlParams.get("draftId") || formData.draftId;
-
-        if (draftId) {
-          console.log("🗑️ Deleting draft:", draftId);
-
-          // Get all drafts
-          const savedDrafts = localStorage.getItem("draftProjects");
-          if (savedDrafts) {
-            const drafts = JSON.parse(savedDrafts);
-            console.log("📋 Before deletion:", drafts.length, "drafts");
-
-            // Filter out the completed draft
-            const updatedDrafts = drafts.filter(
-              (draft) => draft.id !== draftId
-            );
-            console.log("📋 After deletion:", updatedDrafts.length, "drafts");
-
-            // Save back to localStorage
-            localStorage.setItem(
-              "draftProjects",
-              JSON.stringify(updatedDrafts)
-            );
-          }
+        // Database save happens after user moved to next page
+        if (formData.projectId) {
+          await saveGeneratedImage(
+            singlePayload,
+            token,
+            true,
+            formData.projectId,
+          );
+        } else {
+          await saveGeneratedImage([singlePayload], token);
         }
 
-        // Remove current draft from localStorage
-        localStorage.removeItem("currentDraft");
-        console.log("✅ Draft deleted successfully");
-      } catch (error) {
-        console.error("❌ Error deleting draft:", error);
-      }
+        // Background success notification
+        toast.success("Project saved to database!", {
+          id: "saving",
+          duration: 2000,
+        });
 
-      next();
-    } catch (error) {
-      console.error("❌ Error:", error);
-      toast.error(`Error: ${error.message}`, { id: "processing" });
-    } finally {
-      setIsSaving(false);
-    }
+        // ✅ STEP 7: Delete draft after successful DB save
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const draftId = urlParams.get("draftId") || formData.draftId;
+
+          if (draftId) {
+            const savedDrafts = localStorage.getItem("draftProjects");
+            if (savedDrafts) {
+              const drafts = JSON.parse(savedDrafts);
+              const updatedDrafts = drafts.filter(
+                (draft) => draft.id !== draftId,
+              );
+              localStorage.setItem(
+                "draftProjects",
+                JSON.stringify(updatedDrafts),
+              );
+            }
+          }
+
+          localStorage.removeItem("currentDraft");
+        } catch (error) {
+          console.error("❌ Error deleting draft:", error);
+        }
+      } catch (error) {
+        console.error("❌ Database save error:", error);
+        toast.error(`Failed to save: ${error.message}`, {
+          id: "saving",
+          duration: 3000,
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    })();
   };
 
   const handleFileUpload = async (e) => {
@@ -223,7 +223,7 @@ const Step1 = ({ formData, setFormData, next }) => {
 
     // ✅ STEP 2: Loading placeholders show karo (instant)
     const loadingPlaceholders = validFiles.map(
-      (_, idx) => `loading-${Date.now()}-${idx}`
+      (_, idx) => `loading-${Date.now()}-${idx}`,
     );
 
     setFormData((prev) => ({
@@ -243,7 +243,7 @@ const Step1 = ({ formData, setFormData, next }) => {
           {
             method: "POST",
             body: uploadForm,
-          }
+          },
         );
 
         const data = await res.json();
@@ -251,7 +251,7 @@ const Step1 = ({ formData, setFormData, next }) => {
         // ✅ Smaller optimized URL (faster loading)
         const optimizedUrl = data.secure_url.replace(
           "/upload/",
-          "/upload/f_auto,q_auto,w_800,h_600,c_limit/"
+          "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
         );
 
         return { success: true, url: optimizedUrl };
@@ -272,7 +272,7 @@ const Step1 = ({ formData, setFormData, next }) => {
     // ✅ STEP 5: Single state update (ek hi baar)
     setFormData((prev) => {
       const withoutPlaceholders = prev.uploadedImages.filter(
-        (img) => !img.startsWith("loading-")
+        (img) => !img.startsWith("loading-"),
       );
       return {
         ...prev,
@@ -325,7 +325,7 @@ const Step1 = ({ formData, setFormData, next }) => {
     setFormData((prev) => ({
       ...prev,
       uploadedImages: prev.uploadedImages.filter(
-        (_, idx) => idx !== indexToRemove
+        (_, idx) => idx !== indexToRemove,
       ),
     }));
   };
@@ -354,7 +354,7 @@ const Step1 = ({ formData, setFormData, next }) => {
 
   // ✅ ADDED: Check if there are any real images (not loading placeholders)
   const realImages = formData.uploadedImages.filter(
-    (img) => !img.startsWith("loading-")
+    (img) => !img.startsWith("loading-"),
   );
   const hasImages = realImages.length > 0 || loadingCount > 0;
 
