@@ -133,19 +133,26 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     }
     next();
   };
-  const handleRemoveObject = async () => {
-    if (!token) {
-      toast.error("Please login first");
-      return;
-    }
+const handleRemoveObject = async () => {
+  // ✅ STEP 1: Validation (instant - 0ms)
+  if (!token) {
+    toast.error("Please login first");
+    return;
+  }
 
-    if (!allImagesHaveSelection) {
-      toast.error("Please select objects in all images first");
-      return;
-    }
+  if (!allImagesHaveSelection) {
+    toast.error("Please select objects in all images first");
+    return;
+  }
 
-    toast.loading("Removing objects & saving...", { id: "remove" });
+  // ✅ STEP 2: Show success toast INSTANTLY
+  toast.success("Processing your request...", { id: "remove" });
 
+  // ✅ STEP 3: Navigate to next page IMMEDIATELY
+  next();
+
+  // ✅ STEP 4: Process & save in BACKGROUND (async, non-blocking)
+  (async () => {
     try {
       const allUploadedImages = [];
       const allBeforeAfterData = [];
@@ -166,11 +173,11 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         return data.secure_url;
       };
 
+      // Upload all images
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const originalUrl = await uploadToCloudinary(
           formData.uploadedImages[i]
         );
-
         const processedUrl = originalUrl;
 
         allUploadedImages.push(originalUrl);
@@ -195,7 +202,9 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         image: allUploadedImages[0],
       };
 
+      // Save to database
       const savedData = await saveGeneratedImage([singlePayload], token);
+      
       const normalizedBeforeAfter = Array.isArray(savedData)
         ? savedData.flatMap((item) => item.beforeAfterData || [])
         : savedData.beforeAfterData || [];
@@ -205,41 +214,32 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         beforeAfterData: normalizedBeforeAfter,
       }));
 
-      toast.dismiss("remove");
-      toast.success("Objects removed & saved successfully!");
+      // Delete draft after successful save
+      const urlParams = new URLSearchParams(window.location.search);
+      const draftId = urlParams.get("draftId") || formData.draftId;
 
-      // ✅ DELETE DRAFT AFTER SUCCESSFUL SAVE
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const draftId = urlParams.get("draftId") || formData.draftId;
-
-        if (draftId) {
-          const savedDrafts = localStorage.getItem("draftProjects");
-          if (savedDrafts) {
-            const drafts = JSON.parse(savedDrafts);
-            const updatedDrafts = drafts.filter(
-              (draft) => draft.id !== draftId
-            );
-            localStorage.setItem(
-              "draftProjects",
-              JSON.stringify(updatedDrafts)
-            );
-          }
+      if (draftId) {
+        const savedDrafts = localStorage.getItem("draftProjects");
+        if (savedDrafts) {
+          const drafts = JSON.parse(savedDrafts);
+          const updatedDrafts = drafts.filter(
+            (draft) => draft.id !== draftId
+          );
+          localStorage.setItem(
+            "draftProjects",
+            JSON.stringify(updatedDrafts)
+          );
         }
-
-        localStorage.removeItem("currentDraft");
-        console.log("✅ Draft deleted after object removal");
-      } catch (error) {
-        console.error("Error deleting draft:", error);
       }
+      localStorage.removeItem("currentDraft");
 
-      next();
+      toast.success("Objects removed & saved successfully!", { id: "remove" });
     } catch (err) {
       console.error(err);
-      toast.dismiss("remove");
-      toast.error("Failed to remove objects");
+      toast.error("Failed to remove objects", { id: "remove" });
     }
-  };
+  })();
+};
 
   return (
     <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">

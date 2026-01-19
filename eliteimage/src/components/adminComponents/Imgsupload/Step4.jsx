@@ -41,7 +41,7 @@ const uploadToCloudinary = async (imageUrl) => {
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     if (!response.ok) {
@@ -185,13 +185,13 @@ const downloadImagesAsZip = async (formData) => {
             saveAs(zipBlob, "Elite-Image-AI-Project.zip");
             toast.dismiss("zip");
             toast.success(
-              `${dataArray.length} image(s) downloaded! (Default location used)`
+              `${dataArray.length} image(s) downloaded! (Default location used)`,
             );
           }
 
           toast.success(
             `${formData.uploadedImages.length} image(s) downloaded!`,
-            { id: "zip" }
+            { id: "zip" },
           );
         } catch (error) {
           if (error.name === "AbortError") {
@@ -323,7 +323,7 @@ const downloadImagesAsZip = async (formData) => {
       saveAs(zipBlob, "Elite-Image-AI-Project.zip");
       toast.success(
         `${dataArray.length} image(s) downloaded! (Default location used)`,
-        { id: "zip" }
+        { id: "zip" },
       );
     }
   } catch (error) {
@@ -414,7 +414,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
             ...formData,
             draftId: existingDraftId,
           },
-          "step4"
+          "step4",
         );
       } catch (error) {
         console.error("Error saving draft:", error);
@@ -703,20 +703,27 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                         }% 0 0)`,
                       }}
                     >
-                      <Image
-                        src={
+                      {(() => {
+                        const afterSrc =
                           formData.featureType === "Sky Replacement"
                             ? img
                             : Array.isArray(formData.beforeAfterData)
-                            ? formData.beforeAfterData[index]?.processedImage
-                            : formData.beforeAfterData?.processedImage
-                        }
-                        alt={`After ${index + 1}`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-contain "
-                        priority
-                      />
+                              ? formData.beforeAfterData[index]?.processedImage
+                              : formData.beforeAfterData?.processedImage;
+
+                        if (!afterSrc) return null;
+
+                        return (
+                          <Image
+                            src={afterSrc}
+                            alt={`After ${index + 1}`}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 800px"
+                            className="object-contain"
+                            priority
+                          />
+                        );
+                      })()}
                     </div>
 
                     <div
@@ -829,12 +836,12 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                 ? "Download Images"
                 : "No Images"
               : formData.beforeAfterData &&
-                ((Array.isArray(formData.beforeAfterData) &&
-                  formData.beforeAfterData.length > 0) ||
-                  (!Array.isArray(formData.beforeAfterData) &&
-                    formData.beforeAfterData.processedImage))
-              ? "Download"
-              : "No Images"}
+                  ((Array.isArray(formData.beforeAfterData) &&
+                    formData.beforeAfterData.length > 0) ||
+                    (!Array.isArray(formData.beforeAfterData) &&
+                      formData.beforeAfterData.processedImage))
+                ? "Download"
+                : "No Images"}
           </span>
         </button>
         {/* Bottom Back Button */}
