@@ -1,31 +1,55 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { STYLES_DATA } from "./featuresData";
 import ProgressBar from "./ProgressBar";
-import { useContext } from "react";
 import { AppContext } from "@/context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 const Step3 = ({ formData, setFormData, next, back, featureType }) => {
-  const { token, saveGeneratedImage, user } = useContext(AppContext);
+  const { token, saveGeneratedImage, user, saveDraft } = useContext(AppContext);
   const router = useRouter();
 
-// ✅ ADD THIS:
-useEffect(() => {
-  if (!formData.featureType) {
-    toast.error("Please select a feature first");
-    router.push('/admin/dashboard');
-  }
-}, [formData.featureType, router]);
+  // ✅ ADD THIS:
+  useEffect(() => {
+    if (!formData.featureType) {
+      toast.error("Please select a feature first");
+      router.push("/admin/dashboard");
+    }
+  }, [formData.featureType, router]);
   const styles = STYLES_DATA[featureType];
 
   const [selected, setSelected] = useState(
     formData.selectedStyle || styles[0].name
   );
   const [isSaving, setIsSaving] = useState(false);
+
+  // Auto-save on style change
+  useEffect(() => {
+    if (selected) {
+      const timeoutId = setTimeout(() => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const existingDraftId = urlParams.get("draftId") || formData.draftId;
+
+          saveDraft(
+            {
+              ...formData,
+              selectedStyle: selected,
+              draftId: existingDraftId,
+            },
+            "step3"
+          );
+        } catch (error) {
+          console.error("Error saving draft:", error);
+        }
+      }, 1500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [selected]); // ✅ Remove formData and saveDraft from dependencies
 
   const handleGenerate = async () => {
     if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
@@ -50,8 +74,6 @@ useEffect(() => {
 
     try {
       const allProcessedData = [];
-      // const allBackendPayloads = [];
-
       const CLOUD_NAME = "dhtpqla2b";
       const UPLOAD_PRESET = "unsigned_preset";
 
@@ -108,27 +130,8 @@ useEffect(() => {
           },
         };
         allProcessedData.push(processedData);
-
-        // const backendPayload = {
-        //   userid: user?._id || formData.userId,
-        //   title: `${formData.featureType} - Image ${
-        //     i + 1
-        //   } - ${new Date().toLocaleDateString()}`,
-        //   description: formData.finalNotes || `Generated image ${i + 1}`,
-        //   featureType: formData.featureType,
-        //   uploadedImages: [originalCloudinaryUrl],
-        //   selectedFeature: formData.selectedFeature
-        //     ? [formData.selectedFeature]
-        //     : [],
-        //   selectedStyle: [selected],
-        //   beforeAfterData: [processedData],
-        //   finalNotes: formData.finalNotes || "",
-        //   image: processedCloudinaryUrl,
-        // };
-        // allBackendPayloads.push(backendPayload);
       }
 
-      // ✅ NOW create backendPayload AFTER allProcessedData is ready
       const backendPayload = {
         userid: user?._id || formData.userId,
         title: `${formData.featureType} - ${
@@ -155,10 +158,34 @@ useEffect(() => {
       await saveGeneratedImage(backendPayload, token);
 
       toast.dismiss("processing");
-
       toast.success(
         `${formData.uploadedImages.length} image(s) processed and saved!`
       );
+
+      // ✅ DELETE DRAFT AFTER SUCCESSFUL SAVE
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const draftId = urlParams.get("draftId") || formData.draftId;
+
+        if (draftId) {
+          const savedDrafts = localStorage.getItem("draftProjects");
+          if (savedDrafts) {
+            const drafts = JSON.parse(savedDrafts);
+            const updatedDrafts = drafts.filter(
+              (draft) => draft.id !== draftId
+            );
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts)
+            );
+          }
+        }
+
+        localStorage.removeItem("currentDraft");
+        console.log("✅ Draft deleted after generation");
+      } catch (error) {
+        console.error("Error deleting draft:", error);
+      }
 
       next();
     } catch (error) {

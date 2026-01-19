@@ -109,8 +109,7 @@ const Step4Page = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [projectId, setProjectId] = useState(null);
   const [isViewMode, setIsViewMode] = useState(false);
-  // const [loading, setLoading] = useState(true);
-  const [loading, setLoading] = useState(false); // ← true se false kiya
+const [loading, setLoading] = useState(false);
 
   const [confirmDownload, setConfirmDownload] = useState(false);
 
@@ -153,9 +152,9 @@ const Step4Page = () => {
         });
         // ✅ Toast removed - no more "Project loaded successfully"
       } catch (error) {
-        toast.error("Failed to load project");
-        console.error(error);
-      }
+  toast.error("Failed to load project");
+  console.error(error);
+}
     };
 
     loadProjectData();

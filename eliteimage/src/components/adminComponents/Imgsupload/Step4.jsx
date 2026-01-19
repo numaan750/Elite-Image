@@ -7,6 +7,8 @@ import { IoShareSocial } from "react-icons/io5";
 import { PiDownload } from "react-icons/pi";
 import { AppContext } from "@/context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
+
 // import { useSearchParams } from "next/navigation"; // ✅ ADD THIS
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -362,6 +364,8 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
   const router = useRouter();
+  const { saveDraft } = useContext(AppContext);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!formData.featureType) {
@@ -392,6 +396,31 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       document.removeEventListener("touchend", handleTouchEnd);
     };
   }, [isDragging]);
+
+  // Save to draft when processing completes
+  useEffect(() => {
+    if (
+      formData.beforeAfterData &&
+      ((Array.isArray(formData.beforeAfterData) &&
+        formData.beforeAfterData.length > 0) ||
+        formData.beforeAfterData.processedImage)
+    ) {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const existingDraftId = urlParams.get("draftId") || formData.draftId;
+
+        saveDraft(
+          {
+            ...formData,
+            draftId: existingDraftId,
+          },
+          "step4"
+        );
+      } catch (error) {
+        console.error("Error saving draft:", error);
+      }
+    }
+  }, [formData.beforeAfterData]); // ✅ Only watch beforeAfterData
 
   // ✅ ADD THIS COMPLETE useEffect
   // useEffect(() => {

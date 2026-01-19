@@ -31,6 +31,22 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
+  const [selectedProjects, setSelectedProjects] = useState([]);
+  const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+
+  const toggleProjectSelection = (id) => {
+    setSelectedProjects((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+    );
+  };
+  const handleSelectAll = () => {
+    if (selectedProjects.length === images.length) {
+      setSelectedProjects([]);
+    } else {
+      setSelectedProjects(images.map((img) => img._id));
+    }
+  };
 
   // useEffect(() => {
   //   // Sirf agar images empty hain tabhi fetch karo
@@ -97,6 +113,26 @@ const Projects = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    const toastId = toast.loading("Deleting selected projects...");
+    setBulkDeleteLoading(true);
+
+    try {
+      for (const id of selectedProjects) {
+        await deleteImages(id);
+      }
+
+      toast.success("Selected projects deleted ✅", { id: toastId });
+      setSelectedProjects([]);
+      setIsSelectionMode(false);
+      setShowDeleteModal(false);
+    } catch (err) {
+      toast.error("Bulk delete failed ❌", { id: toastId });
+    } finally {
+      setBulkDeleteLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -116,6 +152,51 @@ const Projects = () => {
             My Projects
           </h2>
 
+          {images.length > 0 && (
+            <div className="flex gap-2 sm:gap-3">
+              {!isSelectionMode ? (
+                <button
+                  onClick={() => setIsSelectionMode(true)}
+                  className="px-4 py-2 rounded-md cursor-pointer bg-[#034F75] text-white hover:bg-[#023d5c] transition-colors text-sm sm:text-base"
+                >
+                  Select Multiple
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={handleSelectAll}
+                    className="px-4 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-sm sm:text-base"
+                  >
+                    Select All
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setIsSelectionMode(false);
+                      setSelectedProjects([]);
+                    }}
+                    className="px-4 py-2 cursor-pointer rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-sm sm:text-base"
+                  >
+                    Cancel
+                  </button>
+
+                  {selectedProjects.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setProjectToDelete("bulk");
+                        setShowDeleteModal(true);
+                      }}
+                      className="px-4 py-2 rounded-md cursor-pointer bg-red-600 hover:bg-red-700 text-white transition-colors text-sm sm:text-base flex items-center gap-2"
+                    >
+                      <Trash2 size={16} />
+                      Delete ({selectedProjects.length})
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
           {/* <button
             onClick={getAiImages}
             className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[18px] text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
@@ -128,8 +209,18 @@ const Projects = () => {
           {images.map((project) => (
             <div
               key={project._id}
-              className="flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
+              className="relative flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
             >
+              {isSelectionMode && (
+                <div className="absolute top-2 left-2 z-10">
+                  <input
+                    type="checkbox"
+                    checked={selectedProjects.includes(project._id)}
+                    onChange={() => toggleProjectSelection(project._id)}
+                    className="w-5 h-5 cursor-pointer accent-[#034F75]"
+                  />
+                </div>
+              )}
               <Image
                 src={
                   project.image ||
@@ -332,10 +423,14 @@ const Projects = () => {
               </button>
 
               <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  handleDelete(projectToDelete);
-                }}
+                onClick={() =>
+                  projectToDelete === "bulk"
+                    ? handleBulkDelete()
+                    : (() => {
+                        setShowDeleteModal(false);
+                        handleDelete(projectToDelete);
+                      })()
+                }
                 disabled={deleteLoading === projectToDelete}
                 className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
               >

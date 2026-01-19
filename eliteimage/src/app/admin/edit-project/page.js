@@ -23,7 +23,7 @@ const EditProjectPage = () => {
   projectId: "",
 }); // ← Initial empty state instead of null
   // const [loading, setLoading] = useState(true);
-  const [loading, setLoading] = useState(false); // ← true se false
+const [loading, setLoading] = useState(false);
 
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);

@@ -1,7 +1,9 @@
 "use client";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Upload, ArrowRight, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+
 import ProgressBar from "./ProgressBar";
 import { AppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
@@ -13,7 +15,8 @@ const UPLOAD_PRESET = "unsigned_preset";
 const Step1 = ({ formData, setFormData, next }) => {
   const router = useRouter();
 
-  const { token, saveGeneratedImage } = useContext(AppContext);
+  const { token, saveGeneratedImage, saveDraft } = useContext(AppContext);
+  const searchParams = useSearchParams();
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -21,6 +24,53 @@ const Step1 = ({ formData, setFormData, next }) => {
 
   // ✅ ADDED: Track loading images count
   const [loadingCount, setLoadingCount] = useState(0);
+
+  useEffect(() => {
+    const realImages = formData.uploadedImages.filter(
+      (img) => !img.startsWith("loading-")
+    );
+
+    // ✅ FIX: Sirf basic conditions check karo
+    if (
+      realImages.length > 0 && // Images hai
+      !uploadingImage && // Upload complete
+      formData.featureType // Feature selected
+    ) {
+      const timeoutId = setTimeout(() => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const existingDraftId = urlParams.get("draftId") || formData.draftId;
+
+          console.log("💾 Saving draft with images:", realImages.length);
+
+          const draftId = saveDraft(
+            {
+              ...formData,
+              uploadedImages: realImages,
+              draftId: existingDraftId,
+            },
+            "step1"
+          );
+
+          if (draftId && draftId !== formData.draftId) {
+            setFormData((prev) => ({
+              ...prev,
+              draftId,
+            }));
+          }
+        } catch (error) {
+          console.error("Error saving draft:", error);
+        }
+      }, 2000); // ✅ 2 seconds (5000 se kam)
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [
+    formData.uploadedImages,
+    formData.featureType,
+    uploadingImage,
+    saveDraft, // ✅ ADD: saveDraft dependency
+  ]);
 
   const handleGenerateAndSave = async () => {
     if (!formData.featureType) {
@@ -50,9 +100,7 @@ const Step1 = ({ formData, setFormData, next }) => {
 
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const uploadedImage = formData.uploadedImages[i];
-
         console.log(`📤 [${i + 1}] Processing ${formData.featureType}...`);
-
         const processedImageUrl = uploadedImage;
 
         const processedData = {
@@ -99,11 +147,45 @@ const Step1 = ({ formData, setFormData, next }) => {
         await saveGeneratedImage([singlePayload], token);
         toast.success(
           `${formData.uploadedImages.length} image(s) saved in 1 project!`,
-          {
-            id: "processing",
-          }
+          { id: "processing" }
         );
       }
+
+      // ✅ FIX: Properly delete draft
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const draftId = urlParams.get("draftId") || formData.draftId;
+
+        if (draftId) {
+          console.log("🗑️ Deleting draft:", draftId);
+
+          // Get all drafts
+          const savedDrafts = localStorage.getItem("draftProjects");
+          if (savedDrafts) {
+            const drafts = JSON.parse(savedDrafts);
+            console.log("📋 Before deletion:", drafts.length, "drafts");
+
+            // Filter out the completed draft
+            const updatedDrafts = drafts.filter(
+              (draft) => draft.id !== draftId
+            );
+            console.log("📋 After deletion:", updatedDrafts.length, "drafts");
+
+            // Save back to localStorage
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts)
+            );
+          }
+        }
+
+        // Remove current draft from localStorage
+        localStorage.removeItem("currentDraft");
+        console.log("✅ Draft deleted successfully");
+      } catch (error) {
+        console.error("❌ Error deleting draft:", error);
+      }
+
       next();
     } catch (error) {
       console.error("❌ Error:", error);
@@ -117,24 +199,10 @@ const Step1 = ({ formData, setFormData, next }) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    setLoadingCount(files.length);
-    setUploadingImage(true);
+    // ✅ STEP 1: Pehle validation karo (fast)
+    const validFiles = [];
 
-    const loadingPlaceholders = files.map(
-      (_, idx) => `loading-${Date.now()}-${idx}`
-    );
-
-    setFormData((prev) => ({
-      ...prev,
-      uploadedImages: [...prev.uploadedImages, ...loadingPlaceholders],
-    }));
-
-    const uploadedUrls = [];
-    let successCount = 0;
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-
+    for (const file of files) {
       if (!file.type.startsWith("image/")) {
         toast.error(`${file.name}: Only image files allowed`);
         continue;
@@ -145,6 +213,26 @@ const Step1 = ({ formData, setFormData, next }) => {
         continue;
       }
 
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) return;
+
+    setLoadingCount(validFiles.length);
+    setUploadingImage(true);
+
+    // ✅ STEP 2: Loading placeholders show karo (instant)
+    const loadingPlaceholders = validFiles.map(
+      (_, idx) => `loading-${Date.now()}-${idx}`
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      uploadedImages: [...prev.uploadedImages, ...loadingPlaceholders],
+    }));
+
+    // ✅ STEP 3: PARALLEL UPLOAD - Sab ek sath upload ho
+    const uploadPromises = validFiles.map(async (file) => {
       const uploadForm = new FormData();
       uploadForm.append("file", file);
       uploadForm.append("upload_preset", UPLOAD_PRESET);
@@ -160,26 +248,28 @@ const Step1 = ({ formData, setFormData, next }) => {
 
         const data = await res.json();
 
+        // ✅ Smaller optimized URL (faster loading)
         const optimizedUrl = data.secure_url.replace(
           "/upload/",
-          "/upload/f_auto,q_auto,w_1200/"
+          "/upload/f_auto,q_auto,w_800,h_600,c_limit/"
         );
 
-        // ✅ **YE NEW CODE HAI - IMAGE KO PRELOAD KAREIN**
-        await new Promise((resolve, reject) => {
-          const img = new window.Image();
-          img.onload = () => resolve();
-          img.onerror = () => reject();
-          img.src = optimizedUrl;
-        });
-
-        uploadedUrls.push(optimizedUrl);
-        successCount++;
+        return { success: true, url: optimizedUrl };
       } catch (err) {
+        console.error(`Upload failed for ${file.name}:`, err);
         toast.error(`${file.name}: Upload failed`);
+        return { success: false };
       }
-    }
+    });
 
+    // ✅ STEP 4: Wait for ALL uploads (parallel mein)
+    const results = await Promise.allSettled(uploadPromises);
+
+    const uploadedUrls = results
+      .filter((r) => r.status === "fulfilled" && r.value.success)
+      .map((r) => r.value.url);
+
+    // ✅ STEP 5: Single state update (ek hi baar)
     setFormData((prev) => {
       const withoutPlaceholders = prev.uploadedImages.filter(
         (img) => !img.startsWith("loading-")
@@ -188,14 +278,15 @@ const Step1 = ({ formData, setFormData, next }) => {
         ...prev,
         uploadedImages: [...withoutPlaceholders, ...uploadedUrls],
         lastUploadedAt: new Date().toISOString(),
+        hasUploadedImages: true,
       };
     });
 
     setLoadingCount(0);
     setUploadingImage(false);
 
-    if (successCount > 0) {
-      toast.success(`${successCount} image(s) uploaded successfully!`);
+    if (uploadedUrls.length > 0) {
+      toast.success(`${uploadedUrls.length} image(s) uploaded successfully!`);
     }
 
     e.target.value = "";
@@ -348,10 +439,11 @@ const Step1 = ({ formData, setFormData, next }) => {
               {/* ✅ CHANGED: Show real images after loading */}
               {realImages.map((img, idx) => {
                 const loaded = imageLoadedMap[img];
+                const uniqueKey = `${img}-${idx}`; // ⬅️ YE ADD KIYA
 
                 return (
                   <div
-                    key={img}
+                    key={uniqueKey}
                     className="relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6]"
                   >
                     {/* SHIMMER OVERLAY */}
@@ -365,15 +457,15 @@ const Step1 = ({ formData, setFormData, next }) => {
                       alt={`Uploaded ${idx + 1}`}
                       width={400}
                       height={350}
-                      quality={75}
-                      priority={idx < 4} // ✅ First 4 images ko priority dein
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      quality={60}
+                      loading="lazy"
+                      sizes="(max-width: 640px) 50vw, 25vw"
                       className={`w-full h-32 sm:h-36 lg:h-40 object-contain transition-opacity duration-300 ${
                         loaded ? "opacity-100" : "opacity-0"
                       }`}
-                      onLoadingComplete={() =>
-                        setImageLoadedMap((prev) => ({ ...prev, [img]: true }))
-                      }
+                      onLoad={() => {
+                        setImageLoadedMap((prev) => ({ ...prev, [img]: true }));
+                      }}
                     />
 
                     {/* REMOVE BUTTON */}

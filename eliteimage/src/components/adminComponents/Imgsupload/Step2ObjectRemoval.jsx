@@ -10,14 +10,15 @@ import { useRouter } from "next/navigation";
 const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
   const { token, saveGeneratedImage, user } = useContext(AppContext);
+  const { saveDraft } = useContext(AppContext);
 
-// ✅ ADD THIS:
-useEffect(() => {
-  if (!formData.featureType) {
-    toast.error("Please select a feature first");
-    router.push('/admin/dashboard');
-  }
-}, [formData.featureType, router]);
+  // ✅ ADD THIS:
+  useEffect(() => {
+    if (!formData.featureType) {
+      toast.error("Please select a feature first");
+      router.push("/admin/dashboard");
+    }
+  }, [formData.featureType, router]);
 
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);
@@ -84,6 +85,31 @@ useEffect(() => {
     setIsDragging(false);
   };
 
+  // Auto-save on area selection
+  useEffect(() => {
+    if (Object.keys(selectedAreas).length > 0) {
+      const timeoutId = setTimeout(() => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const existingDraftId = urlParams.get("draftId") || formData.draftId;
+
+          saveDraft(
+            {
+              ...formData,
+              selectedObjectAreas: selectedAreas,
+              draftId: existingDraftId,
+            },
+            "step2"
+          );
+        } catch (error) {
+          console.error("Error saving draft:", error);
+        }
+      }, 2000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [selectedAreas]); // ✅ Remove formData and saveDraft from dependencies
+
   const getSelectionStyle = () => {
     if (!dragStart || !dragEnd) return {};
 
@@ -125,6 +151,7 @@ useEffect(() => {
       const allBeforeAfterData = [];
       const CLOUD_NAME = "dhtpqla2b";
       const UPLOAD_PRESET = "unsigned_preset";
+
       const uploadToCloudinary = async (img) => {
         const fd = new FormData();
         const blob = await fetch(img).then((r) => r.blob());
@@ -138,8 +165,6 @@ useEffect(() => {
         const data = await res.json();
         return data.secure_url;
       };
-
-      // PURANI LINES DELETE KAREN (152-177) aur NAYE LINES likhein:
 
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const originalUrl = await uploadToCloudinary(
@@ -159,7 +184,7 @@ useEffect(() => {
       }
 
       const singlePayload = {
-        userid: user?._id || formData.userId,
+        userid: user?._id || formData.userid,
         title: `Object Removal - ${new Date().toLocaleDateString()}`,
         description: `Object removal with ${totalSelectedObjects} selected area(s) across ${formData.uploadedImages.length} image(s)`,
         featureType: "object-removal",
@@ -182,6 +207,31 @@ useEffect(() => {
 
       toast.dismiss("remove");
       toast.success("Objects removed & saved successfully!");
+
+      // ✅ DELETE DRAFT AFTER SUCCESSFUL SAVE
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const draftId = urlParams.get("draftId") || formData.draftId;
+
+        if (draftId) {
+          const savedDrafts = localStorage.getItem("draftProjects");
+          if (savedDrafts) {
+            const drafts = JSON.parse(savedDrafts);
+            const updatedDrafts = drafts.filter(
+              (draft) => draft.id !== draftId
+            );
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts)
+            );
+          }
+        }
+
+        localStorage.removeItem("currentDraft");
+        console.log("✅ Draft deleted after object removal");
+      } catch (error) {
+        console.error("Error deleting draft:", error);
+      }
 
       next();
     } catch (err) {

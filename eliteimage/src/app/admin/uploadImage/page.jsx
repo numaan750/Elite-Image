@@ -11,6 +11,7 @@ import Step4 from "@/components/adminComponents/Imgsupload/Step4";
 import Step5 from "@/components/adminComponents/Imgsupload/Step5";
 import Step2ObjectRemoval from "@/components/adminComponents/Imgsupload/Step2ObjectRemoval";
 import Step3Farniturestyle from "@/components/adminComponents/Imgsupload/Step3Farniturestyle";
+import toast from "react-hot-toast";
 
 const FEATURE_STEPS_CONFIG = {
   Enhance: {
@@ -114,7 +115,7 @@ const UploadImageTabs = () => {
   const router = useRouter();
 
   const featureType = searchParams.get("type");
-  
+
   const [activeStep, setActiveStep] = useState(1);
   const [userId, setUserId] = useState(null);
   const [showAllFeatures, setShowAllFeatures] = useState(!featureType);
@@ -136,6 +137,51 @@ const UploadImageTabs = () => {
     totalSteps: currentConfig.totalSteps,
     projectId: null,
   });
+
+  // Load draft on mount
+  // Load draft on mount
+  // Load draft on mount
+  useEffect(() => {
+    const mode = searchParams.get("mode");
+    const draftId = searchParams.get("draftId");
+
+    if (mode === "draft" && draftId) {
+      const currentDraft = localStorage.getItem("currentDraft");
+
+      if (currentDraft) {
+        try {
+          const draft = JSON.parse(currentDraft);
+
+          // ✅ FIX: Verify draft ID matches
+          if (draft.id === draftId || draft.draftId === draftId) {
+            setFormData({
+              ...draft,
+              draftId: draftId,
+            });
+
+            // Set active step from draft
+            const stepMap = {
+              step1: 1,
+              step2: 2,
+              step3: 3,
+              step4: 4,
+              step5: 5,
+            };
+            setActiveStep(stepMap[draft.currentStep] || 1);
+
+            console.log("✅ Draft loaded:", draftId);
+          } else {
+            console.warn("⚠️ Draft ID mismatch");
+            localStorage.removeItem("currentDraft");
+          }
+        } catch (error) {
+          console.error("Error loading draft:", error);
+          toast.error("Failed to load draft");
+          localStorage.removeItem("currentDraft");
+        }
+      }
+    }
+  }, [searchParams]); // ✅ No saveDraft here
 
   useEffect(() => {
     let id = localStorage.getItem("userId");

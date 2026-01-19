@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
 import { useRouter } from "next/navigation";
+import { AppContext } from "@/context/AppContext";
 
 const FURNITURE_TYPES = [
   { name: "Modern Furniture", img: "/projects/Visual/Furniture-Styles-1.webp" },
@@ -40,20 +41,50 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
     formData.selectedFurniture || FURNITURE_TYPES[0].name
   );
   const router = useRouter();
+  const { saveDraft } = useContext(AppContext);
 
-// ✅ ADD THIS:
-useEffect(() => {
-  if (!formData.featureType) {
-    toast.error("Please select a feature first");
-    router.push('/admin/dashboard');
-  }
-}, [formData.featureType, router]);
+  // Auto-save on furniture selection
+  useEffect(() => {
+    if (selectedFurniture) {
+      const timeoutId = setTimeout(() => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const existingDraftId = urlParams.get("draftId") || formData.draftId;
+
+          saveDraft(
+            {
+              ...formData,
+              selectedFurniture,
+              draftId: existingDraftId,
+            },
+            "step3"
+          );
+        } catch (error) {
+          console.error("Error saving draft:", error);
+        }
+      }, 1500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [selectedFurniture]); // ✅ Remove formData and saveDraft from dependencies
+
+  // ✅ ADD THIS:
+  useEffect(() => {
+    if (!formData.featureType) {
+      toast.error("Please select a feature first");
+      router.push("/admin/dashboard");
+    }
+  }, [formData.featureType, router]);
 
   const handleContinue = () => {
     setFormData((prev) => ({
       ...prev,
       selectedFurniture: selectedFurniture,
     }));
+
+    // ✅ YE REMOVE KAREIN - Furniture selection ke baad draft delete nahi karna
+    // Draft sirf final save par hi delete hoga
+
     next();
   };
 

@@ -10,9 +10,9 @@ const AppProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [draftProjects, setDraftProjects] = useState([]);
   const [images, setImages] = useState([]);
   const [projectCache, setProjectCache] = useState({}); // ← YE LINE ADD KARO (Line 17)
-
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
@@ -34,6 +34,16 @@ const AppProvider = ({ children }) => {
     }
 
     setLoading(false);
+    // Load drafts from localStorage
+    const savedDrafts = localStorage.getItem("draftProjects");
+    if (savedDrafts) {
+      try {
+        setDraftProjects(JSON.parse(savedDrafts));
+      } catch (error) {
+        console.error("Error parsing drafts:", error);
+        localStorage.removeItem("draftProjects");
+      }
+    }
   }, []);
 
   const signupUser = async (username, email, password) => {
@@ -109,24 +119,23 @@ const AppProvider = ({ children }) => {
     }
   };
 
-const deleteImages = async (id) => {
-  // UI se remove (optimistic)
-  setImages((prev) => prev.filter((img) => img._id !== id));
+  const deleteImages = async (id) => {
+    // UI se remove (optimistic)
+    setImages((prev) => prev.filter((img) => img._id !== id));
 
-  const res = await fetch(`${API_URL}/api/aiImagesmodels/${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const res = await fetch(`${API_URL}/api/aiImagesmodels/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!res.ok) {
-    await getAiImages(); // restore list
-    throw new Error("Failed to delete project");
-  }
-};
-
+    if (!res.ok) {
+      await getAiImages(); // restore list
+      throw new Error("Failed to delete project");
+    }
+  };
 
   // ✅ ADD THIS NEW FUNCTION
   // ✅ UPDATED getProjectById with CACHE
@@ -196,12 +205,31 @@ const deleteImages = async (id) => {
 
         const updatedProject = await response.json();
 
-        // ✅ YE NAYA CODE: Images state mein update karo
         setImages((prevImages) =>
           prevImages.map((img) =>
             img._id === projectId ? updatedProject : img
           )
         );
+
+        // ✅ FIX: Delete draft after update
+        try {
+          const allDrafts = JSON.parse(
+            localStorage.getItem("draftProjects") || "[]"
+          );
+          const updatedDrafts = allDrafts.filter(
+            (draft) =>
+              !(
+                draft.projectId === projectId ||
+                (draft.userId === imageData.userid &&
+                  draft.featureType === imageData.featureType)
+              )
+          );
+
+          localStorage.setItem("draftProjects", JSON.stringify(updatedDrafts));
+          console.log("✅ Draft deleted after update");
+        } catch (error) {
+          console.error("Error cleaning drafts:", error);
+        }
 
         toast.success("Project updated successfully!");
         return updatedProject;
@@ -229,8 +257,37 @@ const deleteImages = async (id) => {
           savedImages.push(result);
         }
 
-        // ✅ YE NAYA CODE: Bulk save ke baad images state update karo
         setImages((prevImages) => [...savedImages, ...prevImages]);
+
+        // ✅ FIX: Delete all related drafts after bulk save
+        try {
+          const allDrafts = JSON.parse(
+            localStorage.getItem("draftProjects") || "[]"
+          );
+          const updatedDrafts = allDrafts.filter((draft) => {
+            // Check if draft matches any saved project
+            const matches = savedImages.some(
+              (saved) =>
+                draft.userId === saved.userid &&
+                draft.featureType === saved.featureType
+            );
+            return !matches;
+          });
+
+          if (allDrafts.length !== updatedDrafts.length) {
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts)
+            );
+            console.log(
+              "✅ Bulk drafts cleaned:",
+              allDrafts.length - updatedDrafts.length,
+              "removed"
+            );
+          }
+        } catch (error) {
+          console.error("Error cleaning bulk drafts:", error);
+        }
 
         return savedImages;
       } else {
@@ -251,8 +308,34 @@ const deleteImages = async (id) => {
 
         const savedProject = await response.json();
 
-        // ✅ YE NAYA CODE: Single save ke baad images state update karo
         setImages((prevImages) => [savedProject, ...prevImages]);
+
+        // ✅ FIX: Improved draft cleanup for single save
+        try {
+          const allDrafts = JSON.parse(
+            localStorage.getItem("draftProjects") || "[]"
+          );
+          const updatedDrafts = allDrafts.filter(
+            (draft) =>
+              !(
+                draft.userId === imageData.userid &&
+                draft.featureType === imageData.featureType &&
+                Math.abs(new Date(draft.lastEdited).getTime() - Date.now()) <
+                  300000
+              ) // 5 minutes
+          );
+
+          if (allDrafts.length !== updatedDrafts.length) {
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts)
+            );
+            localStorage.removeItem("currentDraft");
+            console.log("✅ Related draft cleaned from AppContext");
+          }
+        } catch (error) {
+          console.error("Error cleaning drafts:", error);
+        }
 
         return savedProject;
       }
@@ -334,6 +417,94 @@ const deleteImages = async (id) => {
     }
   };
 
+  // Save draft function
+  // Save draft function
+  // Save draft function - ✅ IMPROVED VERSION
+  const saveDraft = (formData, currentStep) => {
+    try {
+      // ✅ Get existing draftId from URL or formData
+      const existingDraftId = formData.draftId;
+      const draftId =
+        existingDraftId ||
+        `draft_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      const draftProject = {
+        id: draftId,
+        ...formData,
+        draftId: draftId,
+        currentStep: currentStep,
+        lastEdited: new Date().toISOString(),
+        progress: calculateProgress(currentStep, formData.totalSteps),
+      };
+
+      // ✅ FIX: Direct localStorage operation without state update during render
+      const savedDrafts = localStorage.getItem("draftProjects");
+      const currentDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
+
+      const existingIndex = currentDrafts.findIndex((d) => d.id === draftId);
+      let updatedDrafts;
+
+      if (existingIndex > -1) {
+        // Update existing draft
+        updatedDrafts = [...currentDrafts];
+        updatedDrafts[existingIndex] = draftProject;
+        console.log("📝 Draft updated:", draftId);
+      } else {
+        // Add new draft
+        updatedDrafts = [draftProject, ...currentDrafts];
+        console.log("📝 New draft created:", draftId);
+      }
+
+      // Remove duplicates based on userId + featureType
+      const uniqueDrafts = updatedDrafts.filter((draft, index, self) => {
+        const firstIndex = self.findIndex(
+          (d) =>
+            d.userId === draft.userId &&
+            d.featureType === draft.featureType &&
+            d.id === draft.id
+        );
+        return index === firstIndex;
+      });
+
+      // Save to localStorage
+      localStorage.setItem("draftProjects", JSON.stringify(uniqueDrafts));
+
+      // ✅ Schedule state update for next tick (avoid render-time setState)
+      setTimeout(() => {
+        setDraftProjects(uniqueDrafts);
+      }, 0);
+
+      return draftId;
+    } catch (error) {
+      console.error("Error in saveDraft:", error);
+      return formData.draftId || null;
+    }
+  };
+
+  // Delete draft function
+  const deleteDraft = (draftId) => {
+    setDraftProjects((prev) => {
+      const updated = prev.filter((d) => d.id !== draftId);
+      localStorage.setItem("draftProjects", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  // Calculate progress helper
+  const calculateProgress = (currentStep, totalSteps) => {
+    const stepMap = {
+      step1: 1,
+      step2: 2,
+      step3: 3,
+      step4: 4,
+      step5: 5,
+    };
+
+    const stepNumber = stepMap[currentStep] || 1;
+    const total = totalSteps > 0 ? totalSteps + 2 : 5; // +2 for step4 and step5
+    return Math.round((stepNumber / total) * 100);
+  };
+
   useEffect(() => {
     if (token) {
       getAiImages();
@@ -348,6 +519,7 @@ const deleteImages = async (id) => {
         loading,
         error,
         images,
+        draftProjects,
         getAiImages,
         deleteImages,
         saveGeneratedImage,
@@ -357,6 +529,8 @@ const deleteImages = async (id) => {
         updateProfile,
         updatePassword,
         getProjectById, // ← YE LINE ADD KARO
+        saveDraft,
+        deleteDraft,
       }}
     >
       {children}

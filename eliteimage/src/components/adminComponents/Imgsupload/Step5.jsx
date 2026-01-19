@@ -5,9 +5,12 @@ import { ChevronLeft, ChevronRight, MoveHorizontal } from "lucide-react";
 import { FaMagic } from "react-icons/fa";
 import { AppContext } from "@/context/AppContext";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 const Step5 = ({ formData, setFormData, back }) => {
-  const { token, saveGeneratedImage } = useContext(AppContext);
+  const { token, saveGeneratedImage, saveDraft, deleteDraft } =
+    useContext(AppContext);
+  const searchParams = useSearchParams();
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
   const [isSaving, setIsSaving] = useState(false); // ✅ ADD THIS
@@ -103,6 +106,31 @@ const Step5 = ({ formData, setFormData, back }) => {
       } else {
         await saveGeneratedImage(backendPayload, token);
         alert("Image saved successfully!");
+      }
+
+      // ✅ DELETE DRAFT AFTER SUCCESSFUL SAVE
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const draftId = urlParams.get("draftId") || formData.draftId;
+
+        if (draftId) {
+          const savedDrafts = localStorage.getItem("draftProjects");
+          if (savedDrafts) {
+            const drafts = JSON.parse(savedDrafts);
+            const updatedDrafts = drafts.filter(
+              (draft) => draft.id !== draftId
+            );
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts)
+            );
+          }
+        }
+
+        localStorage.removeItem("currentDraft");
+        console.log("✅ Draft deleted after final save");
+      } catch (error) {
+        console.error("Error deleting draft:", error);
       }
 
       router.push("/admin/dashboard");

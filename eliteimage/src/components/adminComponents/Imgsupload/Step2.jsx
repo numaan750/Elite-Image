@@ -1,16 +1,18 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FEATURES_DATA } from "./featuresData";
 import Image from "next/image";
 import ProgressBar from "./ProgressBar";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { AppContext } from "@/context/AppContext";
 
 const Step2 = ({ formData, setFormData, next, back, featureType }) => {
   const router = useRouter();
 
   const featureData = FEATURES_DATA[featureType];
+  const { saveDraft } = useContext(AppContext);
 
   const [selected, setSelected] = useState(formData.selectedFeatures || []);
 
@@ -20,6 +22,31 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
       router.push("/admin/dashboard");
     }
   }, [formData.featureType, router]);
+
+  // Auto-save on selection change
+  useEffect(() => {
+    if (selected.length > 0) {
+      const timeoutId = setTimeout(() => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const existingDraftId = urlParams.get("draftId") || formData.draftId;
+
+          saveDraft(
+            {
+              ...formData,
+              selectedFeatures: selected,
+              draftId: existingDraftId,
+            },
+            "step2"
+          );
+        } catch (error) {
+          console.error("Error saving draft:", error);
+        }
+      }, 1500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [selected]); // ✅ Remove saveDraft and formData from dependencies
 
   // const handleContinue = async () => {
   //   setFormData((prev) => ({
@@ -97,7 +124,9 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
       selectedFeatures: selected,
     }));
 
-    // Sirf next step par jao
+    // ✅ YE CONDITION REMOVE KAREIN - Draft delete nahi karna Step 2 mein
+    // Sirf last step mein hi draft delete hoga
+
     next();
   };
 
