@@ -6,6 +6,7 @@ import { FaMagic } from "react-icons/fa";
 import { AppContext } from "@/context/AppContext";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 const Step5 = ({ formData, setFormData, back }) => {
   const { token, saveGeneratedImage, saveDraft, deleteDraft } =
@@ -32,7 +33,7 @@ const Step5 = ({ formData, setFormData, back }) => {
     setSliderPositions(initialPositions);
   }, [formData.uploadedImages.length]);
   const [editDescription, setEditDescription] = useState(
-    formData.finalNotes || ""
+    formData.finalNotes || "",
   );
   useEffect(() => {
     if (formData.finalNotes) {
@@ -56,6 +57,7 @@ const Step5 = ({ formData, setFormData, back }) => {
   }, [isDragging]);
 
   const handleGenerate = async () => {
+    // ✅ STEP 1: Validation (instant)
     if (!token) {
       alert("Please login to save images");
       return;
@@ -63,6 +65,7 @@ const Step5 = ({ formData, setFormData, back }) => {
 
     setIsSaving(true);
 
+    // ✅ STEP 2: Prepare data (instant)
     const finalData = {
       ...formData,
       finalNotes: editDescription,
@@ -91,25 +94,24 @@ const Step5 = ({ formData, setFormData, back }) => {
         "",
     };
 
-    try {
-      console.log("💾 Saving to backend...", backendPayload);
+    // ✅ STEP 3: Navigate IMMEDIATELY
+    router.push("/admin/dashboard");
 
-      // ✅ Check if editing existing project
-      if (formData.projectId) {
-        await saveGeneratedImage(
-          backendPayload,
-          token,
-          true,
-          formData.projectId
-        );
-        alert("Project updated successfully!");
-      } else {
-        await saveGeneratedImage(backendPayload, token);
-        alert("Image saved successfully!");
-      }
-
-      // ✅ DELETE DRAFT AFTER SUCCESSFUL SAVE
+    // ✅ STEP 4: Save in BACKGROUND
+    (async () => {
       try {
+        if (formData.projectId) {
+          await saveGeneratedImage(
+            backendPayload,
+            token,
+            true,
+            formData.projectId,
+          );
+        } else {
+          await saveGeneratedImage(backendPayload, token);
+        }
+
+        // Delete draft
         const urlParams = new URLSearchParams(window.location.search);
         const draftId = urlParams.get("draftId") || formData.draftId;
 
@@ -118,28 +120,24 @@ const Step5 = ({ formData, setFormData, back }) => {
           if (savedDrafts) {
             const drafts = JSON.parse(savedDrafts);
             const updatedDrafts = drafts.filter(
-              (draft) => draft.id !== draftId
+              (draft) => draft.id !== draftId,
             );
             localStorage.setItem(
               "draftProjects",
-              JSON.stringify(updatedDrafts)
+              JSON.stringify(updatedDrafts),
             );
           }
         }
-
         localStorage.removeItem("currentDraft");
-        console.log("✅ Draft deleted after final save");
-      } catch (error) {
-        console.error("Error deleting draft:", error);
-      }
 
-      router.push("/admin/dashboard");
-    } catch (error) {
-      console.error("❌ Failed to save:", error);
-      alert(`Failed to save image: ${error.message}`);
-    } finally {
-      setIsSaving(false);
-    }
+        toast.success("Project saved successfully!");
+      } catch (error) {
+        console.error("❌ Failed to save:", error);
+        toast.error(`Failed to save: ${error.message}`);
+      } finally {
+        setIsSaving(false);
+      }
+    })();
   };
 
   return (

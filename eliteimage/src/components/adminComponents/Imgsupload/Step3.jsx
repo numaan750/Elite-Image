@@ -22,7 +22,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   const styles = STYLES_DATA[featureType];
 
   const [selected, setSelected] = useState(
-    formData.selectedStyle || styles[0].name
+    formData.selectedStyle || styles[0].name,
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -40,7 +40,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
               selectedStyle: selected,
               draftId: existingDraftId,
             },
-            "step3"
+            "step3",
           );
         } catch (error) {
           console.error("Error saving draft:", error);
@@ -52,6 +52,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   }, [selected]); // ✅ Remove formData and saveDraft from dependencies
 
   const handleGenerate = async () => {
+    // ✅ STEP 1: Validation (instant)
     if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
       toast.error("Please upload at least one image first!");
       return;
@@ -62,108 +63,109 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
       return;
     }
 
+    // ✅ STEP 2: Update local state immediately
     setFormData((prev) => ({
       ...prev,
       selectedStyle: selected,
     }));
 
     setIsSaving(true);
-    toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
+
+    // ✅ STEP 3: Show success & navigate INSTANTLY
+    toast.success(`Processing ${formData.uploadedImages.length} image(s)...`, {
       id: "processing",
+      duration: 2000,
     });
 
-    try {
-      const allProcessedData = [];
-      const CLOUD_NAME = "dhtpqla2b";
-      const UPLOAD_PRESET = "unsigned_preset";
+    next(); // ⬅️ USER IMMEDIATELY MOVES TO NEXT PAGE
 
-      const uploadToCloudinary = async (imageUrl) => {
-        const formData = new FormData();
-        let imageBlob;
+    // ✅ STEP 4: Process & save in BACKGROUND
+    (async () => {
+      try {
+        const allProcessedData = [];
+        const CLOUD_NAME = "dhtpqla2b";
+        const UPLOAD_PRESET = "unsigned_preset";
 
-        if (typeof imageUrl === "string" && imageUrl.startsWith("http")) {
-          const response = await fetch(imageUrl);
-          imageBlob = await response.blob();
-        } else if (
-          typeof imageUrl === "string" &&
-          imageUrl.startsWith("data:")
-        ) {
-          const response = await fetch(imageUrl);
-          imageBlob = await response.blob();
-        } else {
-          imageBlob = imageUrl;
+        const uploadToCloudinary = async (imageUrl) => {
+          const formData = new FormData();
+          let imageBlob;
+
+          if (typeof imageUrl === "string" && imageUrl.startsWith("http")) {
+            const response = await fetch(imageUrl);
+            imageBlob = await response.blob();
+          } else if (
+            typeof imageUrl === "string" &&
+            imageUrl.startsWith("data:")
+          ) {
+            const response = await fetch(imageUrl);
+            imageBlob = await response.blob();
+          } else {
+            imageBlob = imageUrl;
+          }
+
+          formData.append("file", imageBlob);
+          formData.append("upload_preset", UPLOAD_PRESET);
+          formData.append("cloud_name", CLOUD_NAME);
+
+          const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+            { method: "POST", body: formData },
+          );
+
+          if (!response.ok) throw new Error("Cloudinary upload failed");
+          const data = await response.json();
+          return data.secure_url;
+        };
+
+        for (let i = 0; i < formData.uploadedImages.length; i++) {
+          const uploadedImage = formData.uploadedImages[i];
+
+          const originalCloudinaryUrl = await uploadToCloudinary(uploadedImage);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const processedCloudinaryUrl =
+            await uploadToCloudinary(uploadedImage);
+
+          const processedData = {
+            originalImage: originalCloudinaryUrl,
+            processedImage: processedCloudinaryUrl,
+            processedAt: new Date().toISOString(),
+            status: "completed",
+            userId: user?._id || formData.userId,
+            featureType: formData.featureType,
+            selectedOptions: {
+              feature: formData.selectedFeature,
+              style: selected,
+            },
+          };
+          allProcessedData.push(processedData);
         }
 
-        formData.append("file", imageBlob);
-        formData.append("upload_preset", UPLOAD_PRESET);
-        formData.append("cloud_name", CLOUD_NAME);
-
-        const response = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-          { method: "POST", body: formData }
-        );
-
-        if (!response.ok) throw new Error("Cloudinary upload failed");
-        const data = await response.json();
-        return data.secure_url;
-      };
-
-      for (let i = 0; i < formData.uploadedImages.length; i++) {
-        const uploadedImage = formData.uploadedImages[i];
-
-        console.log(`📤 [${i + 1}] Uploading original image...`);
-        const originalCloudinaryUrl = await uploadToCloudinary(uploadedImage);
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const processedCloudinaryUrl = await uploadToCloudinary(uploadedImage);
-
-        const processedData = {
-          originalImage: originalCloudinaryUrl,
-          processedImage: processedCloudinaryUrl,
-          processedAt: new Date().toISOString(),
-          status: "completed",
-          userId: user?._id || formData.userId,
+        const backendPayload = {
+          userid: user?._id || formData.userId,
+          title: `${formData.featureType} - ${
+            formData.uploadedImages.length
+          } Images - ${new Date().toLocaleDateString()}`,
+          description: `Project with ${formData.uploadedImages.length} image(s)`,
           featureType: formData.featureType,
-          selectedOptions: {
-            feature: formData.selectedFeature,
-            style: selected,
-          },
+          uploadedImages: allProcessedData.map((data) => data.originalImage),
+          selectedFeature: formData.selectedFeature
+            ? [formData.selectedFeature]
+            : [],
+          selectedStyle: [selected],
+          beforeAfterData: allProcessedData,
+          finalNotes: formData.finalNotes || "",
+          image: allProcessedData[0].processedImage,
         };
-        allProcessedData.push(processedData);
-      }
 
-      const backendPayload = {
-        userid: user?._id || formData.userId,
-        title: `${formData.featureType} - ${
-          formData.uploadedImages.length
-        } Images - ${new Date().toLocaleDateString()}`,
-        description: `Project with ${formData.uploadedImages.length} image(s)`,
-        featureType: formData.featureType,
-        uploadedImages: allProcessedData.map((data) => data.originalImage),
-        selectedFeature: formData.selectedFeature
-          ? [formData.selectedFeature]
-          : [],
-        selectedStyle: [selected],
-        beforeAfterData: allProcessedData,
-        finalNotes: formData.finalNotes || "",
-        image: allProcessedData[0].processedImage,
-      };
+        setFormData((prev) => ({
+          ...prev,
+          beforeAfterData: allProcessedData,
+          selectedStyle: selected,
+        }));
 
-      setFormData((prev) => ({
-        ...prev,
-        beforeAfterData: allProcessedData,
-        selectedStyle: selected,
-      }));
+        await saveGeneratedImage(backendPayload, token);
 
-      await saveGeneratedImage(backendPayload, token);
-
-      toast.dismiss("processing");
-      toast.success(
-        `${formData.uploadedImages.length} image(s) processed and saved!`
-      );
-
-      // ✅ DELETE DRAFT AFTER SUCCESSFUL SAVE
-      try {
+        // Delete draft
         const urlParams = new URLSearchParams(window.location.search);
         const draftId = urlParams.get("draftId") || formData.draftId;
 
@@ -172,29 +174,27 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
           if (savedDrafts) {
             const drafts = JSON.parse(savedDrafts);
             const updatedDrafts = drafts.filter(
-              (draft) => draft.id !== draftId
+              (draft) => draft.id !== draftId,
             );
             localStorage.setItem(
               "draftProjects",
-              JSON.stringify(updatedDrafts)
+              JSON.stringify(updatedDrafts),
             );
           }
         }
-
         localStorage.removeItem("currentDraft");
-        console.log("✅ Draft deleted after generation");
-      } catch (error) {
-        console.error("Error deleting draft:", error);
-      }
 
-      next();
-    } catch (error) {
-      console.error("❌ Error:", error);
-      toast.dismiss("processing");
-      toast.error(`Error: ${error.message}`);
-    } finally {
-      setIsSaving(false);
-    }
+        toast.success(
+          `${formData.uploadedImages.length} image(s) saved successfully!`,
+          { id: "processing" },
+        );
+      } catch (error) {
+        console.error("❌ Error:", error);
+        toast.error(`Error: ${error.message}`, { id: "processing" });
+      } finally {
+        setIsSaving(false);
+      }
+    })();
   };
 
   return (
