@@ -461,6 +461,36 @@ const Step4 = ({ formData, setFormData, next, back }) => {
     }
   }, [formData.beforeAfterData]); // ✅ Only watch beforeAfterData
 
+  // Remove draft when user reaches Step 4
+  useEffect(() => {
+    const removeDraftFromList = () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const draftId = urlParams.get("draftId") || formData.draftId;
+
+        if (draftId) {
+          const savedDrafts = localStorage.getItem("draftProjects");
+          if (savedDrafts) {
+            const drafts = JSON.parse(savedDrafts);
+            const updatedDrafts = drafts.filter(
+              (draft) => draft.id !== draftId,
+            );
+
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts),
+            );
+            console.log("✅ Draft removed from list on Step 4");
+          }
+        }
+      } catch (error) {
+        console.error("Error removing draft:", error);
+      }
+    };
+
+    removeDraftFromList();
+  }, []); // Component mount hone par ek baar chalega
+
   // ✅ ADD THIS COMPLETE useEffect
   // useEffect(() => {
   //   const loadProjectData = async () => {

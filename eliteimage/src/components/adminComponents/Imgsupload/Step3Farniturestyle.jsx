@@ -38,7 +38,7 @@ const FURNITURE_TYPES = [
 
 const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
   const [selectedFurniture, setSelectedFurniture] = useState(
-    formData.selectedFurniture || FURNITURE_TYPES[0].name
+    formData.selectedFurniture || FURNITURE_TYPES[0].name,
   );
   const router = useRouter();
   const { saveDraft } = useContext(AppContext);
@@ -57,7 +57,7 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
               selectedFurniture,
               draftId: existingDraftId,
             },
-            "step3"
+            "step3",
           );
         } catch (error) {
           console.error("Error saving draft:", error);
@@ -172,47 +172,46 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
     
     flex flex-col sm:flex-row
     items-stretch sm:items-center
-    justify-center sm:justify-center lg:justify-end
+    justify-between
     gap-3 sm:gap-4
-    max-w-7xl mx-auto px-4
   "
       >
-        {/* Back Button */}
         <button
           onClick={back}
           className="
-      w-full sm:w-auto
-      flex items-center justify-center gap-2
-      bg-gray-300 hover:bg-gray-400
-      text-black
-      text-[14px] sm:text-[16px] lg:text-[18px]
-      px-4 sm:px-6 lg:px-8
-      py-2.5 sm:py-3
-      rounded-lg
-      transition-colors
-    "
+    w-full sm:w-auto
+    flex items-center justify-center gap-2
+    bg-gray-300 hover:bg-gray-400
+    text-black
+    text-[14px] sm:text-[16px] lg:text-[18px]
+    px-4 sm:px-6 lg:px-8
+    py-2.5 sm:py-3
+    rounded-lg
+    transition-colors
+  "
         >
+          <ChevronRight size={17} className="rotate-180" />
           Back
         </button>
 
         {/* Generate Button */}
         <button
           onClick={handleContinue}
-          disabled={!selectedFurniture}
           className={`
-      w-full sm:w-auto
-      flex items-center justify-center gap-2
-      bg-[#034F75] hover:bg-[#023a5c]
-      text-white
-      text-[14px] sm:text-[16px] lg:text-[18px]
-      px-4 sm:px-6 lg:px-8
-      py-2.5 sm:py-3
-      rounded-lg
-      transition-colors
-      ${!selectedFurniture ? "opacity-50 cursor-not-allowed" : ""}
-    `}
+    w-full sm:w-auto
+    flex items-center justify-center gap-2
+    bg-[#034F75] hover:bg-[#023a5c]
+    text-white
+    text-[14px] sm:text-[16px] lg:text-[18px]
+    px-4 sm:px-6 lg:px-8
+    py-2.5 sm:py-3
+    rounded-lg
+    transition-colors
+    ${!selectedFurniture ? "opacity-50" : ""}
+  `}
         >
-          Generate Now
+          Continue
+          <ChevronRight size={18} />
         </button>
       </div>
     </div>

@@ -37,7 +37,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
               selectedFeatures: selected,
               draftId: existingDraftId,
             },
-            "step2"
+            "step2",
           );
         } catch (error) {
           console.error("Error saving draft:", error);
