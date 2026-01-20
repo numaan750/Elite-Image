@@ -29,11 +29,11 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
   const totalSelectedObjects = Object.values(selectedAreas).reduce(
     (total, areas) => total + areas.length,
-    0
+    0,
   );
 
   const allImagesHaveSelection = formData.uploadedImages.every(
-    (img, index) => selectedAreas[index] && selectedAreas[index].length > 0
+    (img, index) => selectedAreas[index] && selectedAreas[index].length > 0,
   );
   const handleMouseDown = (e) => {
     if (!imageRef.current) return;
@@ -99,7 +99,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               selectedObjectAreas: selectedAreas,
               draftId: existingDraftId,
             },
-            "step2"
+            "step2",
           );
         } catch (error) {
           console.error("Error saving draft:", error);
@@ -133,113 +133,122 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     }
     next();
   };
-const handleRemoveObject = async () => {
-  // ✅ STEP 1: Validation (instant - 0ms)
-  if (!token) {
-    toast.error("Please login first");
-    return;
-  }
-
-  if (!allImagesHaveSelection) {
-    toast.error("Please select objects in all images first");
-    return;
-  }
-
-  // ✅ STEP 2: Show success toast INSTANTLY
-  toast.success("Processing your request...", { id: "remove" });
-
-  // ✅ STEP 3: Navigate to next page IMMEDIATELY
-  next();
-
-  // ✅ STEP 4: Process & save in BACKGROUND (async, non-blocking)
-  (async () => {
-    try {
-      const allUploadedImages = [];
-      const allBeforeAfterData = [];
-      const CLOUD_NAME = "dhtpqla2b";
-      const UPLOAD_PRESET = "unsigned_preset";
-
-      const uploadToCloudinary = async (img) => {
-        let blob;
-        if (img.startsWith('blob:')) {
-          const idx = formData.uploadedImages.indexOf(img);
-          blob = formData.localFiles?.[idx] || await fetch(img).then(r => r.blob());
-        } else {
-          blob = await fetch(img).then((r) => r.blob());
-        }
-        
-        const fd = new FormData();
-        fd.append("file", blob);
-        fd.append("upload_preset", UPLOAD_PRESET);
-
-        const res = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-          { method: "POST", body: fd }
-        );
-        const data = await res.json();
-        return data.secure_url;
-      };
-
-      // Upload all images in parallel
-      const uploadPromises = formData.uploadedImages.map(async (img, i) => {
-        const originalUrl = await uploadToCloudinary(img);
-        const processedUrl = originalUrl; // Replace with actual processing
-
-        return {
-          originalImage: originalUrl,
-          processedImage: processedUrl,
-          removedAreas: selectedAreas[i] || [],
-          processedAt: new Date().toISOString(),
-          status: "completed",
-        };
-      });
-
-      const results = await Promise.all(uploadPromises);
-      allBeforeAfterData.push(...results);
-      allUploadedImages.push(...results.map(r => r.originalImage));
-
-      const singlePayload = {
-        userid: user?._id || formData.userid,
-        title: `Object Removal - ${new Date().toLocaleDateString()}`,
-        description: `Object removal with ${totalSelectedObjects} selected area(s)`,
-        featureType: "object-removal",
-        uploadedImages: allUploadedImages,
-        selectedFeature: ["object-removal"],
-        beforeAfterData: allBeforeAfterData,
-        finalNotes: `Removed ${totalSelectedObjects} object(s)`,
-        image: allUploadedImages[0],
-      };
-
-      const savedData = await saveGeneratedImage([singlePayload], token);
-      
-      setFormData((prev) => ({
-        ...prev,
-        beforeAfterData: Array.isArray(savedData)
-          ? savedData.flatMap((item) => item.beforeAfterData || [])
-          : savedData.beforeAfterData || [],
-      }));
-
-      // Delete draft
-      const urlParams = new URLSearchParams(window.location.search);
-      const draftId = urlParams.get("draftId") || formData.draftId;
-
-      if (draftId) {
-        const savedDrafts = localStorage.getItem("draftProjects");
-        if (savedDrafts) {
-          const drafts = JSON.parse(savedDrafts);
-          const updatedDrafts = drafts.filter((draft) => draft.id !== draftId);
-          localStorage.setItem("draftProjects", JSON.stringify(updatedDrafts));
-        }
-      }
-      localStorage.removeItem("currentDraft");
-
-      toast.success("Objects removed & saved successfully!", { id: "remove" });
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to remove objects", { id: "remove" });
+  const handleRemoveObject = async () => {
+    // ✅ STEP 1: Validation (instant - 0ms)
+    if (!token) {
+      toast.error("Please login first");
+      return;
     }
-  })();
-};
+
+    if (!allImagesHaveSelection) {
+      toast.error("Please select objects in all images first");
+      return;
+    }
+
+    // ✅ STEP 2: Show success toast INSTANTLY
+    toast.success("Processing your request...", { id: "remove" });
+
+    // ✅ STEP 3: Navigate to next page IMMEDIATELY
+    next();
+
+    // ✅ STEP 4: Process & save in BACKGROUND (async, non-blocking)
+    (async () => {
+      try {
+        const allUploadedImages = [];
+        const allBeforeAfterData = [];
+        const CLOUD_NAME = "dhtpqla2b";
+        const UPLOAD_PRESET = "unsigned_preset";
+
+        const uploadToCloudinary = async (img) => {
+          let blob;
+          if (img.startsWith("blob:")) {
+            const idx = formData.uploadedImages.indexOf(img);
+            blob =
+              formData.localFiles?.[idx] ||
+              (await fetch(img).then((r) => r.blob()));
+          } else {
+            blob = await fetch(img).then((r) => r.blob());
+          }
+
+          const fd = new FormData();
+          fd.append("file", blob);
+          fd.append("upload_preset", UPLOAD_PRESET);
+
+          const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+            { method: "POST", body: fd },
+          );
+          const data = await res.json();
+          return data.secure_url;
+        };
+
+        // Upload all images in parallel
+        const uploadPromises = formData.uploadedImages.map(async (img, i) => {
+          const originalUrl = await uploadToCloudinary(img);
+          const processedUrl = originalUrl; // Replace with actual processing
+
+          return {
+            originalImage: originalUrl,
+            processedImage: processedUrl,
+            removedAreas: selectedAreas[i] || [],
+            processedAt: new Date().toISOString(),
+            status: "completed",
+          };
+        });
+
+        const results = await Promise.all(uploadPromises);
+        allBeforeAfterData.push(...results);
+        allUploadedImages.push(...results.map((r) => r.originalImage));
+
+        const singlePayload = {
+          userid: user?._id || formData.userid,
+          title: `Object Removal - ${new Date().toLocaleDateString()}`,
+          description: `Object removal with ${totalSelectedObjects} selected area(s)`,
+          featureType: "object-removal",
+          uploadedImages: allUploadedImages,
+          selectedFeature: ["object-removal"],
+          beforeAfterData: allBeforeAfterData,
+          finalNotes: `Removed ${totalSelectedObjects} object(s)`,
+          image: allUploadedImages[0],
+        };
+
+        const savedData = await saveGeneratedImage([singlePayload], token);
+
+        setFormData((prev) => ({
+          ...prev,
+          beforeAfterData: Array.isArray(savedData)
+            ? savedData.flatMap((item) => item.beforeAfterData || [])
+            : savedData.beforeAfterData || [],
+        }));
+
+        // Delete draft
+        const urlParams = new URLSearchParams(window.location.search);
+        const draftId = urlParams.get("draftId") || formData.draftId;
+
+        if (draftId) {
+          const savedDrafts = localStorage.getItem("draftProjects");
+          if (savedDrafts) {
+            const drafts = JSON.parse(savedDrafts);
+            const updatedDrafts = drafts.filter(
+              (draft) => draft.id !== draftId,
+            );
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts),
+            );
+          }
+        }
+        localStorage.removeItem("currentDraft");
+
+        toast.success("Objects removed & saved successfully!", {
+          id: "remove",
+        });
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to remove objects", { id: "remove" });
+      }
+    })();
+  };
 
   return (
     <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
@@ -315,7 +324,7 @@ const handleRemoveObject = async () => {
                 typeof formData.uploadedImages[activeImageIndex] === "string"
                   ? formData.uploadedImages[activeImageIndex]
                   : URL.createObjectURL(
-                      formData.uploadedImages[activeImageIndex]
+                      formData.uploadedImages[activeImageIndex],
                     )
               }
               alt="Select object to remove"
@@ -358,9 +367,8 @@ const handleRemoveObject = async () => {
    
   flex flex-col sm:flex-row 
   items-stretch sm:items-center
-  justify-center sm:justify-center lg:justify-end 
-  gap-3 
-  max-w-4xl mx-auto px-3
+  justify-between
+  gap-3
 "
       >
         {/* Back Button */}
@@ -381,23 +389,23 @@ const handleRemoveObject = async () => {
           Back
         </button>
 
-        {/* Clear Selection */}
-        {selectedAreas[activeImageIndex]?.length > 0 && (
-          <button
-            onClick={() => {
-              setSelectedAreas((prev) => ({
-                ...prev,
-                [activeImageIndex]: [],
-              }));
-              setFormData((prev) => ({
-                ...prev,
-                selectedObjectAreas: {
-                  ...(prev.selectedObjectAreas || {}),
+        <div className="flex flex-col sm:flex-row gap-3">
+          {selectedAreas[activeImageIndex]?.length > 0 && (
+            <button
+              onClick={() => {
+                setSelectedAreas((prev) => ({
+                  ...prev,
                   [activeImageIndex]: [],
-                },
-              }));
-            }}
-            className="
+                }));
+                setFormData((prev) => ({
+                  ...prev,
+                  selectedObjectAreas: {
+                    ...(prev.selectedObjectAreas || {}),
+                    [activeImageIndex]: [],
+                  },
+                }));
+              }}
+              className="
         w-full sm:w-auto
         px-4 sm:px-6 lg:px-8 
         py-2.5 sm:py-3 
@@ -408,16 +416,15 @@ const handleRemoveObject = async () => {
         hover:bg-[#034F75] hover:text-white
         transition-colors
       "
-          >
-            Clear All Selections
-          </button>
-        )}
+            >
+              Clear All Selections
+            </button>
+          )}
 
-        {/* Remove Object */}
-        <button
-          onClick={handleRemoveObject}
-          disabled={!allImagesHaveSelection}
-          className={`
+          <button
+            onClick={handleRemoveObject}
+            disabled={!allImagesHaveSelection}
+            className={`
       w-full sm:w-auto
       flex items-center justify-center gap-2
       px-4 sm:px-6 lg:px-8 
@@ -431,9 +438,10 @@ const handleRemoveObject = async () => {
           : "bg-gray-300 text-gray-500 cursor-not-allowed"
       }
     `}
-        >
-          Remove Object
-        </button>
+          >
+            Remove Object
+          </button>
+        </div>
       </div>
     </div>
   );
