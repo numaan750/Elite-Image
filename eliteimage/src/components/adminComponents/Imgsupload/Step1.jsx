@@ -24,6 +24,7 @@ const Step1 = ({ formData, setFormData, next }) => {
 
   // ✅ ADDED: Track loading images count
   const [loadingCount, setLoadingCount] = useState(0);
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false); // ✅ ADD THIS LINE
 
   useEffect(() => {
     const realImages = formData.uploadedImages.filter(
@@ -234,6 +235,7 @@ const Step1 = ({ formData, setFormData, next }) => {
       const CLOUD_NAME = "dhtpqla2b";
       const UPLOAD_PRESET = "unsigned_preset";
 
+      // ✅ Upload ALL images parallelly
       const uploadPromises = validFiles.map(async (file, idx) => {
         const uploadForm = new FormData();
         uploadForm.append("file", file);
@@ -246,31 +248,40 @@ const Step1 = ({ formData, setFormData, next }) => {
           );
           const data = await res.json();
 
-          // Smaller optimized URL
           const optimizedUrl = data.secure_url.replace(
             "/upload/",
             "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
           );
 
-          // Replace local URL with Cloudinary URL
-          setFormData((prev) => {
-            const newImages = [...prev.uploadedImages];
-            const localIdx = prev.uploadedImages.indexOf(localUrls[idx]);
-            if (localIdx !== -1) {
-              newImages[localIdx] = optimizedUrl;
-            }
-            return { ...prev, uploadedImages: newImages };
-          });
-
-          return { success: true, url: optimizedUrl };
+          return { success: true, url: optimizedUrl, localUrl: localUrls[idx] };
         } catch (err) {
           console.error(`Upload failed for ${file.name}:`, err);
-          return { success: false };
+          return { success: false, localUrl: localUrls[idx] };
         }
       });
 
-      // Wait for all uploads
-      await Promise.allSettled(uploadPromises);
+      // ✅ Wait for ALL uploads to complete
+      const results = await Promise.allSettled(uploadPromises);
+
+      // ✅ Replace ALL local URLs with Cloudinary URLs AT ONCE
+      setFormData((prev) => {
+        const newImages = [...prev.uploadedImages];
+
+        results.forEach((result) => {
+          if (result.status === "fulfilled" && result.value.success) {
+            const { localUrl, url } = result.value;
+            const localIdx = prev.uploadedImages.indexOf(localUrl);
+            if (localIdx !== -1) {
+              newImages[localIdx] = url;
+            }
+          }
+        });
+
+        return { ...prev, uploadedImages: newImages };
+      });
+
+      // ✅ Mark all images as loaded
+      setAllImagesLoaded(true);
 
       // Clean up local URLs
       localUrls.forEach((url) => URL.revokeObjectURL(url));
@@ -443,7 +454,8 @@ const Step1 = ({ formData, setFormData, next }) => {
                       width={400}
                       height={350}
                       quality={isLocalUrl ? 100 : 60} // Higher quality for local preview
-                      loading="lazy"
+                      loading="eager"
+                      priority={!isLocalUrl}
                       sizes="(max-width: 640px) 50vw, 25vw"
                       className={`w-full h-32 sm:h-36 lg:h-40 object-contain transition-opacity duration-300 ${
                         isLocalUrl || imageLoadedMap[img]
@@ -535,7 +547,7 @@ const Step1 = ({ formData, setFormData, next }) => {
         }
 
         .animate-shimmer {
-          animation: shimmer 1.5s ease-in-out infinite;
+          animation: shimmer 0.8s ease-in-out infinite; // ✅ Fast shimmer effect
         }
       `}</style>
     </div>
