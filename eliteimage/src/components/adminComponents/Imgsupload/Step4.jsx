@@ -139,19 +139,73 @@ const downloadImagesAsZip = async (formData) => {
 
         return;
       }
-
       // ✅ MULTIPLE IMAGES - ZIP DOWNLOAD
+      toast.loading("Select download location...", { id: "download-init" });
+
+      // Location select PEHLE
+      let fileHandle;
+      try {
+        fileHandle = await window.showSaveFilePicker({
+          suggestedName: "Elite-Image-AI-Sky-Replacement.zip",
+          types: [
+            {
+              description: "ZIP Archive",
+              accept: { "application/zip": [".zip"] },
+            },
+          ],
+        });
+      } catch (error) {
+        if (error.name === "AbortError") {
+          toast.error("Download cancelled", { id: "download-init" });
+          return;
+        }
+        // Agar showSaveFilePicker support nahi karta
+        if (!window.showSaveFilePicker) {
+          toast.loading("Creating ZIP file...", { id: "download-init" });
+
+          const zip = new JSZip();
+          const folder = zip.folder("Elite-Image-AI-Sky-Replacement");
+
+          for (let i = 0; i < formData.uploadedImages.length; i++) {
+            const imageUrl = formData.uploadedImages[i];
+            try {
+              const response = await fetch(imageUrl);
+              if (!response.ok)
+                throw new Error(`Failed to fetch image ${i + 1}`);
+              const blob = await response.blob();
+              folder.file(`sky-original-${i + 1}.jpg`, blob);
+            } catch (error) {
+              console.error(`Error downloading image ${i + 1}:`, error);
+            }
+          }
+
+          const zipBlob = await zip.generateAsync({ type: "blob" });
+          saveAs(zipBlob, "Sky-Replacement-Images.zip");
+          toast.success(
+            `${formData.uploadedImages.length} images downloaded!`,
+            { id: "download-init" },
+          );
+          return;
+        }
+        throw error;
+      }
+
+      // Ab ZIP create karo with progress
+      toast.loading("Creating ZIP file...", { id: "download-init" });
       const zip = new JSZip();
       const folder = zip.folder("Elite-Image-AI-Sky-Replacement");
 
-      // Original images download (kyunki processing nahi hui)
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const imageUrl = formData.uploadedImages[i];
+
+        toast.loading(
+          `Adding image ${i + 1} of ${formData.uploadedImages.length}...`,
+          { id: "download-init" },
+        );
 
         try {
           const response = await fetch(imageUrl);
           if (!response.ok) throw new Error(`Failed to fetch image ${i + 1}`);
-
           const blob = await response.blob();
           folder.file(`sky-original-${i + 1}.jpg`, blob);
         } catch (error) {
@@ -159,54 +213,19 @@ const downloadImagesAsZip = async (formData) => {
         }
       }
 
+      toast.loading("Finalizing download...", { id: "download-init" });
       const zipBlob = await zip.generateAsync({ type: "blob" });
 
-      if (window.showSaveFilePicker) {
-        try {
-          const fileHandle = await window.showSaveFilePicker({
-            suggestedName: "Sky-Replacement-Images.zip",
-            types: [
-              {
-                description: "ZIP Archive",
-                accept: { "application/zip": [".zip"] },
-              },
-            ],
-          });
+      // Write to selected location
+      const writableStream = await fileHandle.createWritable();
+      await writableStream.write(zipBlob);
+      await writableStream.close();
 
-          // Only write if fileHandle exists
-          if (fileHandle) {
-            const writableStream = await fileHandle.createWritable();
-            await writableStream.write(zipBlob);
-            await writableStream.close();
-            toast.dismiss("zip");
-            toast.success(`${dataArray.length} image(s) downloaded!`);
-          } else {
-            // fallback for unsupported browsers
-            saveAs(zipBlob, "Elite-Image-AI-Project.zip");
-            toast.dismiss("zip");
-            toast.success(
-              `${dataArray.length} image(s) downloaded! (Default location used)`,
-            );
-          }
-
-          toast.success(
-            `${formData.uploadedImages.length} image(s) downloaded!`,
-            { id: "zip" },
-          );
-        } catch (error) {
-          if (error.name === "AbortError") {
-            toast.error("Download cancelled", { id: "zip" });
-          } else {
-            saveAs(zipBlob, "Sky-Replacement-Images.zip");
-            toast.success(`Downloaded!`, { id: "zip" });
-          }
-        }
-      } else {
-        saveAs(zipBlob, "Sky-Replacement-Images.zip");
-        toast.success(`Downloaded!`, { id: "zip" });
-      }
-
-      return; // Early return for Sky Replacement
+      toast.success(
+        `${formData.uploadedImages.length} images downloaded successfully!`,
+        { id: "download-init" },
+      );
+      return;
     }
     const processedData = formData.beforeAfterData;
 
@@ -265,12 +284,66 @@ const downloadImagesAsZip = async (formData) => {
       return;
     }
 
+    // Location select PEHLE karo
+    toast.loading("Select download location...", { id: "download-init" });
+
+    let fileHandle;
+    try {
+      fileHandle = await window.showSaveFilePicker({
+        suggestedName: "Elite-Image-AI-Project.zip",
+        types: [
+          {
+            description: "ZIP Archive",
+            accept: { "application/zip": [".zip"] },
+          },
+        ],
+      });
+    } catch (error) {
+      if (error.name === "AbortError") {
+        toast.error("Download cancelled", { id: "download-init" });
+        return;
+      }
+      // Fallback for old browsers
+      if (!window.showSaveFilePicker) {
+        toast.loading("Creating ZIP file...", { id: "download-init" });
+
+        const zip = new JSZip();
+        const folder = zip.folder("Elite-Image-AI");
+
+        for (let i = 0; i < dataArray.length; i++) {
+          const imageUrl = dataArray[i].processedImage;
+          try {
+            const response = await fetch(imageUrl);
+            if (!response.ok) throw new Error(`Failed to fetch image ${i + 1}`);
+            const blob = await response.blob();
+            folder.file(`elite-image-${i + 1}.jpg`, blob);
+          } catch (error) {
+            console.error(`Error downloading image ${i + 1}:`, error);
+          }
+        }
+
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        saveAs(zipBlob, "Elite-Image-AI-Project.zip");
+        toast.success(`${dataArray.length} images downloaded!`, {
+          id: "download-init",
+        });
+        return;
+      }
+      throw error;
+    }
+
+    // Ab ZIP create karo with progress
+    toast.loading("Creating ZIP file...", { id: "download-init" });
     const zip = new JSZip();
     const folder = zip.folder("Elite-Image-AI");
 
-    // Fetch images and add to zip only after getting fileHandle
     for (let i = 0; i < dataArray.length; i++) {
       const imageUrl = dataArray[i].processedImage;
+
+      toast.loading(`Adding image ${i + 1} of ${dataArray.length}...`, {
+        id: "download-init",
+      });
+
       try {
         const response = await fetch(imageUrl);
         if (!response.ok) throw new Error(`Failed to fetch image ${i + 1}`);
@@ -278,54 +351,20 @@ const downloadImagesAsZip = async (formData) => {
         folder.file(`elite-image-${i + 1}.jpg`, blob);
       } catch (error) {
         console.error(`Error downloading image ${i + 1}:`, error);
-        toast.error(`Failed to add image ${i + 1} to zip`);
       }
     }
 
-    // Generate zip blob
+    toast.loading("Finalizing download...", { id: "download-init" });
     const zipBlob = await zip.generateAsync({ type: "blob" });
 
-    // ✅ NEW: Check if File System Access API is supported
-    if (window.showSaveFilePicker) {
-      try {
-        // Open save dialog with location selection
-        const fileHandle = await window.showSaveFilePicker({
-          suggestedName: "Elite-Image-AI-Project.zip",
-          types: [
-            {
-              description: "ZIP Archive",
-              accept: { "application/zip": [".zip"] },
-            },
-          ],
-        });
+    // Write to selected location
+    const writableStream = await fileHandle.createWritable();
+    await writableStream.write(zipBlob);
+    await writableStream.close();
 
-        // Write the file
-        const writableStream = await fileHandle.createWritable();
-        await writableStream.write(zipBlob);
-        await writableStream.close();
-
-        toast.dismiss("zip");
-        toast.success(`${dataArray.length} image(s) downloaded!`);
-      } catch (error) {
-        // User cancelled the dialog
-        if (error.name === "AbortError") {
-          toast.error("Download cancelled", { id: "zip" });
-        } else {
-          console.error("Save dialog error:", error);
-          // Fallback to default download
-          saveAs(zipBlob, "Elite-Image-AI-Project.zip");
-          toast.dismiss("zip");
-          toast.success(`${dataArray.length} image(s) downloaded!`);
-        }
-      }
-    } else {
-      // ✅ Fallback for browsers that don't support File System Access API
-      saveAs(zipBlob, "Elite-Image-AI-Project.zip");
-      toast.success(
-        `${dataArray.length} image(s) downloaded! (Default location used)`,
-        { id: "zip" },
-      );
-    }
+    toast.success(`${dataArray.length} images downloaded successfully!`, {
+      id: "download-init",
+    });
   } catch (error) {
     console.error("Zip download error:", error);
     toast.dismiss("zip");
@@ -832,20 +871,20 @@ const Step4 = ({ formData, setFormData, next, back }) => {
           </span>
         </button>
         {/* Info Text */}
-{formData.beforeAfterData &&
-  ((Array.isArray(formData.beforeAfterData) &&
-    formData.beforeAfterData.length > 0) ||
-    formData.beforeAfterData.processedImage) && (
-  <p className="text-center text-[14px] text-gray-600 mb-3">
-    ✅ Images ready for download!
-  </p>
-)}
+        {formData.beforeAfterData &&
+          ((Array.isArray(formData.beforeAfterData) &&
+            formData.beforeAfterData.length > 0) ||
+            formData.beforeAfterData.processedImage) && (
+            <p className="text-center text-[14px] text-gray-600 mb-3">
+              ✅ Images ready for download!
+            </p>
+          )}
 
-{!formData.beforeAfterData && (
-  <p className="text-center text-[14px] text-amber-600 mb-3">
-    ⏳ Processing in background... You can download soon!
-  </p>
-)}
+        {!formData.beforeAfterData && (
+          <p className="text-center text-[14px] text-amber-600 mb-3">
+            ⏳ Processing in background... You can download soon!
+          </p>
+        )}
         {/* Bottom Back Button */}
       </div>
     </div>
