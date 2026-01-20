@@ -42,7 +42,7 @@ const Draft = () => {
             console.log(
               "🧹 Cleaned",
               drafts.length - validDrafts.length,
-              "invalid drafts"
+              "invalid drafts",
             );
           }
 
@@ -65,7 +65,7 @@ const Draft = () => {
     setTimeout(() => {
       try {
         const updatedDrafts = draftProjects.filter(
-          (project) => project.id !== id
+          (project) => project.id !== id,
         );
         setDraftProjects(updatedDrafts);
         localStorage.setItem("draftProjects", JSON.stringify(updatedDrafts));
@@ -82,7 +82,7 @@ const Draft = () => {
     localStorage.setItem("currentDraft", JSON.stringify(project));
 
     router.push(
-      `/admin/uploadImage?type=${project.featureType}&mode=draft&draftId=${project.id}`
+      `/admin/uploadImage?type=${project.featureType}&mode=draft&draftId=${project.id}`,
     );
   };
 
@@ -96,7 +96,7 @@ const Draft = () => {
 
   const handleSelectProject = (id) => {
     setSelectedProjects((prev) =>
-      prev.includes(id) ? prev.filter((pId) => pId !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((pId) => pId !== id) : [...prev, id],
     );
   };
 
@@ -106,7 +106,7 @@ const Draft = () => {
     setTimeout(() => {
       try {
         const updatedDrafts = draftProjects.filter(
-          (project) => !selectedProjects.includes(project.id)
+          (project) => !selectedProjects.includes(project.id),
         );
         setDraftProjects(updatedDrafts);
         localStorage.setItem("draftProjects", JSON.stringify(updatedDrafts));
@@ -242,9 +242,14 @@ const Draft = () => {
                       "/placeholder.png"
                     }
                     alt="draft project"
-                    width={112}
-                    height={112}
-                    className="h-30 w-30 sm:h-40 sm:w-40 rounded-lg object-cover flex-shrink-0"
+                    width={160}
+                    height={160}
+                    priority
+                    loading="eager"
+                    unoptimized
+                    placeholder="blur"
+                    blurDataURL="/placeholder.png"
+                    className="h-30 w-30 sm:h-40 sm:w-40 rounded-lg object-cover"
                   />
                 </div>
 
