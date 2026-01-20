@@ -21,22 +21,15 @@ const Step1 = ({ formData, setFormData, next }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [imageLoadedMap, setImageLoadedMap] = useState({});
-
-  // ✅ ADDED: Track loading images count
   const [loadingCount, setLoadingCount] = useState(0);
-  const [allImagesLoaded, setAllImagesLoaded] = useState(false); // ✅ ADD THIS LINE
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
+  const [uploadingUrls, setUploadingUrls] = useState(new Set());
 
   useEffect(() => {
     const realImages = formData.uploadedImages.filter(
       (img) => !img.startsWith("loading-"),
     );
-
-    // ✅ FIX: Sirf basic conditions check karo
-    if (
-      realImages.length > 0 && // Images hai
-      !uploadingImage && // Upload complete
-      formData.featureType // Feature selected
-    ) {
+    if (realImages.length > 0 && !uploadingImage && formData.featureType) {
       const timeoutId = setTimeout(() => {
         try {
           const urlParams = new URLSearchParams(window.location.search);
@@ -62,7 +55,7 @@ const Step1 = ({ formData, setFormData, next }) => {
         } catch (error) {
           console.error("Error saving draft:", error);
         }
-      }, 2000); // ✅ 2 seconds (5000 se kam)
+      }, 2000);
 
       return () => clearTimeout(timeoutId);
     }
@@ -70,11 +63,10 @@ const Step1 = ({ formData, setFormData, next }) => {
     formData.uploadedImages,
     formData.featureType,
     uploadingImage,
-    saveDraft, // ✅ ADD: saveDraft dependency
+    saveDraft,
   ]);
 
   const handleGenerateAndSave = async () => {
-    // ✅ STEP 1: Validation (instant - 0ms)
     if (!formData.featureType) {
       toast.error("Please select a feature first");
       router.push("/admin/dashboard");
@@ -90,8 +82,6 @@ const Step1 = ({ formData, setFormData, next }) => {
       toast.error("Please login to save images");
       return;
     }
-
-    // ✅ STEP 2: Prepare data (instant - 5-10ms)
     const allProcessedData = [];
     const allUploadedImages = [];
 
@@ -122,28 +112,19 @@ const Step1 = ({ formData, setFormData, next }) => {
       finalNotes: formData.finalNotes || "",
       image: allUploadedImages[0],
     };
-
-    // ✅ STEP 3: Update local state immediately (instant UI update)
     setFormData((prev) => ({
       ...prev,
       beforeAfterData: allProcessedData,
     }));
-
-    // ✅ STEP 4: Show success toast INSTANTLY
     toast.success(`Saving ${formData.uploadedImages.length} image(s)...`, {
       id: "saving",
       duration: 2000,
     });
-
-    // ✅ STEP 5: Navigate to next page IMMEDIATELY (no waiting!)
     next();
-
-    // ✅ STEP 6: Save to database in BACKGROUND (async, non-blocking)
     setIsSaving(true);
 
     (async () => {
       try {
-        // Database save happens after user moved to next page
         if (formData.projectId) {
           await saveGeneratedImage(
             singlePayload,
@@ -154,14 +135,10 @@ const Step1 = ({ formData, setFormData, next }) => {
         } else {
           await saveGeneratedImage([singlePayload], token);
         }
-
-        // Background success notification
         toast.success("Project saved to database!", {
           id: "saving",
           duration: 2000,
         });
-
-        // ✅ STEP 7: Delete draft after successful DB save
         try {
           const urlParams = new URLSearchParams(window.location.search);
           const draftId = urlParams.get("draftId") || formData.draftId;
@@ -199,8 +176,6 @@ const Step1 = ({ formData, setFormData, next }) => {
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-
-    // ✅ STEP 1: Immediate validation (fast - 10ms)
     const validFiles = [];
     for (const file of files) {
       if (!file.type.startsWith("image/")) {
@@ -217,75 +192,74 @@ const Step1 = ({ formData, setFormData, next }) => {
     if (validFiles.length === 0) return;
 
     setUploadingImage(true);
-
-    // ✅ STEP 2: Show images INSTANTLY using local URLs (0ms delay)
-    const localUrls = validFiles.map((file) => URL.createObjectURL(file));
+    const placeholderIds = validFiles.map(
+      (_, idx) => `loading-${Date.now()}-${idx}`,
+    );
+    setUploadingUrls((prev) => new Set([...prev, ...placeholderIds]));
+    setLoadingCount((prev) => prev + validFiles.length);
 
     setFormData((prev) => ({
       ...prev,
-      uploadedImages: [...prev.uploadedImages, ...localUrls],
-      localFiles: [...(prev.localFiles || []), ...validFiles], // Store actual files
+      uploadedImages: [...prev.uploadedImages, ...placeholderIds],
     }));
+    const uploadPromises = validFiles.map(async (file, idx) => {
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
+      uploadForm.append("upload_preset", UPLOAD_PRESET);
 
-    toast.success(`${validFiles.length} image(s) added!`);
-    setUploadingImage(false);
+      try {
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          { method: "POST", body: uploadForm },
+        );
+        const data = await res.json();
 
-    // ✅ STEP 3: Upload to Cloudinary in BACKGROUND (non-blocking)
-    (async () => {
-      const CLOUD_NAME = "dhtpqla2b";
-      const UPLOAD_PRESET = "unsigned_preset";
+        const optimizedUrl = data.secure_url.replace(
+          "/upload/",
+          "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
+        );
 
-      // ✅ Upload ALL images parallelly
-      const uploadPromises = validFiles.map(async (file, idx) => {
-        const uploadForm = new FormData();
-        uploadForm.append("file", file);
-        uploadForm.append("upload_preset", UPLOAD_PRESET);
+        return {
+          success: true,
+          url: optimizedUrl,
+          placeholderId: placeholderIds[idx],
+          localUrl: URL.createObjectURL(file),
+        };
+      } catch (err) {
+        console.error(`Upload failed for ${file.name}:`, err);
+        return {
+          success: false,
+          placeholderId: placeholderIds[idx],
+        };
+      }
+    });
+    const results = await Promise.allSettled(uploadPromises);
+    setFormData((prev) => {
+      let newImages = [...prev.uploadedImages];
 
-        try {
-          const res = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-            { method: "POST", body: uploadForm },
-          );
-          const data = await res.json();
-
-          const optimizedUrl = data.secure_url.replace(
-            "/upload/",
-            "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
-          );
-
-          return { success: true, url: optimizedUrl, localUrl: localUrls[idx] };
-        } catch (err) {
-          console.error(`Upload failed for ${file.name}:`, err);
-          return { success: false, localUrl: localUrls[idx] };
+      results.forEach((result) => {
+        if (result.status === "fulfilled" && result.value.success) {
+          const { placeholderId, url } = result.value;
+          const placeholderIdx = newImages.indexOf(placeholderId);
+          if (placeholderIdx !== -1) {
+            newImages[placeholderIdx] = url;
+          }
+        } else if (result.status === "fulfilled") {
+          const placeholderIdx = newImages.indexOf(result.value.placeholderId);
+          if (placeholderIdx !== -1) {
+            newImages.splice(placeholderIdx, 1);
+          }
         }
       });
 
-      // ✅ Wait for ALL uploads to complete
-      const results = await Promise.allSettled(uploadPromises);
+      return { ...prev, uploadedImages: newImages };
+    });
+    setUploadingUrls(new Set());
+    setLoadingCount(0);
+    setAllImagesLoaded(true);
+    setUploadingImage(false);
 
-      // ✅ Replace ALL local URLs with Cloudinary URLs AT ONCE
-      setFormData((prev) => {
-        const newImages = [...prev.uploadedImages];
-
-        results.forEach((result) => {
-          if (result.status === "fulfilled" && result.value.success) {
-            const { localUrl, url } = result.value;
-            const localIdx = prev.uploadedImages.indexOf(localUrl);
-            if (localIdx !== -1) {
-              newImages[localIdx] = url;
-            }
-          }
-        });
-
-        return { ...prev, uploadedImages: newImages };
-      });
-
-      // ✅ Mark all images as loaded
-      setAllImagesLoaded(true);
-
-      // Clean up local URLs
-      localUrls.forEach((url) => URL.revokeObjectURL(url));
-    })();
+    toast.success(`${validFiles.length} image(s) uploaded successfully!`);
 
     e.target.value = "";
   };
@@ -349,12 +323,13 @@ const Step1 = ({ formData, setFormData, next }) => {
   const isSpecialFeature =
     formData.featureType === "Straighten" ||
     formData.featureType === "Watermark Remove";
-
-  // ✅ ADDED: Check if there are any real images (not loading placeholders)
   const realImages = formData.uploadedImages.filter(
     (img) => !img.startsWith("loading-"),
   );
   const hasImages = realImages.length > 0 || loadingCount > 0;
+  const isAnyImageUploading = formData.uploadedImages.some((img) =>
+    img.startsWith("loading-"),
+  );
 
   return (
     <div className="bg-white mt-14 sm:mt-16 lg:mt-15">
@@ -420,22 +395,8 @@ const Step1 = ({ formData, setFormData, next }) => {
             </>
           ) : (
             <div className="w-full grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-              {/* ✅ ADDED: Show skeleton loaders */}
-              {loadingCount > 0 &&
-                Array.from({ length: loadingCount }).map((_, idx) => (
-                  <div
-                    key={`skeleton-${idx}`}
-                    className="relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6] animate-none"
-                  >
-                    <div className="w-full h-32 sm:h-36 lg:h-40 bg-gradient-to-r from-[#d3d3d3] via-[#d5d5d5] to-[#d7d7d7] bg-[length:200%_100%] animate-shimmer" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-[#034F75] text-sm">Loading...</div>
-                    </div>
-                  </div>
-                ))}
-
               {formData.uploadedImages.map((img, idx) => {
-                const isLocalUrl = img.startsWith("blob:");
+                const isPlaceholder = img.startsWith("loading-");
                 const uniqueKey = `${img}-${idx}`;
 
                 return (
@@ -443,44 +404,51 @@ const Step1 = ({ formData, setFormData, next }) => {
                     key={uniqueKey}
                     className="relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6]"
                   >
-                    {/* ✅ No shimmer for local URLs - they load instantly */}
-                    {!isLocalUrl && !imageLoadedMap[img] && (
-                      <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#d3d3d3] via-[#d5d5d5] to-[#d7d7d7] bg-[length:200%_100%] animate-shimmer" />
+                    {isPlaceholder ? (
+                      <div className="w-full h-32 sm:h-36 lg:h-40 bg-gradient-to-r from-[#d3d3d3] via-[#e0e0e0] to-[#d3d3d3] bg-[length:200%_100%] animate-shimmer">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-[#034F75] text-sm font-medium">
+                            Uploading...
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {!imageLoadedMap[img] && (
+                          <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#d3d3d3] via-[#e0e0e0] to-[#d3d3d3] bg-[length:200%_100%] animate-shimmer" />
+                        )}
+
+                        <Image
+                          src={img}
+                          alt={`Uploaded ${idx + 1}`}
+                          width={400}
+                          height={350}
+                          quality={60}
+                          loading="eager"
+                          priority={true}
+                          sizes="(max-width: 640px) 50vw, 25vw"
+                          className={`w-full h-32 sm:h-36 lg:h-40 object-contain transition-opacity duration-300 ${
+                            imageLoadedMap[img] ? "opacity-100" : "opacity-0"
+                          }`}
+                          onLoad={() => {
+                            setImageLoadedMap((prev) => ({
+                              ...prev,
+                              [img]: true,
+                            }));
+                          }}
+                        />
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveImage(idx);
+                          }}
+                          className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 cursor-pointer text-white rounded-full p-1 hover:bg-black/70 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </>
                     )}
-
-                    <Image
-                      src={img}
-                      alt={`Uploaded ${idx + 1}`}
-                      width={400}
-                      height={350}
-                      quality={isLocalUrl ? 100 : 60} // Higher quality for local preview
-                      loading="eager"
-                      priority={!isLocalUrl}
-                      sizes="(max-width: 640px) 50vw, 25vw"
-                      className={`w-full h-32 sm:h-36 lg:h-40 object-contain transition-opacity duration-300 ${
-                        isLocalUrl || imageLoadedMap[img]
-                          ? "opacity-100"
-                          : "opacity-0"
-                      }`}
-                      onLoad={() => {
-                        if (!isLocalUrl) {
-                          setImageLoadedMap((prev) => ({
-                            ...prev,
-                            [img]: true,
-                          }));
-                        }
-                      }}
-                    />
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveImage(idx);
-                      }}
-                      className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 cursor-pointer text-white rounded-full p-1"
-                    >
-                      <X size={14} />
-                    </button>
                   </div>
                 );
               })}
@@ -510,28 +478,69 @@ const Step1 = ({ formData, setFormData, next }) => {
         {isSpecialFeature ? (
           <button
             onClick={handleGenerateAndSave}
-            disabled={realImages.length === 0 || isSaving || uploadingImage}
+            disabled={
+              realImages.length === 0 ||
+              isSaving ||
+              uploadingImage ||
+              isAnyImageUploading ||
+              loadingCount > 0
+            }
             className={`flex items-center gap-2 rounded-lg px-5 sm:px-6 py-2 text-[12px] sm:text-[20px] text-white transition-colors ${
-              realImages.length === 0 || isSaving || uploadingImage
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-[#034F75]"
+              realImages.length === 0 ||
+              isSaving ||
+              uploadingImage ||
+              isAnyImageUploading ||
+              loadingCount > 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#034F75] hover:bg-[#023d5c]"
             }`}
           >
-            {isSaving ? "Saving..." : "Generate Now "}
-            <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
+            {isSaving ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : isAnyImageUploading || loadingCount > 0 ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                Generate Now
+                <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
+              </>
+            )}
           </button>
         ) : (
           <button
             onClick={handleContinue}
-            disabled={realImages.length === 0 || uploadingImage}
-            className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors ${
-              realImages.length === 0 || uploadingImage
-                ? "opacity-50 cursor-not-allowed"
-                : ""
+            disabled={
+              realImages.length === 0 ||
+              uploadingImage ||
+              isAnyImageUploading ||
+              loadingCount > 0
+            }
+            className={`flex items-center gap-2 rounded-lg bg-[#034F75] px-5 sm:px-6 py-2 text-[16px] sm:text-[18px] text-white transition-colors ${
+              realImages.length === 0 ||
+              uploadingImage ||
+              isAnyImageUploading ||
+              loadingCount > 0
+                ? "opacity-50 cursor-not-allowed bg-gray-400"
+                : "hover:bg-[#023d5c]"
             }`}
           >
-            Continue
-            <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
+            {isAnyImageUploading || loadingCount > 0 ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                Continue
+                <ArrowRight size={17} className="sm:w-[18px] sm:h-[18px]" />
+              </>
+            )}
           </button>
         )}
       </div>
@@ -539,15 +548,28 @@ const Step1 = ({ formData, setFormData, next }) => {
       <style jsx>{`
         @keyframes shimmer {
           0% {
-            background-position: 200% 200%;
+            background-position: -200% 0;
           }
           100% {
-            background-position: -200% -200%;
+            background-position: 200% 0;
+          }
+        }
+
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
           }
         }
 
         .animate-shimmer {
-          animation: shimmer 0.8s ease-in-out infinite; // ✅ Fast shimmer effect
+          animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        .animate-spin {
+          animation: spin 0.8s linear infinite;
         }
       `}</style>
     </div>
