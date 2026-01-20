@@ -199,95 +199,82 @@ const Step1 = ({ formData, setFormData, next }) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    // ✅ STEP 1: Pehle validation karo (fast)
+    // ✅ STEP 1: Immediate validation (fast - 10ms)
     const validFiles = [];
-
     for (const file of files) {
       if (!file.type.startsWith("image/")) {
         toast.error(`${file.name}: Only image files allowed`);
         continue;
       }
-
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`${file.name}: Image must be under 5MB`);
         continue;
       }
-
       validFiles.push(file);
     }
 
     if (validFiles.length === 0) return;
 
-    setLoadingCount(validFiles.length);
     setUploadingImage(true);
 
-    // ✅ STEP 2: Loading placeholders show karo (instant)
-    const loadingPlaceholders = validFiles.map(
-      (_, idx) => `loading-${Date.now()}-${idx}`,
-    );
+    // ✅ STEP 2: Show images INSTANTLY using local URLs (0ms delay)
+    const localUrls = validFiles.map((file) => URL.createObjectURL(file));
 
     setFormData((prev) => ({
       ...prev,
-      uploadedImages: [...prev.uploadedImages, ...loadingPlaceholders],
+      uploadedImages: [...prev.uploadedImages, ...localUrls],
+      localFiles: [...(prev.localFiles || []), ...validFiles], // Store actual files
     }));
 
-    // ✅ STEP 3: PARALLEL UPLOAD - Sab ek sath upload ho
-    const uploadPromises = validFiles.map(async (file) => {
-      const uploadForm = new FormData();
-      uploadForm.append("file", file);
-      uploadForm.append("upload_preset", UPLOAD_PRESET);
-
-      try {
-        const res = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-          {
-            method: "POST",
-            body: uploadForm,
-          },
-        );
-
-        const data = await res.json();
-
-        // ✅ Smaller optimized URL (faster loading)
-        const optimizedUrl = data.secure_url.replace(
-          "/upload/",
-          "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
-        );
-
-        return { success: true, url: optimizedUrl };
-      } catch (err) {
-        console.error(`Upload failed for ${file.name}:`, err);
-        toast.error(`${file.name}: Upload failed`);
-        return { success: false };
-      }
-    });
-
-    // ✅ STEP 4: Wait for ALL uploads (parallel mein)
-    const results = await Promise.allSettled(uploadPromises);
-
-    const uploadedUrls = results
-      .filter((r) => r.status === "fulfilled" && r.value.success)
-      .map((r) => r.value.url);
-
-    // ✅ STEP 5: Single state update (ek hi baar)
-    setFormData((prev) => {
-      const withoutPlaceholders = prev.uploadedImages.filter(
-        (img) => !img.startsWith("loading-"),
-      );
-      return {
-        ...prev,
-        uploadedImages: [...withoutPlaceholders, ...uploadedUrls],
-        lastUploadedAt: new Date().toISOString(),
-        hasUploadedImages: true,
-      };
-    });
-
-    setLoadingCount(0);
+    toast.success(`${validFiles.length} image(s) added!`);
     setUploadingImage(false);
 
-    if (uploadedUrls.length > 0) {
-      toast.success(`${uploadedUrls.length} image(s) uploaded successfully!`);
-    }
+    // ✅ STEP 3: Upload to Cloudinary in BACKGROUND (non-blocking)
+    (async () => {
+      const CLOUD_NAME = "dhtpqla2b";
+      const UPLOAD_PRESET = "unsigned_preset";
+
+      const uploadPromises = validFiles.map(async (file, idx) => {
+        const uploadForm = new FormData();
+        uploadForm.append("file", file);
+        uploadForm.append("upload_preset", UPLOAD_PRESET);
+
+        try {
+          const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+            { method: "POST", body: uploadForm },
+          );
+          const data = await res.json();
+
+          // Smaller optimized URL
+          const optimizedUrl = data.secure_url.replace(
+            "/upload/",
+            "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
+          );
+
+          // Replace local URL with Cloudinary URL
+          setFormData((prev) => {
+            const newImages = [...prev.uploadedImages];
+            const localIdx = prev.uploadedImages.indexOf(localUrls[idx]);
+            if (localIdx !== -1) {
+              newImages[localIdx] = optimizedUrl;
+            }
+            return { ...prev, uploadedImages: newImages };
+          });
+
+          return { success: true, url: optimizedUrl };
+        } catch (err) {
+          console.error(`Upload failed for ${file.name}:`, err);
+          return { success: false };
+        }
+      });
+
+      // Wait for all uploads
+      await Promise.allSettled(uploadPromises);
+
+      // Clean up local URLs
+      localUrls.forEach((url) => URL.revokeObjectURL(url));
+    })();
 
     e.target.value = "";
   };
@@ -436,39 +423,43 @@ const Step1 = ({ formData, setFormData, next }) => {
                   </div>
                 ))}
 
-              {/* ✅ CHANGED: Show real images after loading */}
-              {realImages.map((img, idx) => {
-                const loaded = imageLoadedMap[img];
-                const uniqueKey = `${img}-${idx}`; // ⬅️ YE ADD KIYA
+              {formData.uploadedImages.map((img, idx) => {
+                const isLocalUrl = img.startsWith("blob:");
+                const uniqueKey = `${img}-${idx}`;
 
                 return (
                   <div
                     key={uniqueKey}
                     className="relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6]"
                   >
-                    {/* SHIMMER OVERLAY */}
-                    {!loaded && (
+                    {/* ✅ No shimmer for local URLs - they load instantly */}
+                    {!isLocalUrl && !imageLoadedMap[img] && (
                       <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#d3d3d3] via-[#d5d5d5] to-[#d7d7d7] bg-[length:200%_100%] animate-shimmer" />
                     )}
 
-                    {/* IMAGE */}
                     <Image
                       src={img}
                       alt={`Uploaded ${idx + 1}`}
                       width={400}
                       height={350}
-                      quality={60}
+                      quality={isLocalUrl ? 100 : 60} // Higher quality for local preview
                       loading="lazy"
                       sizes="(max-width: 640px) 50vw, 25vw"
                       className={`w-full h-32 sm:h-36 lg:h-40 object-contain transition-opacity duration-300 ${
-                        loaded ? "opacity-100" : "opacity-0"
+                        isLocalUrl || imageLoadedMap[img]
+                          ? "opacity-100"
+                          : "opacity-0"
                       }`}
                       onLoad={() => {
-                        setImageLoadedMap((prev) => ({ ...prev, [img]: true }));
+                        if (!isLocalUrl) {
+                          setImageLoadedMap((prev) => ({
+                            ...prev,
+                            [img]: true,
+                          }));
+                        }
                       }}
                     />
 
-                    {/* REMOVE BUTTON */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

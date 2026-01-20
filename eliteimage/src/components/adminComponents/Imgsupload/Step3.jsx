@@ -52,7 +52,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   }, [selected]); // ✅ Remove formData and saveDraft from dependencies
 
   const handleGenerate = async () => {
-    // ✅ STEP 1: Validation (instant)
+    // ✅ STEP 1: Validation (instant - 0ms)
     if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
       toast.error("Please upload at least one image first!");
       return;
@@ -63,89 +63,139 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
       return;
     }
 
-    // ✅ STEP 2: Update local state immediately
+    // ✅ STEP 2: Update local state immediately (instant UI update)
     setFormData((prev) => ({
       ...prev,
       selectedStyle: selected,
     }));
 
-    setIsSaving(true);
-
-    // ✅ STEP 3: Show success & navigate INSTANTLY
+    // ✅ STEP 3: Show success toast INSTANTLY
     toast.success(`Processing ${formData.uploadedImages.length} image(s)...`, {
       id: "processing",
       duration: 2000,
     });
 
-    next(); // ⬅️ USER IMMEDIATELY MOVES TO NEXT PAGE
+    // ✅ STEP 4: Navigate to next page IMMEDIATELY (no waiting!)
+    next();
 
-    // ✅ STEP 4: Process & save in BACKGROUND
+    // ✅ STEP 5: Process & save in BACKGROUND (async, non-blocking)
+    setIsSaving(true);
+
     (async () => {
       try {
-        const allProcessedData = [];
         const CLOUD_NAME = "dhtpqla2b";
         const UPLOAD_PRESET = "unsigned_preset";
 
-        const uploadToCloudinary = async (imageUrl) => {
-          const formData = new FormData();
+        const uploadToCloudinary = async (imageSource, index) => {
           let imageBlob;
 
-          if (typeof imageUrl === "string" && imageUrl.startsWith("http")) {
-            const response = await fetch(imageUrl);
+          // ✅ Handle different image source types
+          if (
+            typeof imageSource === "string" &&
+            imageSource.startsWith("blob:")
+          ) {
+            // For blob URLs, get from localFiles array
+            const localFile = formData.localFiles?.[index];
+            if (localFile) {
+              imageBlob = localFile;
+            } else {
+              // Fallback: fetch the blob
+              const response = await fetch(imageSource);
+              imageBlob = await response.blob();
+            }
+          } else if (
+            typeof imageSource === "string" &&
+            imageSource.startsWith("http")
+          ) {
+            // Already uploaded to Cloudinary - return as is
+            return imageSource;
+          } else if (
+            typeof imageSource === "string" &&
+            imageSource.startsWith("data:")
+          ) {
+            // Data URL
+            const response = await fetch(imageSource);
             imageBlob = await response.blob();
           } else if (
-            typeof imageUrl === "string" &&
-            imageUrl.startsWith("data:")
+            imageSource instanceof File ||
+            imageSource instanceof Blob
           ) {
-            const response = await fetch(imageUrl);
-            imageBlob = await response.blob();
+            // Direct file/blob
+            imageBlob = imageSource;
           } else {
-            imageBlob = imageUrl;
+            throw new Error("Unsupported image format");
           }
 
-          formData.append("file", imageBlob);
-          formData.append("upload_preset", UPLOAD_PRESET);
-          formData.append("cloud_name", CLOUD_NAME);
+          // Upload to Cloudinary
+          const fd = new FormData();
+          fd.append("file", imageBlob);
+          fd.append("upload_preset", UPLOAD_PRESET);
 
           const response = await fetch(
             `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-            { method: "POST", body: formData },
+            { method: "POST", body: fd },
           );
 
-          if (!response.ok) throw new Error("Cloudinary upload failed");
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              `Upload failed: ${errorData.error?.message || "Unknown error"}`,
+            );
+          }
+
           const data = await response.json();
           return data.secure_url;
         };
 
-        for (let i = 0; i < formData.uploadedImages.length; i++) {
-          const uploadedImage = formData.uploadedImages[i];
+        const allProcessedData = [];
 
-          const originalCloudinaryUrl = await uploadToCloudinary(uploadedImage);
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          const processedCloudinaryUrl =
-            await uploadToCloudinary(uploadedImage);
+        // ✅ PARALLEL processing - all images at once
+        const processingPromises = formData.uploadedImages.map(
+          async (uploadedImage, i) => {
+            try {
+              // Upload original image
+              const originalUrl = await uploadToCloudinary(uploadedImage, i);
 
-          const processedData = {
-            originalImage: originalCloudinaryUrl,
-            processedImage: processedCloudinaryUrl,
-            processedAt: new Date().toISOString(),
-            status: "completed",
-            userId: user?._id || formData.userId,
-            featureType: formData.featureType,
-            selectedOptions: {
-              feature: formData.selectedFeature,
-              style: selected,
-            },
-          };
-          allProcessedData.push(processedData);
+              // ✅ For now, use same image as processed (simulate processing)
+              // In real app, you'd call your AI processing API here
+              const processedUrl = originalUrl; // or await processImage(originalUrl)
+
+              return {
+                originalImage: originalUrl,
+                processedImage: processedUrl,
+                processedAt: new Date().toISOString(),
+                status: "completed",
+                userId: user?._id || formData.userId,
+                featureType: formData.featureType,
+                selectedOptions: {
+                  feature: formData.selectedFeature,
+                  style: selected,
+                },
+              };
+            } catch (error) {
+              console.error(`Error processing image ${i + 1}:`, error);
+              toast.error(`Failed to process image ${i + 1}`);
+              return null;
+            }
+          },
+        );
+
+        const results = await Promise.all(processingPromises);
+
+        // Filter out any failed uploads
+        const successfulResults = results.filter((result) => result !== null);
+
+        if (successfulResults.length === 0) {
+          throw new Error("All images failed to process");
         }
 
+        allProcessedData.push(...successfulResults);
+
+        // Save to backend
         const backendPayload = {
           userid: user?._id || formData.userId,
-          title: `${formData.featureType} - ${
-            formData.uploadedImages.length
-          } Images - ${new Date().toLocaleDateString()}`,
-          description: `Project with ${formData.uploadedImages.length} image(s)`,
+          title: `${formData.featureType} - ${successfulResults.length} Images - ${new Date().toLocaleDateString()}`,
+          description: `Project with ${successfulResults.length} image(s)`,
           featureType: formData.featureType,
           uploadedImages: allProcessedData.map((data) => data.originalImage),
           selectedFeature: formData.selectedFeature
@@ -157,6 +207,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
           image: allProcessedData[0].processedImage,
         };
 
+        // Update state for Step4
         setFormData((prev) => ({
           ...prev,
           beforeAfterData: allProcessedData,
@@ -185,8 +236,10 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         localStorage.removeItem("currentDraft");
 
         toast.success(
-          `${formData.uploadedImages.length} image(s) saved successfully!`,
-          { id: "processing" },
+          `${successfulResults.length} image(s) saved successfully!`,
+          {
+            id: "processing",
+          },
         );
       } catch (error) {
         console.error("❌ Error:", error);

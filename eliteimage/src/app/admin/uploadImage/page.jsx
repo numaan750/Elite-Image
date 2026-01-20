@@ -126,17 +126,18 @@ const UploadImageTabs = () => {
   const stepsConfig = currentConfig.steps;
 
   const [formData, setFormData] = useState({
-    userId: null,
-    featureType: featureType || null,
-    uploadedImages: [],
-    selectedFeature: "",
-    selectedFurniture: "",
-    selectedStyle: "",
-    beforeAfterData: {},
-    finalNotes: "",
-    totalSteps: currentConfig.totalSteps,
-    projectId: null,
-  });
+  userId: null,
+  featureType: featureType || null,
+  uploadedImages: [],
+  localFiles: [], // ✅ ADD THIS - Store actual File objects
+  selectedFeature: "",
+  selectedFurniture: "",
+  selectedStyle: "",
+  beforeAfterData: {},
+  finalNotes: "",
+  totalSteps: currentConfig.totalSteps,
+  projectId: null,
+});
 
   // Load draft on mount
   // Load draft on mount

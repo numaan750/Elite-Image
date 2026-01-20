@@ -807,43 +807,45 @@ const Step4 = ({ formData, setFormData, next, back }) => {
         <button
           onClick={() => downloadImagesAsZip(formData)}
           disabled={
-            formData.featureType === "Sky Replacement"
-              ? formData.uploadedImages.length === 0
-              : !formData.beforeAfterData ||
-                (Array.isArray(formData.beforeAfterData) &&
-                  formData.beforeAfterData.length === 0) ||
-                (!Array.isArray(formData.beforeAfterData) &&
-                  !formData.beforeAfterData.processedImage)
+            !formData.beforeAfterData ||
+            (Array.isArray(formData.beforeAfterData) &&
+              formData.beforeAfterData.length === 0)
           }
           className={`w-full sm:w-[280px] flex items-center justify-center gap-2 text-[16px] sm:text-[18px] py-2.5 sm:py-3 rounded-lg transition-colors
     ${
-      (formData.featureType === "Sky Replacement" &&
-        formData.uploadedImages.length > 0) ||
-      (formData.featureType !== "Sky Replacement" &&
-        formData.beforeAfterData &&
-        ((Array.isArray(formData.beforeAfterData) &&
-          formData.beforeAfterData.length > 0) ||
-          (!Array.isArray(formData.beforeAfterData) &&
-            formData.beforeAfterData.processedImage)))
+      formData.beforeAfterData &&
+      ((Array.isArray(formData.beforeAfterData) &&
+        formData.beforeAfterData.length > 0) ||
+        formData.beforeAfterData.processedImage)
         ? "bg-[#034F75] text-white hover:bg-[#023d5c] cursor-pointer"
         : "bg-gray-300 text-gray-500 cursor-not-allowed"
     }`}
         >
           <PiDownload size={20} className="sm:w-5 sm:h-5" />
           <span>
-            {formData.featureType === "Sky Replacement"
-              ? formData.uploadedImages.length > 0
-                ? "Download Images"
-                : "No Images"
-              : formData.beforeAfterData &&
-                  ((Array.isArray(formData.beforeAfterData) &&
-                    formData.beforeAfterData.length > 0) ||
-                    (!Array.isArray(formData.beforeAfterData) &&
-                      formData.beforeAfterData.processedImage))
-                ? "Download"
-                : "No Images"}
+            {formData.beforeAfterData &&
+            ((Array.isArray(formData.beforeAfterData) &&
+              formData.beforeAfterData.length > 0) ||
+              formData.beforeAfterData.processedImage)
+              ? "Download Now"
+              : "Processing..."}
           </span>
         </button>
+        {/* Info Text */}
+{formData.beforeAfterData &&
+  ((Array.isArray(formData.beforeAfterData) &&
+    formData.beforeAfterData.length > 0) ||
+    formData.beforeAfterData.processedImage) && (
+  <p className="text-center text-[14px] text-gray-600 mb-3">
+    ✅ Images ready for download!
+  </p>
+)}
+
+{!formData.beforeAfterData && (
+  <p className="text-center text-[14px] text-amber-600 mb-3">
+    ⏳ Processing in background... You can download soon!
+  </p>
+)}
         {/* Bottom Back Button */}
       </div>
     </div>

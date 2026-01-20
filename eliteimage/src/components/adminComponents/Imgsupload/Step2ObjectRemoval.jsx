@@ -160,8 +160,15 @@ const handleRemoveObject = async () => {
       const UPLOAD_PRESET = "unsigned_preset";
 
       const uploadToCloudinary = async (img) => {
+        let blob;
+        if (img.startsWith('blob:')) {
+          const idx = formData.uploadedImages.indexOf(img);
+          blob = formData.localFiles?.[idx] || await fetch(img).then(r => r.blob());
+        } else {
+          blob = await fetch(img).then((r) => r.blob());
+        }
+        
         const fd = new FormData();
-        const blob = await fetch(img).then((r) => r.blob());
         fd.append("file", blob);
         fd.append("upload_preset", UPLOAD_PRESET);
 
@@ -173,48 +180,46 @@ const handleRemoveObject = async () => {
         return data.secure_url;
       };
 
-      // Upload all images
-      for (let i = 0; i < formData.uploadedImages.length; i++) {
-        const originalUrl = await uploadToCloudinary(
-          formData.uploadedImages[i]
-        );
-        const processedUrl = originalUrl;
+      // Upload all images in parallel
+      const uploadPromises = formData.uploadedImages.map(async (img, i) => {
+        const originalUrl = await uploadToCloudinary(img);
+        const processedUrl = originalUrl; // Replace with actual processing
 
-        allUploadedImages.push(originalUrl);
-        allBeforeAfterData.push({
+        return {
           originalImage: originalUrl,
           processedImage: processedUrl,
           removedAreas: selectedAreas[i] || [],
           processedAt: new Date().toISOString(),
           status: "completed",
-        });
-      }
+        };
+      });
+
+      const results = await Promise.all(uploadPromises);
+      allBeforeAfterData.push(...results);
+      allUploadedImages.push(...results.map(r => r.originalImage));
 
       const singlePayload = {
         userid: user?._id || formData.userid,
         title: `Object Removal - ${new Date().toLocaleDateString()}`,
-        description: `Object removal with ${totalSelectedObjects} selected area(s) across ${formData.uploadedImages.length} image(s)`,
+        description: `Object removal with ${totalSelectedObjects} selected area(s)`,
         featureType: "object-removal",
         uploadedImages: allUploadedImages,
         selectedFeature: ["object-removal"],
         beforeAfterData: allBeforeAfterData,
-        finalNotes: `Removed ${totalSelectedObjects} object(s) from ${formData.uploadedImages.length} image(s)`,
+        finalNotes: `Removed ${totalSelectedObjects} object(s)`,
         image: allUploadedImages[0],
       };
 
-      // Save to database
       const savedData = await saveGeneratedImage([singlePayload], token);
       
-      const normalizedBeforeAfter = Array.isArray(savedData)
-        ? savedData.flatMap((item) => item.beforeAfterData || [])
-        : savedData.beforeAfterData || [];
-
       setFormData((prev) => ({
         ...prev,
-        beforeAfterData: normalizedBeforeAfter,
+        beforeAfterData: Array.isArray(savedData)
+          ? savedData.flatMap((item) => item.beforeAfterData || [])
+          : savedData.beforeAfterData || [],
       }));
 
-      // Delete draft after successful save
+      // Delete draft
       const urlParams = new URLSearchParams(window.location.search);
       const draftId = urlParams.get("draftId") || formData.draftId;
 
@@ -222,13 +227,8 @@ const handleRemoveObject = async () => {
         const savedDrafts = localStorage.getItem("draftProjects");
         if (savedDrafts) {
           const drafts = JSON.parse(savedDrafts);
-          const updatedDrafts = drafts.filter(
-            (draft) => draft.id !== draftId
-          );
-          localStorage.setItem(
-            "draftProjects",
-            JSON.stringify(updatedDrafts)
-          );
+          const updatedDrafts = drafts.filter((draft) => draft.id !== draftId);
+          localStorage.setItem("draftProjects", JSON.stringify(updatedDrafts));
         }
       }
       localStorage.removeItem("currentDraft");
