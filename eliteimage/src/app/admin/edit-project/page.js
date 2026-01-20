@@ -13,17 +13,17 @@ const EditProjectPage = () => {
   const { token, saveGeneratedImage, getProjectById } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
-  uploadedImages: [],
-  featureType: "",
-  selectedFeature: "",
-  selectedStyle: "",
-  beforeAfterData: {},
-  finalNotes: "",
-  userId: "",
-  projectId: "",
-}); // ← Initial empty state instead of null
+    uploadedImages: [],
+    featureType: "",
+    selectedFeature: "",
+    selectedStyle: "",
+    beforeAfterData: {},
+    finalNotes: "",
+    userId: "",
+    projectId: "",
+  }); // ← Initial empty state instead of null
   // const [loading, setLoading] = useState(true);
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
@@ -31,42 +31,42 @@ const [loading, setLoading] = useState(false);
   const [editDescription, setEditDescription] = useState("");
 
   // Load project data
-useEffect(() => {
-  const loadProject = async () => {
-    const projectId = searchParams.get("projectId");
+  useEffect(() => {
+    const loadProject = async () => {
+      const projectId = searchParams.get("projectId");
 
-    if (!projectId) {
-      toast.error("Project ID missing!");
-      router.push("/admin/dashboard");
-      return;
-    }
+      if (!projectId) {
+        toast.error("Project ID missing!");
+        router.push("/admin/dashboard");
+        return;
+      }
 
-    try {
-      const project = await getProjectById(projectId, true);
+      try {
+        const project = await getProjectById(projectId, true);
 
-      const loadedFormData = {
-        uploadedImages: project.uploadedImages || [],
-        featureType: project.featureType || "",
-        selectedFeature: project.selectedFeature?.[0] || "",
-        selectedStyle: project.selectedStyle?.[0] || "",
-        beforeAfterData: project.beforeAfterData?.[0] || {},
-        finalNotes: project.finalNotes || "",
-        userId: project.userid,
-        projectId: projectId,
-      };
+        const loadedFormData = {
+          uploadedImages: project.uploadedImages || [],
+          featureType: project.featureType || "",
+          selectedFeature: project.selectedFeature?.[0] || "",
+          selectedStyle: project.selectedStyle?.[0] || "",
+          beforeAfterData: project.beforeAfterData?.[0] || {},
+          finalNotes: project.finalNotes || "",
+          userId: project.userid,
+          projectId: projectId,
+        };
 
-      setFormData(loadedFormData);
-      setEditDescription(project.finalNotes || "");
-      // ✅ Toast removed - no more "Project loaded successfully"
-    } catch (error) {
-      console.error("Failed to load project:", error);
-      toast.error("Failed to load project");
-      router.push("/admin/dashboard");
-    }
-  };
+        setFormData(loadedFormData);
+        setEditDescription(project.finalNotes || "");
+        // ✅ Toast removed - no more "Project loaded successfully"
+      } catch (error) {
+        console.error("Failed to load project:", error);
+        toast.error("Failed to load project");
+        router.push("/admin/dashboard");
+      }
+    };
 
-  loadProject();
-}, []);
+    loadProject();
+  }, []);
 
   // Initialize slider positions
   useEffect(() => {
@@ -161,17 +161,17 @@ useEffect(() => {
   // }
 
   // ✅ Show skeleton only if data is still loading
-if (!formData.projectId && loading) {
-  return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
-      <div className="w-full animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-        <div className="h-64 bg-gray-200 rounded w-full mb-4"></div>
-        <div className="h-32 bg-gray-200 rounded w-full"></div>
+  if (!formData.projectId && loading) {
+    return (
+      <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
+        <div className="w-full animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="h-64 bg-gray-200 rounded w-full mb-4"></div>
+          <div className="h-32 bg-gray-200 rounded w-full"></div>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
@@ -334,7 +334,7 @@ if (!formData.projectId && loading) {
           className="
   flex flex-col sm:flex-row
   w-full
-  justify-center sm:justify-end
+  justify-between
   items-stretch sm:items-center
   gap-3 sm:gap-4
   

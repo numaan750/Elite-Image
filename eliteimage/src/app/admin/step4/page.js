@@ -583,9 +583,6 @@ const [loading, setLoading] = useState(false);
           <PiDownload size={20} />
           <span>
             Download{" "}
-            {formData.uploadedImages.length > 1
-              ? `(${formData.uploadedImages.length} images)`
-              : ""}
           </span>
         </button>
       </div>
