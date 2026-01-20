@@ -109,7 +109,7 @@ const Step4Page = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [projectId, setProjectId] = useState(null);
   const [isViewMode, setIsViewMode] = useState(false);
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [confirmDownload, setConfirmDownload] = useState(false);
 
@@ -145,16 +145,16 @@ const [loading, setLoading] = useState(false);
             project.beforeAfterData && project.beforeAfterData.length > 0
               ? project.beforeAfterData
               : project.image
-              ? [{ processedImage: project.image }]
-              : [],
+                ? [{ processedImage: project.image }]
+                : [],
           finalNotes: project.finalNotes || "",
           userId: project.userid || user?._id,
         });
         // ✅ Toast removed - no more "Project loaded successfully"
       } catch (error) {
-  toast.error("Failed to load project");
-  console.error(error);
-}
+        toast.error("Failed to load project");
+        console.error(error);
+      }
     };
 
     loadProjectData();
@@ -186,36 +186,7 @@ const [loading, setLoading] = useState(false);
   }, [isDragging]);
 
   const showDownloadConfirmToast = () => {
-    toast(
-      (t) => (
-        <div className="flex flex-col gap-3">
-          <p className="font-medium text-black">Download images as ZIP?</p>
-
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                toast("Download cancelled");
-              }}
-              className="px-3 py-1 rounded border text-sm"
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                handleDownloadConfirmed();
-              }}
-              className="px-3 py-1 rounded bg-[#034F75] text-white text-sm"
-            >
-              Yes, Download
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: Infinity }
-    );
+    handleDownloadConfirmed();
   };
 
   const handleDownloadConfirmed = async () => {
@@ -235,8 +206,8 @@ const [loading, setLoading] = useState(false);
         const blob = await response.blob();
 
         if (window.showSaveFilePicker) {
-          try {
-            const fileHandle = await window.showSaveFilePicker({
+          const fileHandle = await window
+            .showSaveFilePicker({
               suggestedName: "elite-image-1.jpg",
               types: [
                 {
@@ -244,20 +215,26 @@ const [loading, setLoading] = useState(false);
                   accept: { "image/jpeg": [".jpg"] },
                 },
               ],
-            });
+            })
+            .catch(() => null); // ✅ Cancel ko handle karein
 
+          if (!fileHandle) {
+            toast("Download cancelled", { id: "download", duration: 2000 });
+            return;
+          }
+
+          try {
             const writable = await fileHandle.createWritable();
             await writable.write(blob);
             await writable.close();
 
-            // ✅ Success toast with auto-dismiss
             toast.success("Download complete", {
               id: "download",
               duration: 2000,
             });
-          } catch {
-            // ✅ Cancel toast with auto-dismiss
-            toast("Download cancelled", { id: "download", duration: 2000 });
+          } catch (err) {
+            console.error(err);
+            toast.error("Save failed", { id: "download", duration: 2000 });
             return;
           }
         } else {
@@ -296,8 +273,8 @@ const [loading, setLoading] = useState(false);
       const zipBlob = await zip.generateAsync({ type: "blob" });
 
       if (window.showSaveFilePicker) {
-        try {
-          const fileHandle = await window.showSaveFilePicker({
+        const fileHandle = await window
+          .showSaveFilePicker({
             suggestedName: "Elite-Image-AI-Project.zip",
             types: [
               {
@@ -305,20 +282,28 @@ const [loading, setLoading] = useState(false);
                 accept: { "application/zip": [".zip"] },
               },
             ],
-          });
+          })
+          .catch(() => null); // ✅ Cancel ko handle karein
 
+        if (!fileHandle) {
+          toast("Download cancelled", { id: "zip", duration: 2000 });
+          return;
+        }
+
+        try {
           const writable = await fileHandle.createWritable();
           await writable.write(zipBlob);
           await writable.close();
-        } catch {
-          toast("Download cancelled", { id: "zip", duration: 2000 });
+          toast.success("Download complete", { id: "zip", duration: 2000 });
+        } catch (err) {
+          console.error(err);
+          toast.error("Save failed", { id: "zip", duration: 2000 });
           return;
         }
       } else {
         saveAs(zipBlob, "Elite-Image-AI-Project.zip");
+        toast.success("Download complete", { id: "zip", duration: 2000 });
       }
-
-      toast.success("Download complete", { id: "zip", duration: 2000 });
     } catch (err) {
       console.error(err);
       toast.error("Download failed", { id: "zip", duration: 3000 });
@@ -364,8 +349,8 @@ const [loading, setLoading] = useState(false);
           {isViewMode
             ? "View Results"
             : isEditMode
-            ? "Edit Project"
-            : "Processing Complete"}
+              ? "Edit Project"
+              : "Processing Complete"}
         </h2>
         {/* ✅ ADD THIS NEW LINE */}
         <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-5 lg:mb-6 ">
@@ -581,9 +566,7 @@ const [loading, setLoading] = useState(false);
   }`}
         >
           <PiDownload size={20} />
-          <span>
-            Download{" "}
-          </span>
+          <span>Download </span>
         </button>
       </div>
     </div>
