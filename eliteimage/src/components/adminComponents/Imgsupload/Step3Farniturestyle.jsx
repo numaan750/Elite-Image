@@ -193,8 +193,7 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
     bg-[#034F75] hover:bg-[#023a5c]
     text-white
     text-[14px] sm:text-[16px] lg:text-[18px]
-    px-4 sm:px-6 lg:px-8
-    py-2.5 sm:py-3
+    px-5 sm:px-6 py-2
     rounded-lg
     transition-colors
     ${!selectedFurniture ? "opacity-50" : ""}
