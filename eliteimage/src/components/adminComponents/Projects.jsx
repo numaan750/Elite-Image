@@ -37,7 +37,7 @@ const Projects = () => {
 
   const toggleProjectSelection = (id) => {
     setSelectedProjects((prev) =>
-      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id],
     );
   };
   const handleSelectAll = () => {
@@ -157,7 +157,7 @@ const Projects = () => {
               {!isSelectionMode ? (
                 <button
                   onClick={() => setIsSelectionMode(true)}
-                  className="px-4 py-2 rounded-md cursor-pointer bg-[#034F75] text-white hover:bg-[#023d5c] transition-colors text-sm sm:text-base"
+                  className="px-3 py-2 rounded-md cursor-pointer bg-[#034F75] text-white hover:bg-[#023d5c] transition-colors text-[14px] sm:text-[16px]"
                 >
                   Select Multiple
                 </button>
@@ -165,7 +165,7 @@ const Projects = () => {
                 <>
                   <button
                     onClick={handleSelectAll}
-                    className="px-4 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-sm sm:text-base"
+                    className="px-3 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-[14px] sm:text-[16px]"
                   >
                     Select All
                   </button>
@@ -175,7 +175,7 @@ const Projects = () => {
                       setIsSelectionMode(false);
                       setSelectedProjects([]);
                     }}
-                    className="px-4 py-2 cursor-pointer rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-sm sm:text-base"
+                    className="px-3 py-2 cursor-pointer rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-[14px] sm:text-[16px]"
                   >
                     Cancel
                   </button>
@@ -186,7 +186,7 @@ const Projects = () => {
                         setProjectToDelete("bulk");
                         setShowDeleteModal(true);
                       }}
-                      className="px-4 py-2 rounded-md cursor-pointer bg-red-600 hover:bg-red-700 text-white transition-colors text-sm sm:text-base flex items-center gap-2"
+                      className="px-3 py-2 rounded-md cursor-pointer bg-red-600 hover:bg-red-700 text-white transition-colors text-[14px] sm:text-[16px] flex items-center gap-2"
                     >
                       <Trash2 size={16} />
                       Delete ({selectedProjects.length})

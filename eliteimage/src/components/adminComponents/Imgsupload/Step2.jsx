@@ -209,7 +209,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         {/* Back Button */}
         <button
           onClick={back}
-          className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-black text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg transition-colors"
+          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
         >
           <ChevronRight size={17} className="rotate-180" /> {/* Left arrow */}
           Back
@@ -218,7 +218,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         <button
           onClick={handleContinue}
           disabled={selected.length === 0}
-          className={`flex items-center gap-2 bg-[#034F75] hover:bg-[#023a5c] text-white text-[16px] sm:text-[18px] px-6 sm:px-10 py-2.5 sm:py-3 rounded-lg transition-colors ${
+          className={`flex items-center gap-2 bg-[#034F75] hover:bg-[#023a5c] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg transition-colors ${
             selected.length === 0 ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

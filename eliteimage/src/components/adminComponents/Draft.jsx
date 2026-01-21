@@ -151,7 +151,7 @@ const Draft = () => {
               {!isSelectionMode ? (
                 <button
                   onClick={() => setIsSelectionMode(true)}
-                  className="px-4 cursor-pointer py-2 rounded-md bg-[#034F75] text-white hover:bg-[#023d5c] transition-colors text-sm sm:text-base"
+                  className="px-3 cursor-pointer py-2 rounded-md bg-[#034F75] text-white hover:bg-[#023d5c] transition-colors text-[14px] sm:text-[16px]"
                 >
                   Select Multiple
                 </button>
@@ -159,7 +159,7 @@ const Draft = () => {
                 <>
                   <button
                     onClick={handleSelectAll}
-                    className="px-4 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-sm sm:text-base"
+                    className="px-3 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-[14px] sm:text-[16px]"
                   >
                     Select All
                   </button>
@@ -169,7 +169,7 @@ const Draft = () => {
                       setIsSelectionMode(false);
                       setSelectedProjects([]);
                     }}
-                    className="px-4 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-sm sm:text-base"
+                    className="px-3 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-[14px] sm:text-[16px]"
                   >
                     Cancel
                   </button>
@@ -180,7 +180,7 @@ const Draft = () => {
                         setProjectToDelete("bulk");
                         setShowDeleteModal(true);
                       }}
-                      className="px-4 py-2 rounded-md cursor-pointer bg-red-600 hover:bg-red-700 text-white transition-colors text-sm sm:text-base flex items-center gap-2"
+                      className="px-3 py-2 rounded-md cursor-pointer bg-red-600 hover:bg-red-700 text-white transition-colors text-[14px] sm:text-[16px] flex items-center gap-2"
                     >
                       <Trash2 size={16} />
                       Delete ({selectedProjects.length})

@@ -326,7 +326,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         {/* Back Button (Left) */}
         <button
           onClick={back}
-          className="flex items-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-gray-400 transition-colors"
+          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
         >
           <ChevronRight size={17} className="rotate-180" />
           Back
@@ -336,7 +336,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         <button
           onClick={handleGenerate}
           disabled={!selected || isSaving}
-          className={`flex items-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-[#023d5c] transition-colors ${
+          className={`flex items-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg hover:bg-[#023d5c] transition-colors ${
             !selected || isSaving ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

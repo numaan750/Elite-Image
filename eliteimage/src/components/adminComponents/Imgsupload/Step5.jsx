@@ -307,17 +307,16 @@ const Step5 = ({ formData, setFormData, back }) => {
           {/* Back Button (LEFT) */}
           <button
             onClick={back}
-            className="flex items-center justify-center gap-2 bg-gray-300 text-black text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-gray-400 transition-colors"
+            className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
           >
-            <ChevronRight size={15} className="rotate-180" />
-            Back
+            Cancel
           </button>
 
           {/* Generate Button (RIGHT) */}
           <button
             onClick={handleGenerate}
             disabled={isSaving}
-            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors
+            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg transition-colors
               ${
                 isSaving
                   ? "opacity-50 cursor-not-allowed"

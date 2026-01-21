@@ -49,7 +49,7 @@ const RecentProjects = () => {
         </h2>
 
         <Link href="/admin/projects">
-          <button className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[18px] text-white w-fit hover:bg-[#034F75] transition-colors">
+          <button className="rounded-md cursor-pointer bg-[#0B5C7A] px-3 py-2 text-[16px] sm:text-[16px] text-white w-fit hover:bg-[#034F75] transition-colors">
             View All
           </button>
         </Link>

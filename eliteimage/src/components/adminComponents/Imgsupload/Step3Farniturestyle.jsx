@@ -178,17 +178,7 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
       >
         <button
           onClick={back}
-          className="
-    w-full sm:w-auto
-    flex items-center justify-center gap-2
-    bg-gray-300 hover:bg-gray-400
-    text-black
-    text-[14px] sm:text-[16px] lg:text-[18px]
-    px-4 sm:px-6 lg:px-8
-    py-2.5 sm:py-3
-    rounded-lg
-    transition-colors
-  "
+          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
         >
           <ChevronRight size={17} className="rotate-180" />
           Back

@@ -70,9 +70,9 @@ const AIEnhancement = () => {
             </p>
           </div>
 
-          <button className="flex items-center gap-2 rounded-lg bg-[#034F75] px-4 py-2 text-white w-full sm:w-auto lg:mt-16 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start">
+          <button className="flex items-center gap-2 rounded-lg bg-[#034F75] px-3 py-2 text-white w-full sm:w-auto lg:mt-16 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start">
             <span className="text-base mb-1">💳</span>
-            <span className="text-[18px] font-medium">Credits : 12</span>
+            <span className="text-[16px] font-medium">Credits : 12</span>
           </button>
         </div>
 

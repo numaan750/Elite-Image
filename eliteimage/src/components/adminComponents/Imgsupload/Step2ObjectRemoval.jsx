@@ -376,18 +376,9 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         {/* Back Button */}
         <button
           onClick={back}
-          className="
-      w-full sm:w-auto
-      px-4 sm:px-6 lg:px-8 
-      py-2.5 sm:py-3 
-      text-[14px] sm:text-[16px] lg:text-[18px] 
-      border-2 border-gray-400 
-      text-gray-700 
-      rounded-lg 
-      hover:bg-gray-100 
-      transition-colors
-    "
+          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
         >
+          <ChevronRight size={17} className="rotate-180" />
           Back
         </button>
 
@@ -409,8 +400,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               }}
               className="
         w-full sm:w-auto
-        px-4 sm:px-6 lg:px-8 
-        py-2.5 sm:py-3 
+        px-3 sm:px-3 py-2
         text-[14px] sm:text-[16px] lg:text-[18px]
         border-2 border-[#034F75] 
         text-[#034F75] 
@@ -429,8 +419,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             className={`
       w-full sm:w-auto
       flex items-center justify-center gap-2
-      px-4 sm:px-6 lg:px-8 
-      py-2.5 sm:py-3 
+      px-5 sm:px-7 py-2 
       text-[14px] sm:text-[16px] lg:text-[18px]
       rounded-lg 
       transition-colors
