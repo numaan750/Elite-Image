@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { memo } from "react";
 import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
 import { useRouter } from "next/navigation";
@@ -61,7 +61,7 @@ const features = [
   },
 ];
 
-const AiFeatures = () => {
+const AiFeatures = memo(() => {
   const router = useRouter();
 
   const handleFeatureClick = (route) => {
@@ -121,6 +121,8 @@ const AiFeatures = () => {
       </div>
     </div>
   );
-};
+});
+
+AiFeatures.displayName = "AiFeatures";
 
 export default AiFeatures;

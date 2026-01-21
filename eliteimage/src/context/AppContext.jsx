@@ -476,7 +476,6 @@ const AppProvider = ({ children }) => {
 
       return draftId;
     } catch (error) {
-      console.error("Error in saveDraft:", error);
       return formData.draftId || null;
     }
   };

@@ -1,17 +1,18 @@
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, memo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
 const FaPlay = dynamic(
   () => import("react-icons/fa").then((mod) => mod.FaPlay),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 );
 const PiUpload = dynamic(
   () => import("react-icons/pi").then((mod) => mod.PiUpload),
-  { ssr: false }
+  { ssr: false, loading: () => null }
 );
-const Hero = () => {
+
+const Hero = memo(() => {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
@@ -211,6 +212,8 @@ const Hero = () => {
       </div>
     </>
   );
-};
+});
+
+Hero.displayName = "Hero";
 
 export default Hero;

@@ -3,6 +3,7 @@ import "./globals.css";
 import AppProvider from "@/context/AppContext";
 import { Toaster } from "react-hot-toast";
 import StripeWrapper from "@/components/StripeWrapper";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -117,17 +118,21 @@ export default function RootLayout({ children }) {
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+        {/* ✅ DNS Prefetch for APIs */}
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
       <body className={`${manrope.className} antialiased`}>
-        <AppProvider>
-          <StripeWrapper>{children}</StripeWrapper>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-            }}
-          />
-        </AppProvider>
+        <ErrorBoundary>
+          <AppProvider>
+            <StripeWrapper>{children}</StripeWrapper>
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3000,
+              }}
+            />
+          </AppProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

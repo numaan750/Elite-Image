@@ -1,10 +1,10 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 
-const Navbar = () => {
+const Navbar = memo(() => {
   const [open, setOpen] = useState(false);
 
   const handleScroll = (e, targetId) => {
@@ -137,6 +137,8 @@ const Navbar = () => {
       </div>
     </header>
   );
-};
+});
+
+Navbar.displayName = "Navbar";
 
 export default Navbar;

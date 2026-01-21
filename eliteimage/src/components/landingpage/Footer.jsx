@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
+import React, { memo } from "react";
 import { Facebook, Linkedin, Instagram, Twitter, Mail } from "lucide-react";
 
-const Footer = () => {
+const Footer = memo(() => {
   const handleScroll = (e, targetId) => {
     e.preventDefault();
 
@@ -190,6 +190,8 @@ const Footer = () => {
       </div>
     </div>
   );
-};
+});
+
+Footer.displayName = "Footer";
 
 export default Footer;
