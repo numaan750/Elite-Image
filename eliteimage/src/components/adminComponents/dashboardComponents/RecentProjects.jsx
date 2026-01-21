@@ -49,7 +49,7 @@ const RecentProjects = () => {
         </h2>
 
         <Link href="/admin/projects" className="group w-fit">
-          <span className=" relative text-[16px]  text-black cursor-pointer after:content-[''] after:absolute after:left-0.5 after:bottom-0.5 after:h-[0.6px] after:w-full  after:bg-black after:transition-colors after:duration-300 group-hover:after:bg-[#034F75] group-hover:text-[#034F75]">
+          <span className=" relative text-[16px] text-black cursor-pointer after:content-[''] after:absolute after:left-0.5 after:bottom-0.5 after:h-[0.6px] after:w-full  after:bg-black after:transition-colors after:duration-300 group-hover:after:bg-[#034F75] group-hover:text-[#034F75]">
             View All
           </span>
         </Link>
