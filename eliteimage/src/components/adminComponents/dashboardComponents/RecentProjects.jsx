@@ -77,7 +77,7 @@ const RecentProjects = () => {
                 className="h-30 w-30 sm:h-35 sm:w-35 rounded-lg object-cover flex-shrink-0"
               />
 
-              <div className="flex flex-1 flex-col justify-between gap-3">
+              <div className="flex flex-1 flex-col justify-between gap-1.5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-[16px] sm:text-[24px] font-medium text-black">
                     {project.featureType || "Unknown Feature"}
@@ -86,7 +86,7 @@ const RecentProjects = () => {
                     {new Date(project.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-[16px] sm:text-[18px] text-gray-600 mb-2">
+                <p className="text-[16px] sm:text-[18px] text-gray-600 mb-4">
                   Images ({project.uploadedImages?.length || 1})
                 </p>
 
