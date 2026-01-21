@@ -355,7 +355,7 @@ const Step1 = ({ formData, setFormData, next }) => {
         </div>
       )}
 
-      <div className="mb-2 sm:mb-4 lg:mb-6 rounded-2xl border border-[#6FB6D6] bg-[#D3E7F0] p-3 sm:p-4 min-h-[250px] sm:min-h-[300px] lg:min-h-[400px]">
+      <div className="mb-2 sm:mb-4 lg:mb-6 rounded-2xl border border-[#6FB6D6] bg-[#D3E7F0] p-3 sm:p-4 min-h-[250px] sm:min-h-[300px] lg:min-h-[350px]">
         <div
           className={`relative flex flex-col ${
             !hasImages
