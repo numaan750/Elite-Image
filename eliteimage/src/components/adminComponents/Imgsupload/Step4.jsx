@@ -900,22 +900,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
               : "Processing..."}
           </span>
         </button>
-        {/* Info Text */}
-        {formData.beforeAfterData &&
-          ((Array.isArray(formData.beforeAfterData) &&
-            formData.beforeAfterData.length > 0) ||
-            formData.beforeAfterData.processedImage) && (
-            <p className="text-center text-[14px] text-gray-600 mb-3">
-              ✅ Images ready for download!
-            </p>
-          )}
-
-        {!formData.beforeAfterData && (
-          <p className="text-center text-[14px] text-amber-600 mb-3">
-            ⏳ Processing in background... You can download soon!
-          </p>
-        )}
-        {/* Bottom Back Button */}
       </div>
     </div>
   );
