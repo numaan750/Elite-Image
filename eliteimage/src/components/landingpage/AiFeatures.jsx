@@ -100,7 +100,7 @@ const AiFeatures = () => {
                   alt={item.title}
                   width={600}
                   height={400}
-                  quality={100}
+                  quality={75}
                   className="w-full h-full object-cover"
                 />
               </div>

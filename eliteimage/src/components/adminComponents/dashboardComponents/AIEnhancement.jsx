@@ -75,7 +75,7 @@ const AIEnhancement = () => {
             <span className="text-[16px] font-medium">Credits : 12</span>
           </button>
         </div>
-
+    
         <section className="mt-6 sm:mt-8 lg:mt-10 mb-6">
           <h3 className="text-[20px] sm:text-[28px] font-semibold text-black">
             AI Enhancement Features
@@ -96,7 +96,7 @@ const AIEnhancement = () => {
                   alt={item.title}
                   height={200}
                   width={400}
-                  quality={100}
+                  quality={75}
                   className="h-48 sm:h-52 lg:h-56 w-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
