@@ -15,6 +15,8 @@ import {
   X,
   History,
 } from "lucide-react";
+import { LuFiles } from "react-icons/lu";
+
 import { useContext } from "react";
 import { AppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
@@ -28,7 +30,7 @@ export default function Sidebar() {
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     // { name: "Upload Image", href: "/admin/uploadImage", icon: Upload },
     { name: "Projects", href: "/admin/projects", icon: Folder },
-    { name: "Draft", href: "/admin/draft", icon: Folder },
+    { name: "Draft", href: "/admin/draft", icon: LuFiles },
     { name: "Pricing", href: "/admin/pricing", icon: CreditCard },
     { name: "Support", href: "/admin/support", icon: HelpCircle },
     { name: "Profile", href: "/admin/profile", icon: User },
