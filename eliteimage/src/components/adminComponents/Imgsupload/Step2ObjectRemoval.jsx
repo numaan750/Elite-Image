@@ -146,10 +146,10 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     }
 
     // ✅ STEP 2: Show success toast INSTANTLY
-    toast.success("Processing your request...", { id: "remove" });
+    toast.loading("Processing images...", { id: "remove" });
 
     // ✅ STEP 3: Navigate to next page IMMEDIATELY
-    next();
+    // next();
 
     // ✅ STEP 4: Process & save in BACKGROUND (async, non-blocking)
     (async () => {
@@ -214,6 +214,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
         const savedData = await saveGeneratedImage([singlePayload], token);
 
+        // ✅ IMPORTANT: Update formData BEFORE navigation
         setFormData((prev) => ({
           ...prev,
           beforeAfterData: Array.isArray(savedData)
@@ -221,7 +222,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             : savedData.beforeAfterData || [],
         }));
 
-        // Delete draft
+        // ✅ Delete draft COMPLETELY
         const urlParams = new URLSearchParams(window.location.search);
         const draftId = urlParams.get("draftId") || formData.draftId;
 
@@ -240,9 +241,10 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         }
         localStorage.removeItem("currentDraft");
 
-        toast.success("Objects removed & saved successfully!", {
-          id: "remove",
-        });
+        toast.success("Objects removed successfully!", { id: "remove" });
+
+        // ✅ Ab navigate karo - Data ready hai
+        next();
       } catch (err) {
         console.error(err);
         toast.error("Failed to remove objects", { id: "remove" });

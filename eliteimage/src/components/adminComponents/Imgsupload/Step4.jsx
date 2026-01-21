@@ -406,12 +406,36 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   const { saveDraft } = useContext(AppContext);
   const searchParams = useSearchParams();
 
+  // LINE 56-61: useEffect ko update karo
+
+  // LINE 56-78: Pehle jo useEffect tha use REPLACE karo is se:
+
   useEffect(() => {
     if (!formData.featureType) {
       toast.error("Please select a feature first");
       router.push("/admin/dashboard");
     }
   }, [formData.featureType, router]);
+
+  // ✅ REPLACE the new useEffect with this corrected version:
+  useEffect(() => {
+    // Pre-load images to prevent loading delay (browser only)
+    if (typeof window !== "undefined" && formData.beforeAfterData) {
+      const dataArray = Array.isArray(formData.beforeAfterData)
+        ? formData.beforeAfterData
+        : [formData.beforeAfterData];
+
+      dataArray.forEach((data) => {
+        if (data.processedImage) {
+          // ✅ Use window.Image instead of new Image()
+          const img = window.Image ? new window.Image() : null;
+          if (img) {
+            img.src = data.processedImage;
+          }
+        }
+      });
+    }
+  }, [formData.beforeAfterData]);
 
   useEffect(() => {
     const initialPositions = {};
