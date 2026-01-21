@@ -126,18 +126,18 @@ const UploadImageTabs = () => {
   const stepsConfig = currentConfig.steps;
 
   const [formData, setFormData] = useState({
-  userId: null,
-  featureType: featureType || null,
-  uploadedImages: [],
-  localFiles: [], // ✅ ADD THIS - Store actual File objects
-  selectedFeature: "",
-  selectedFurniture: "",
-  selectedStyle: "",
-  beforeAfterData: {},
-  finalNotes: "",
-  totalSteps: currentConfig.totalSteps,
-  projectId: null,
-});
+    userId: null,
+    featureType: featureType || null,
+    uploadedImages: [],
+    localFiles: [], // ✅ ADD THIS - Store actual File objects
+    selectedFeature: "",
+    selectedFurniture: "",
+    selectedStyle: "",
+    beforeAfterData: {},
+    finalNotes: "",
+    totalSteps: currentConfig.totalSteps,
+    projectId: null,
+  });
 
   // Load draft on mount
   // Load draft on mount
@@ -254,7 +254,7 @@ const UploadImageTabs = () => {
           )}
         </div>
 
-        <div className="mt-4 flex justify-between text-sm text-gray-600">
+        {/* <div className="mt-4 flex justify-between text-sm text-gray-600">
           <div>
             {activeStep > 1 && (
               <span>← Previous: {stepsConfig[activeStep - 2]?.name}</span>
@@ -265,7 +265,7 @@ const UploadImageTabs = () => {
               <span>Next: {stepsConfig[activeStep]?.name} →</span>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </AuthGuard>
   );
