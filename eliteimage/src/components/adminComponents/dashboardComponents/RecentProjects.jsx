@@ -48,10 +48,10 @@ const RecentProjects = () => {
           Recent Projects
         </h2>
 
-        <Link href="/admin/projects">
-          <button className="rounded-md cursor-pointer bg-[#0B5C7A] px-3 py-2 text-[16px] sm:text-[16px] text-white w-fit hover:bg-[#034F75] transition-colors">
+        <Link href="/admin/projects" className="group w-fit">
+          <span className=" relative text-[16px]  text-black cursor-pointer after:content-[''] after:absolute after:left-0.5 after:bottom-0.5 after:h-[0.6px] after:w-full  after:bg-black after:transition-colors after:duration-300 group-hover:after:bg-[#034F75] group-hover:text-[#034F75]">
             View All
-          </button>
+          </span>
         </Link>
       </div>
 
