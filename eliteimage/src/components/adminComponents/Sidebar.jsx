@@ -28,14 +28,62 @@ export default function Sidebar() {
 
   const menu = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    // { name: "Upload Image", href: "/admin/uploadImage", icon: Upload },
     { name: "Projects", href: "/admin/projects", icon: Folder },
     { name: "Draft", href: "/admin/draft", icon: LuFiles },
     { name: "Pricing", href: "/admin/pricing", icon: CreditCard },
     { name: "Support", href: "/admin/support", icon: HelpCircle },
     { name: "Profile", href: "/admin/profile", icon: User },
-    // { name: "history", href: "/admin/history", icon: History },
   ];
+
+  const handleLogout = () => {
+    toast.custom(
+      (t) => (
+        // Full screen overlay
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black/50 z-[9999]"
+          onClick={() => toast.dismiss(t.id)} // Click outside closes toast
+        >
+          {/* Toast content box */}
+          <div
+            className="bg-white rounded-xl shadow-xl p-6 w-[320px] text-center"
+            onClick={(e) => e.stopPropagation()} // Prevent click bubbling
+          >
+
+            <h3 className="text-lg font-semibold mb-2">Logout Confirmation</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Are you sure you want to logout?
+            </p>
+
+            <div className="flex justify-center gap-4">
+              {/* YES */}
+              <button
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  setTimeout(() => logoutUser(), 300);
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg"
+              >
+                Yes
+              </button>
+
+              {/* NO */}
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="bg-gray-200 hover:bg-gray-300 px-6 py-2 rounded-lg"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      ),
+      {
+        duration: Infinity,
+        position: "top-center", // position is ignored, overlay handles centering
+        style: { background: "transparent", boxShadow: "none" },
+      },
+    );
+  };
 
   return (
     <>
@@ -56,13 +104,13 @@ export default function Sidebar() {
 
       <aside
         className={`
-    fixed top-0 left-0 z-50 h-screen w-64
-    bg-[#D3E7F0] p-6
-    flex flex-col
-    transform transition-transform duration-300
-    ${open ? "translate-x-0" : "-translate-x-full"}
-    lg:translate-x-0 lg:static
-  `}
+          fixed top-0 left-0 z-50 h-screen w-64
+          bg-[#D3E7F0] p-6
+          flex flex-col
+          transform transition-transform duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0 lg:static
+        `}
       >
         <div className="flex items-center justify-between mb-12">
           <h2 className="text-[24px] font-semibold">Eliteimage</h2>
@@ -79,17 +127,16 @@ export default function Sidebar() {
                 pathname.startsWith("/admin/uploadImage"));
 
             return (
-              // <-- add return here
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[16px]
-        ${
-          isActive
-            ? "bg-[#034F75] text-white"
-            : "hover:bg-[#034F75] hover:text-white"
-        }`}
+                  ${
+                    isActive
+                      ? "bg-[#034F75] text-white"
+                      : "hover:bg-[#034F75] hover:text-white"
+                  }`}
               >
                 <item.icon size={18} />
                 <span>{item.name}</span>
@@ -99,25 +146,22 @@ export default function Sidebar() {
         </nav>
 
         <button
-          onClick={() => {
-            logoutUser();
-            toast.success("Logged out successfully ✅");
-            setOpen(false);
-          }}
+          onClick={handleLogout}
           className="
-    mt-auto
-    flex items-center gap-3
-    w-full
-    bg-[#D30000]
-    text-white
-    px-4
-    py-2.5
-    rounded-lg
-    text-[16px]
-    font-medium
-    transition-colors
-    cursor-pointer
-  "
+            mt-auto
+            flex items-center gap-3
+            w-full
+            bg-[#D30000]
+            hover:bg-[#B00000]
+            text-white
+            px-4
+            py-2.5
+            rounded-lg
+            text-[16px]
+            font-medium
+            transition-colors
+            cursor-pointer
+          "
         >
           <LogOut size={18} />
           Logout
