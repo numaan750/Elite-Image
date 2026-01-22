@@ -134,7 +134,7 @@ const EditProjectPage = () => {
       toast.success("Project updated successfully!", { id: "update" });
 
       setTimeout(() => {
-        router.push("/admin/dashboard");
+        router.push("/admin/step4?projectId=" + formData.projectId);
       }, 1000);
     } catch (error) {
       console.error("❌ Failed to update:", error);
