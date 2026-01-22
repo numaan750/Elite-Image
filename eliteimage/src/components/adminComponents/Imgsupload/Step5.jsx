@@ -56,62 +56,72 @@ const Step5 = ({ formData, setFormData, back }) => {
     };
   }, [isDragging]);
 
-  const handleGenerate = async () => {
-    // ✅ STEP 1: Validation (instant)
+const handleGenerate = async () => {
+    // STEP 1: Validation
     if (!token) {
-      alert("Please login to save images");
+      toast.error("Please login to save images");
       return;
     }
 
-    setIsSaving(true);
-
-    // ✅ STEP 2: Prepare data (instant)
+    // STEP 2: Prepare updated data
     const finalData = {
       ...formData,
       finalNotes: editDescription,
       lastModified: new Date().toISOString(),
     };
 
-    setFormData(finalData);
+    // STEP 3: Update beforeAfterData with edit prompt
+    const updatedBeforeAfterData = formData.beforeAfterData 
+      ? (Array.isArray(formData.beforeAfterData) 
+          ? formData.beforeAfterData.map(item => ({
+              ...item,
+              editPrompt: editDescription,
+              editedAt: new Date().toISOString()
+            }))
+          : {
+              ...formData.beforeAfterData,
+              editPrompt: editDescription,
+              editedAt: new Date().toISOString()
+            }
+        )
+      : [];
 
-    const backendPayload = {
-      userid: finalData.userId,
-      title: `${finalData.featureType} - ${new Date().toLocaleDateString()}`,
-      description: finalData.finalNotes || "",
-      featureType: finalData.featureType,
-      uploadedImages: finalData.uploadedImages,
-      selectedFeature: finalData.selectedFeature
-        ? [finalData.selectedFeature]
-        : [],
-      selectedStyle: finalData.selectedStyle ? [finalData.selectedStyle] : [],
-      beforeAfterData: finalData.beforeAfterData
-        ? [finalData.beforeAfterData]
-        : [],
-      finalNotes: finalData.finalNotes || "",
-      image:
-        finalData.beforeAfterData?.processedImage ||
-        finalData.uploadedImages[0] ||
-        "",
-    };
+    // STEP 4: Update formData with new data
+    setFormData((prev) => ({
+      ...prev,
+      beforeAfterData: updatedBeforeAfterData,
+      finalNotes: editDescription,
+      lastModified: new Date().toISOString(),
+    }));
 
-    // ✅ STEP 3: Navigate IMMEDIATELY
-    router.push("/admin/dashboard");
+    // STEP 5: Navigate back to Step 4 INSTANTLY (NO loading!)
+    back(); // ✅ Step 4 par wapis chala jayega
 
-    // ✅ STEP 4: Save in BACKGROUND
+    // STEP 6: Save in BACKGROUND (optional - user ko dikhega nahi)
     (async () => {
       try {
+        const backendPayload = {
+          userid: finalData.userId,
+          title: `${finalData.featureType} - Edited - ${new Date().toLocaleDateString()}`,
+          description: editDescription,
+          featureType: finalData.featureType,
+          uploadedImages: finalData.uploadedImages,
+          selectedFeature: finalData.selectedFeature ? [finalData.selectedFeature] : [],
+          selectedStyle: finalData.selectedStyle ? [finalData.selectedStyle] : [],
+          beforeAfterData: Array.isArray(updatedBeforeAfterData) ? updatedBeforeAfterData : [updatedBeforeAfterData],
+          finalNotes: editDescription,
+          image: (Array.isArray(updatedBeforeAfterData) 
+            ? updatedBeforeAfterData[0]?.processedImage 
+            : updatedBeforeAfterData?.processedImage) || finalData.uploadedImages[0],
+        };
+
         if (formData.projectId) {
-          await saveGeneratedImage(
-            backendPayload,
-            token,
-            true,
-            formData.projectId,
-          );
+          await saveGeneratedImage(backendPayload, token, true, formData.projectId);
         } else {
           await saveGeneratedImage(backendPayload, token);
         }
 
-        // Delete draft
+        // Delete draft silently in background
         const urlParams = new URLSearchParams(window.location.search);
         const draftId = urlParams.get("draftId") || formData.draftId;
 
@@ -119,23 +129,15 @@ const Step5 = ({ formData, setFormData, back }) => {
           const savedDrafts = localStorage.getItem("draftProjects");
           if (savedDrafts) {
             const drafts = JSON.parse(savedDrafts);
-            const updatedDrafts = drafts.filter(
-              (draft) => draft.id !== draftId,
-            );
-            localStorage.setItem(
-              "draftProjects",
-              JSON.stringify(updatedDrafts),
-            );
+            const updatedDrafts = drafts.filter((draft) => draft.id !== draftId);
+            localStorage.setItem("draftProjects", JSON.stringify(updatedDrafts));
           }
         }
         localStorage.removeItem("currentDraft");
 
-        toast.success("Project saved successfully!");
       } catch (error) {
-        console.error("❌ Failed to save:", error);
-        toast.error(`Failed to save: ${error.message}`);
-      } finally {
-        setIsSaving(false);
+        console.error("❌ Background save failed:", error);
+        // Don't show error to user - save failed silently
       }
     })();
   };
