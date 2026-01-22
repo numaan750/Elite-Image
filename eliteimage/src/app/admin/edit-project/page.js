@@ -206,10 +206,10 @@ const EditProjectPage = () => {
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0] mb-2 sm:mb-4 lg:mb-6">
         <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-semibold text-black mb-1">
-          Before / After Comparison
+          Edit Your Image Instantly
         </h3>
         <p className="text-[12px] sm:text-[16px] lg:text-[20px] text-black mb-3 sm:mb-4">
-          Drag the slider to compare original and enhanced versions
+         The image is ready to edit. Enter your prompt below to apply changes instantly.
         </p>
 
         <div className="relative w-full rounded-xl overflow-hidden flex items-center justify-center">
@@ -285,7 +285,7 @@ const EditProjectPage = () => {
                       />
                     </div>
 
-                    <div
+                    {/* <div
                       className="absolute top-0 bottom-0 w-1 bg-white shadow-lg z-10"
                       style={{ left: `${sliderPositions[index] || 50}%` }}
                     >
@@ -298,14 +298,14 @@ const EditProjectPage = () => {
                       >
                         <MoveHorizontal size={20} className="text-[#034F75]" />
                       </div>
-                    </div>
+                    </div> */}
 
-                    <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
+                    {/* <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
                       Before
                     </div>
                     <div className="absolute top-2 right-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
                       After
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

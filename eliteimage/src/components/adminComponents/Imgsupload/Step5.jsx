@@ -176,10 +176,10 @@ const Step5 = ({ formData, setFormData, back }) => {
 
       <div className="border border-[#034F75] rounded-xl p-3 sm:p-4 lg:p-5 w-full bg-[#D3E7F0] mb-2 sm:mb-4 lg:mb-6">
         <h3 className="text-[20px] sm:text-[10px] lg:text-[24px] font-semibold text-black mb-1">
-          Before / After Comparison
+          Edit Your Image Instantly
         </h3>
         <p className="text-[12px] sm:text-[16px] lg:text-[18px] text-black mb-3 sm:mb-4">
-          Drag the slider to compare original and enhanced versions
+         The image is ready to edit. Enter your prompt below to apply changes instantly.
         </p>
 
         <div className="relative w-full rounded-xl overflow-hidden flex items-center justify-center ">
@@ -256,12 +256,12 @@ const Step5 = ({ formData, setFormData, back }) => {
                     </div>
 
                     {/* Slider Line */}
-                    <div
+                    {/* <div
                       className="absolute top-0 bottom-0 w-1 bg-white shadow-lg z-10"
                       style={{ left: `${sliderPositions[index] || 50}%` }}
                     >
                       {/* Slider Handle */}
-                      <div
+                      {/* <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
                         w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow-xl flex items-center justify-center
                         cursor-ew-resize border-2 border-[#034F75]"
@@ -270,15 +270,15 @@ const Step5 = ({ formData, setFormData, back }) => {
                       >
                         <MoveHorizontal size={20} className="text-[#034F75]" />
                       </div>
-                    </div>
+                    </div> */}
 
-                    {/* Labels */}
+                    {/* Labels
                     <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
                       Before
                     </div>
                     <div className="absolute top-2 right-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
                       After
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
