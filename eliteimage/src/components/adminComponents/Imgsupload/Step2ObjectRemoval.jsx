@@ -156,31 +156,53 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
       try {
         const allUploadedImages = [];
         const allBeforeAfterData = [];
-        const CLOUD_NAME = "dhtpqla2b";
-        const UPLOAD_PRESET = "unsigned_preset";
+        const CLOUD_NAME = "drh7q62eh";
+  const UPLOAD_PRESET = "unsigned_preset";
 
-        const uploadToCloudinary = async (img) => {
-          let blob;
-          if (img.startsWith("blob:")) {
-            const idx = formData.uploadedImages.indexOf(img);
-            blob =
-              formData.localFiles?.[idx] ||
-              (await fetch(img).then((r) => r.blob()));
-          } else {
-            blob = await fetch(img).then((r) => r.blob());
-          }
 
-          const fd = new FormData();
-          fd.append("file", blob);
-          fd.append("upload_preset", UPLOAD_PRESET);
+       const uploadToCloudinary = async (img) => {
+  let blob;
+  
+  try {
+    console.log("🚀 Uploading image to Cloudinary...");
+    
+    if (img.startsWith("blob:")) {
+      const idx = formData.uploadedImages.indexOf(img);
+      blob = formData.localFiles?.[idx] || (await fetch(img).then((r) => r.blob()));
+    } else {
+      blob = await fetch(img).then((r) => r.blob());
+    }
 
-          const res = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-            { method: "POST", body: fd },
-          );
-          const data = await res.json();
-          return data.secure_url;
-        };
+    const fd = new FormData();
+    fd.append("file", blob);
+    fd.append("upload_preset", UPLOAD_PRESET);
+
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+      { method: "POST", body: fd },
+    );
+
+    console.log("📡 Response status:", res.status);
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("❌ Upload failed:", errorText);
+      throw new Error(`Upload failed: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log("✅ Upload success:", data.secure_url);
+
+    if (!data.secure_url) {
+      throw new Error("No secure_url in response");
+    }
+
+    return data.secure_url;
+  } catch (error) {
+    console.error("❌ Cloudinary upload error:", error);
+    throw error;
+  }
+};
 
         // Upload all images in parallel
         const uploadPromises = formData.uploadedImages.map(async (img, i) => {

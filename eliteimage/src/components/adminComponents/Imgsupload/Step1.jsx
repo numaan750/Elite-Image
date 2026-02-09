@@ -9,7 +9,7 @@ import { AppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-const CLOUD_NAME = "dhtpqla2b";
+const CLOUD_NAME = "drh7q62eh";
 const UPLOAD_PRESET = "unsigned_preset";
 
 const Step1 = ({ formData, setFormData, next }) => {
@@ -173,96 +173,117 @@ const Step1 = ({ formData, setFormData, next }) => {
     })();
   };
 
-  const handleFileUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
-    const validFiles = [];
-    for (const file of files) {
-      if (!file.type.startsWith("image/")) {
-        toast.error(`${file.name}: Only image files allowed`);
-        continue;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error(`${file.name}: Image must be under 5MB`);
-        continue;
-      }
-      validFiles.push(file);
+const handleFileUpload = async (e) => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  const validFiles = [];
+  for (const file of files) {
+    if (!file.type.startsWith("image/")) {
+      toast.error(`${file.name}: Only image files allowed`);
+      continue;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(`${file.name}: Image must be under 5MB`);
+      continue;
+    }
+    validFiles.push(file);
+  }
 
-    if (validFiles.length === 0) return;
+  if (validFiles.length === 0) return;
 
-    setUploadingImage(true);
-    const placeholderIds = validFiles.map(
-      (_, idx) => `loading-${Date.now()}-${idx}`,
-    );
-    setUploadingUrls((prev) => new Set([...prev, ...placeholderIds]));
-    setLoadingCount((prev) => prev + validFiles.length);
+  setUploadingImage(true);
+  const placeholderIds = validFiles.map(
+    (_, idx) => `loading-${Date.now()}-${idx}`,
+  );
+  setUploadingUrls((prev) => new Set([...prev, ...placeholderIds]));
+  setLoadingCount((prev) => prev + validFiles.length);
 
-    setFormData((prev) => ({
-      ...prev,
-      uploadedImages: [...prev.uploadedImages, ...placeholderIds],
-    }));
-    const uploadPromises = validFiles.map(async (file, idx) => {
-      const uploadForm = new FormData();
-      uploadForm.append("file", file);
-      uploadForm.append("upload_preset", UPLOAD_PRESET);
+  setFormData((prev) => ({
+    ...prev,
+    uploadedImages: [...prev.uploadedImages, ...placeholderIds],
+  }));
+  
+  const uploadPromises = validFiles.map(async (file, idx) => {
+    const uploadForm = new FormData();
+    uploadForm.append("file", file);
+    uploadForm.append("upload_preset", UPLOAD_PRESET);
 
-      try {
-        const res = await fetch(
-          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-          { method: "POST", body: uploadForm },
-        );
-        const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        { method: "POST", body: uploadForm },
+      );
 
-        const optimizedUrl = data.secure_url.replace(
-          "/upload/",
-          "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
-        );
+      // ✅ Check if response is OK
+      if (!res.ok) {
+        console.error("❌ Upload failed - Response not OK:", res.status);
+        throw new Error(`Upload failed with status ${res.status}`);
+      }
 
-        return {
-          success: true,
-          url: optimizedUrl,
-          placeholderId: placeholderIds[idx],
-          localUrl: URL.createObjectURL(file),
-        };
-      } catch (err) {
-        console.error(`Upload failed for ${file.name}:`, err);
-        return {
-          success: false,
-          placeholderId: placeholderIds[idx],
-        };
+      const data = await res.json();
+
+      // ✅ Log response
+      console.log("📦 Cloudinary Response:", data);
+
+      // ✅ Check if secure_url exists
+      if (!data.secure_url) {
+        console.error("❌ No secure_url in response:", data);
+        throw new Error(data.error?.message || "Upload failed - no URL returned");
+      }
+
+      const optimizedUrl = data.secure_url.replace(
+        "/upload/",
+        "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
+      );
+
+      return {
+        success: true,
+        url: optimizedUrl,
+        placeholderId: placeholderIds[idx],
+        localUrl: URL.createObjectURL(file),
+      };
+    } catch (err) {
+      console.error(`❌ Upload failed for ${file.name}:`, err);
+      console.error("Full error:", err.message);
+      
+      return {
+        success: false,
+        placeholderId: placeholderIds[idx],
+        error: err.message,
+      };
+    }
+  });
+  
+  const results = await Promise.allSettled(uploadPromises);
+  setFormData((prev) => {
+    let newImages = [...prev.uploadedImages];
+
+    results.forEach((result) => {
+      if (result.status === "fulfilled" && result.value.success) {
+        const { placeholderId, url } = result.value;
+        const placeholderIdx = newImages.indexOf(placeholderId);
+        if (placeholderIdx !== -1) {
+          newImages[placeholderIdx] = url;
+        }
+      } else if (result.status === "fulfilled") {
+        const placeholderIdx = newImages.indexOf(result.value.placeholderId);
+        if (placeholderIdx !== -1) {
+          newImages.splice(placeholderIdx, 1);
+        }
       }
     });
-    const results = await Promise.allSettled(uploadPromises);
-    setFormData((prev) => {
-      let newImages = [...prev.uploadedImages];
 
-      results.forEach((result) => {
-        if (result.status === "fulfilled" && result.value.success) {
-          const { placeholderId, url } = result.value;
-          const placeholderIdx = newImages.indexOf(placeholderId);
-          if (placeholderIdx !== -1) {
-            newImages[placeholderIdx] = url;
-          }
-        } else if (result.status === "fulfilled") {
-          const placeholderIdx = newImages.indexOf(result.value.placeholderId);
-          if (placeholderIdx !== -1) {
-            newImages.splice(placeholderIdx, 1);
-          }
-        }
-      });
+    return { ...prev, uploadedImages: newImages };
+  });
+  setUploadingUrls(new Set());
+  setLoadingCount(0);
+  setAllImagesLoaded(true);
+  setUploadingImage(false);
 
-      return { ...prev, uploadedImages: newImages };
-    });
-    setUploadingUrls(new Set());
-    setLoadingCount(0);
-    setAllImagesLoaded(true);
-    setUploadingImage(false);
+  toast.success(`${validFiles.length} image(s) uploaded successfully!`);
 
-    toast.success(`${validFiles.length} image(s) uploaded successfully!`);
-
-    e.target.value = "";
-  };
+  e.target.value = "";
+};
 
   const handleDragEnter = (e) => {
     e.preventDefault();

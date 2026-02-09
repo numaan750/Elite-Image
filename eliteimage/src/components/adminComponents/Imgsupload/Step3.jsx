@@ -83,69 +83,64 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
     (async () => {
       try {
-        const CLOUD_NAME = "dhtpqla2b";
-        const UPLOAD_PRESET = "unsigned_preset";
+        const CLOUD_NAME = "drh7q62eh";
+  const UPLOAD_PRESET = "unsigned_preset";
 
         const uploadToCloudinary = async (imageSource, index) => {
-          let imageBlob;
+  let imageBlob;
 
-          // ✅ Handle different image source types
-          if (
-            typeof imageSource === "string" &&
-            imageSource.startsWith("blob:")
-          ) {
-            // For blob URLs, get from localFiles array
-            const localFile = formData.localFiles?.[index];
-            if (localFile) {
-              imageBlob = localFile;
-            } else {
-              // Fallback: fetch the blob
-              const response = await fetch(imageSource);
-              imageBlob = await response.blob();
-            }
-          } else if (
-            typeof imageSource === "string" &&
-            imageSource.startsWith("http")
-          ) {
-            // Already uploaded to Cloudinary - return as is
-            return imageSource;
-          } else if (
-            typeof imageSource === "string" &&
-            imageSource.startsWith("data:")
-          ) {
-            // Data URL
-            const response = await fetch(imageSource);
-            imageBlob = await response.blob();
-          } else if (
-            imageSource instanceof File ||
-            imageSource instanceof Blob
-          ) {
-            // Direct file/blob
-            imageBlob = imageSource;
-          } else {
-            throw new Error("Unsupported image format");
-          }
+  try {
+    console.log(`🚀 [${index + 1}] Uploading to Cloudinary...`);
 
-          // Upload to Cloudinary
-          const fd = new FormData();
-          fd.append("file", imageBlob);
-          fd.append("upload_preset", UPLOAD_PRESET);
+    if (typeof imageSource === "string" && imageSource.startsWith("blob:")) {
+      const localFile = formData.localFiles?.[index];
+      if (localFile) {
+        imageBlob = localFile;
+      } else {
+        const response = await fetch(imageSource);
+        imageBlob = await response.blob();
+      }
+    } else if (typeof imageSource === "string" && imageSource.startsWith("http")) {
+      return imageSource; // Already uploaded
+    } else if (typeof imageSource === "string" && imageSource.startsWith("data:")) {
+      const response = await fetch(imageSource);
+      imageBlob = await response.blob();
+    } else if (imageSource instanceof File || imageSource instanceof Blob) {
+      imageBlob = imageSource;
+    } else {
+      throw new Error("Unsupported image format");
+    }
 
-          const response = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-            { method: "POST", body: fd },
-          );
+    const fd = new FormData();
+    fd.append("file", imageBlob);
+    fd.append("upload_preset", UPLOAD_PRESET);
 
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(
-              `Upload failed: ${errorData.error?.message || "Unknown error"}`,
-            );
-          }
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+      { method: "POST", body: fd },
+    );
 
-          const data = await response.json();
-          return data.secure_url;
-        };
+    console.log(`📡 [${index + 1}] Response status:`, response.status);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error(`❌ [${index + 1}] Upload failed:`, errorData);
+      throw new Error(`Upload failed: ${errorData.error?.message || "Unknown error"}`);
+    }
+
+    const data = await response.json();
+    console.log(`✅ [${index + 1}] Upload success:`, data.secure_url);
+
+    if (!data.secure_url) {
+      throw new Error("No secure_url in response");
+    }
+
+    return data.secure_url;
+  } catch (error) {
+    console.error(`❌ [${index + 1}] Upload error:`, error);
+    throw error;
+  }
+};
 
         const allProcessedData = [];
 

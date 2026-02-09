@@ -14,11 +14,13 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { useRouter } from "next/navigation";
 
-const CLOUD_NAME = "dhtpqla2b";
+const CLOUD_NAME = "drh7q62eh";
 const UPLOAD_PRESET = "unsigned_preset";
 
 const uploadToCloudinary = async (imageUrl) => {
   try {
+    console.log("🚀 Uploading to Cloudinary...");
+    
     const formData = new FormData();
 
     let imageBlob;
@@ -34,7 +36,6 @@ const uploadToCloudinary = async (imageUrl) => {
 
     formData.append("file", imageBlob);
     formData.append("upload_preset", UPLOAD_PRESET);
-    formData.append("cloud_name", CLOUD_NAME);
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
@@ -44,15 +45,25 @@ const uploadToCloudinary = async (imageUrl) => {
       },
     );
 
+    console.log("📡 Response status:", response.status);
+
     if (!response.ok) {
-      throw new Error("Cloudinary upload failed");
+      const errorText = await response.text();
+      console.error("❌ Upload failed:", errorText);
+      throw new Error(`Cloudinary upload failed: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("✅ Cloudinary Upload Success:", data.secure_url);
+    console.log("✅ Upload success:", data.secure_url);
+
+    if (!data.secure_url) {
+      throw new Error("No secure_url in response");
+    }
+
     return data.secure_url;
   } catch (error) {
-    console.error("❌ Cloudinary Upload Error:", error);
+    console.error("❌ Cloudinary error:", error);
+    toast.error(`Upload failed: ${error.message}`);
     throw error;
   }
 };
