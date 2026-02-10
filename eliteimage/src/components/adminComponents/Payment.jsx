@@ -8,6 +8,7 @@ export default function Payment() {
   const stripe = useStripe();
   const elements = useElements();
   const { user } = useContext(AppContext);
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -29,10 +30,13 @@ export default function Payment() {
 
     setLoading(true);
 
-    if (!stripe || !elements) return;
-
+    if (!stripe || !elements) {
+      toast.error("Stripe not loaded");
+      setLoading(false);
+      return;
+    }
     try {
-      const res = await fetch("https://elite-image.vercel.app/api/payment", {
+      const res = await fetch(`${API_URL}/api/payment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -42,6 +46,11 @@ export default function Payment() {
           cardHolder: cardHolder,
         }),
       });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Payment failed");
+      }
+
       const data = await res.json();
       const clientSecret = data.clientSecret;
 
@@ -61,14 +70,9 @@ export default function Payment() {
         setLoading(false);
         return;
       }
-      if (amount <= 0) {
-        toast.error("Please enter a valid amount");
-        setLoading(false);
-        return;
-      }
 
       if (confirmRes.paymentIntent.status === "succeeded") {
-        await fetch("https://elite-image.vercel.app/api/payment/confirm", {
+        await fetch(`${API_URL}/api/payment/confirm`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -84,7 +88,8 @@ export default function Payment() {
         setLoading(false);
       }
     } catch (err) {
-      toast.error(err.message);
+      console.error("❌ Payment Error:", err);
+      toast.error(err.message || "Payment failed");
       setLoading(false);
     }
   };
