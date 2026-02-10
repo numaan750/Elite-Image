@@ -52,25 +52,24 @@ export const signupUser = async (req, res) => {
     const hash = bcrypt.hashSync(password, 10);
 
     const user = await loginUserSchema.create({
-  email,
-  password: hash,
-  username,
-  credits: 15,  // Default credits
-});
-console.log("✅ User created:", {
-  _id: user._id,
-  username: user.username,
-  credits: user.credits
-});
-// ✅ Password field response se remove karo
-const userResponse = {
-  _id: user._id,
-  username: user.username,
-  email: user.email,
-  credits: user.credits,
-};
+      email,
+      password: hash,
+      username,
+      credits: 15,
+    });
+    console.log("✅ User created:", {
+      _id: user._id,
+      username: user.username,
+      credits: user.credits,
+    });
+    const userResponse = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      credits: user.credits,
+    };
 
-res.status(201).json(userResponse);
+    res.status(201).json(userResponse);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -114,16 +113,16 @@ export const loginUser = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.status(200).json({
-  status: "success",
-  message: "Login successful",
-  token,
-  user: {
-    _id: user._id,
-username: user.username,
-    email: user.email,
-     credits: Number(user.credits) || 15,  // ✅ Credits add kiye
-  },
-});
+      status: "success",
+      message: "Login successful",
+      token,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        credits: Number(user.credits) || 15,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -145,7 +144,7 @@ export const updateUser = async (req, res) => {
       // Current password verify karo
       const isPasswordValid = await bcrypt.compare(
         currentPassword,
-        user.password
+        user.password,
       );
       if (!isPasswordValid) {
         return res
@@ -158,7 +157,7 @@ export const updateUser = async (req, res) => {
     }
 
     // Update name and email
-if (name) user.username = name;
+    if (name) user.username = name;
     if (email) user.email = email;
 
     await user.save();
@@ -185,27 +184,21 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-// ✅ YE NAYA FUNCTION ADD KARO
 export const deductCredits = async (req, res) => {
   try {
     const { id } = req.params;
     const { creditsToDeduct } = req.body;
 
-    // User find karo
     const user = await loginUserSchema.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    // Check karo ke enough credits hain
     if (user.credits < creditsToDeduct) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: "Insufficient credits",
-        currentCredits: user.credits 
+        currentCredits: user.credits,
       });
     }
-
-    // Credits deduct karo
     user.credits -= creditsToDeduct;
     await user.save();
 
@@ -215,5 +208,56 @@ export const deductCredits = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+export const googleLogin = async (req, res) => {
+  try {
+    const { email, username, googleId } = req.body;
+
+    if (!email || !googleId) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email and Google ID required.",
+      });
+    }
+
+    let user = await loginUserSchema.findOne({ email });
+    let isNewUser = false;
+
+    if (user) {
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+      isNewUser = false;
+    } else {
+      user = await loginUserSchema.create({
+        email,
+        username: username || email.split("@")[0],
+        googleId,
+        credits: 15,
+        password: null,
+      });
+      isNewUser = true;
+    }
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    res.status(200).json({
+      status: "success",
+      message: "Google login successful",
+      token,
+      isNewUser,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        credits: Number(user.credits) || 15,
+      },
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
   }
 };

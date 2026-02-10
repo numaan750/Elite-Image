@@ -4,6 +4,7 @@ import AppProvider from "@/context/AppContext";
 import { Toaster } from "react-hot-toast";
 import StripeWrapper from "@/components/StripeWrapper";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import SessionWrapper from "@/components/SessionWrapper";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -122,6 +123,7 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
       <body className={`${manrope.className} antialiased`}>
+         <SessionWrapper>
         <ErrorBoundary>
           <AppProvider>
             <StripeWrapper>{children}</StripeWrapper>
@@ -133,6 +135,7 @@ export default function RootLayout({ children }) {
             />
           </AppProvider>
         </ErrorBoundary>
+        </SessionWrapper>
       </body>
     </html>
   );

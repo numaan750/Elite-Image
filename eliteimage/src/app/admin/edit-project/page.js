@@ -209,7 +209,8 @@ const EditProjectPage = () => {
           Edit Your Image Instantly
         </h3>
         <p className="text-[12px] sm:text-[16px] lg:text-[20px] text-black mb-3 sm:mb-4">
-         The image is ready to edit. Enter your prompt below to apply changes instantly.
+          The image is ready to edit. Enter your prompt below to apply changes
+          instantly.
         </p>
 
         <div className="relative w-full rounded-xl overflow-hidden flex items-center justify-center">

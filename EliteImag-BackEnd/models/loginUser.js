@@ -9,14 +9,20 @@ const loginUserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
     },
     password: {
         type: String,
-        required: true,
+        required: false,
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true,
     },
      credits: {
         type: Number,
-        default: 15,  // Free signup credits
+        default: 15,
     },
 });
 

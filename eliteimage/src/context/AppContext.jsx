@@ -2,6 +2,7 @@
 
 import { createContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useSession, signOut } from "next-auth/react";
 export const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
@@ -14,9 +15,17 @@ const AppProvider = ({ children }) => {
   const [projectCache, setProjectCache] = useState({});
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user?.token && !user) {
+      handleGoogleLogin(session);
+    }
+  }, [session?.user?.token]);
+
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user"); 
+    const savedUser = localStorage.getItem("user");
 
     if (savedToken) {
       setToken(savedToken);
@@ -24,7 +33,12 @@ const AppProvider = ({ children }) => {
 
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+
+        setUser({
+          ...parsedUser,
+          credits: Number(parsedUser.credits) || 15,
+        });
       } catch (error) {
         console.error("Error parsing user:", error);
         localStorage.removeItem("user");
@@ -44,24 +58,43 @@ const AppProvider = ({ children }) => {
   }, []);
 
   const signupUser = async (username, email, password) => {
-    const res = await fetch("https://elite-image.vercel.app/api/loginUser", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password }),
-    });
+    try {
+      const res = await fetch("https://elite-image.vercel.app/api/loginUser", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-    return await res.json();
+      const data = await res.json();
+
+      if (data._id) {
+        const userToSave = {
+          _id: data._id,
+          name: data.username,
+          email: data.email,
+          credits: Number(data.credits) || 15,
+        };
+
+        setUser(userToSave);
+        localStorage.setItem("user", JSON.stringify(userToSave));
+
+        toast.success("Account created successfully!");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast.error("Signup failed");
+      return { status: "error", message: error.message };
+    }
   };
 
   const loginUser = async (email, password) => {
-    const res = await fetch(
-      "https://elite-image.vercel.app/api/loginUser/login",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      }
-    );
+    const res = await fetch("https://elite-image.vercel.app/api/loginUser/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
     const data = await res.json();
 
@@ -73,6 +106,7 @@ const AppProvider = ({ children }) => {
           _id: data.user._id,
           name: data.user.username || data.user.name,
           email: data.user.email,
+          credits: Number(data.user.credits) || 15,
         };
         setUser(userToSave);
         localStorage.setItem("user", JSON.stringify(userToSave));
@@ -83,12 +117,31 @@ const AppProvider = ({ children }) => {
     return data;
   };
 
-  const logoutUser = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user"); 
-    setToken(null);
-    setUser(null);
-    window.location.href = "/";
+  const logoutUser = async () => {
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("draftProjects");
+      localStorage.removeItem("currentDraft");
+
+      setToken(null);
+      setUser(null);
+      setDraftProjects([]);
+
+      await signOut({ redirect: false });
+
+      toast.success("Logged out successfully!");
+
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 300);
+    } catch (error) {
+      console.error("Logout error:", error);
+      localStorage.clear();
+      setToken(null);
+      setUser(null);
+      window.location.href = "/";
+    }
   };
 
   const getAiImages = async () => {
@@ -166,7 +219,7 @@ const AppProvider = ({ children }) => {
     imageData,
     token,
     isUpdate = false,
-    projectId = null
+    projectId = null,
   ) => {
     try {
       const isBulkSave = Array.isArray(imageData);
@@ -181,7 +234,7 @@ const AppProvider = ({ children }) => {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(imageData),
-          }
+          },
         );
 
         if (!response.ok) {
@@ -193,12 +246,12 @@ const AppProvider = ({ children }) => {
 
         setImages((prevImages) =>
           prevImages.map((img) =>
-            img._id === projectId ? updatedProject : img
-          )
+            img._id === projectId ? updatedProject : img,
+          ),
         );
         try {
           const allDrafts = JSON.parse(
-            localStorage.getItem("draftProjects") || "[]"
+            localStorage.getItem("draftProjects") || "[]",
           );
           const updatedDrafts = allDrafts.filter(
             (draft) =>
@@ -206,7 +259,7 @@ const AppProvider = ({ children }) => {
                 draft.projectId === projectId ||
                 (draft.userId === imageData.userid &&
                   draft.featureType === imageData.featureType)
-              )
+              ),
           );
 
           localStorage.setItem("draftProjects", JSON.stringify(updatedDrafts));
@@ -242,13 +295,13 @@ const AppProvider = ({ children }) => {
         setImages((prevImages) => [...savedImages, ...prevImages]);
         try {
           const allDrafts = JSON.parse(
-            localStorage.getItem("draftProjects") || "[]"
+            localStorage.getItem("draftProjects") || "[]",
           );
           const updatedDrafts = allDrafts.filter((draft) => {
             const matches = savedImages.some(
               (saved) =>
                 draft.userId === saved.userid &&
-                draft.featureType === saved.featureType
+                draft.featureType === saved.featureType,
             );
             return !matches;
           });
@@ -256,12 +309,12 @@ const AppProvider = ({ children }) => {
           if (allDrafts.length !== updatedDrafts.length) {
             localStorage.setItem(
               "draftProjects",
-              JSON.stringify(updatedDrafts)
+              JSON.stringify(updatedDrafts),
             );
             console.log(
               "✅ Bulk drafts cleaned:",
               allDrafts.length - updatedDrafts.length,
-              "removed"
+              "removed",
             );
           }
         } catch (error) {
@@ -290,7 +343,7 @@ const AppProvider = ({ children }) => {
 
         try {
           const allDrafts = JSON.parse(
-            localStorage.getItem("draftProjects") || "[]"
+            localStorage.getItem("draftProjects") || "[]",
           );
           const updatedDrafts = allDrafts.filter(
             (draft) =>
@@ -299,13 +352,13 @@ const AppProvider = ({ children }) => {
                 draft.featureType === imageData.featureType &&
                 Math.abs(new Date(draft.lastEdited).getTime() - Date.now()) <
                   300000
-              )
+              ),
           );
 
           if (allDrafts.length !== updatedDrafts.length) {
             localStorage.setItem(
               "draftProjects",
-              JSON.stringify(updatedDrafts)
+              JSON.stringify(updatedDrafts),
             );
             localStorage.removeItem("currentDraft");
             console.log("✅ Related draft cleaned from AppContext");
@@ -340,15 +393,12 @@ const AppProvider = ({ children }) => {
         throw new Error(data.message || "Something went wrong");
       }
 
-      setUser((prev) => ({
-        ...prev,
-        ...data.user,
-      }));
-
+      // ✅ Sirf ek baar setUser call karo
       const updatedUser = {
         _id: data.user._id || user._id,
         name: data.user.username || data.user.name,
         email: data.user.email,
+        credits: Number(data.user.credits) || Number(user.credits) || 15,
       };
 
       setUser(updatedUser);
@@ -428,7 +478,7 @@ const AppProvider = ({ children }) => {
           (d) =>
             d.userId === draft.userId &&
             d.featureType === draft.featureType &&
-            d.id === draft.id
+            d.id === draft.id,
         );
         return index === firstIndex;
       });
@@ -450,6 +500,45 @@ const AppProvider = ({ children }) => {
       return updated;
     });
   };
+
+  const handleGoogleLogin = async (session) => {
+    try {
+      console.log("🟢 handleGoogleLogin called:", session);
+
+      if (!session?.user?.token) {
+        console.error("❌ No token in session");
+        return;
+      }
+
+      const userToSave = {
+        _id: session.user._id,
+        name: session.user.username || session.user.name,
+        email: session.user.email,
+        credits: Number(session.user.credits) || 15,
+      };
+
+      console.log("🟢 Saving user:", userToSave);
+
+      setUser(userToSave);
+      setToken(session.user.token);
+      localStorage.setItem("user", JSON.stringify(userToSave));
+      localStorage.setItem("token", session.user.token);
+
+      toast.success("Google login successful! 🎉");
+
+      setTimeout(() => {
+        if (session.user.isNewUser) {
+          window.location.href = "/register";
+        } else {
+          window.location.href = "/admin/dashboard";
+        }
+      }, 1000);
+    } catch (error) {
+      console.error("❌ Google login error:", error);
+      toast.error("Google login failed");
+    }
+  };
+
   const calculateProgress = (currentStep, totalSteps) => {
     const stepMap = {
       step1: 1,
@@ -460,7 +549,7 @@ const AppProvider = ({ children }) => {
     };
 
     const stepNumber = stepMap[currentStep] || 1;
-    const total = totalSteps > 0 ? totalSteps + 2 : 5; 
+    const total = totalSteps > 0 ? totalSteps + 2 : 5;
     return Math.round((stepNumber / total) * 100);
   };
 
@@ -490,6 +579,7 @@ const AppProvider = ({ children }) => {
         getProjectById,
         saveDraft,
         deleteDraft,
+        handleGoogleLogin,
       }}
     >
       {children}

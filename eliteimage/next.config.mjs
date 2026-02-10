@@ -25,8 +25,7 @@ const nextConfig = {
   // ✅ Compression
   compress: true,
 
-  // ✅ SWC Minification
-  swcMinify: true,
+
 
   // ✅ Experimental optimizations
   experimental: {

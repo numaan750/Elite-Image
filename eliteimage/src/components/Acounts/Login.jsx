@@ -3,6 +3,7 @@ import { useState, useContext } from "react";
 import { AppContext } from "@/context/AppContext";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
 
 // import { useRouter } from "next/navigation";
 
@@ -21,7 +22,7 @@ const Login = () => {
     setError("");
 
     const toastId = toast.loading(
-      isSignup ? "Creating account..." : "Logging in..."
+      isSignup ? "Creating account..." : "Logging in...",
     );
 
     if (isSignup) {
@@ -156,7 +157,20 @@ const Login = () => {
               <div className="flex-1 h-px bg-[#00000080]" />
             </div>
 
-            <button className="w-full border cursor-pointer py-2 rounded-md flex items-center justify-center gap-3 hover:bg-gray-50">
+            <button
+              onClick={() => {
+                localStorage.setItem(
+                  "googleAuthIntent",
+                  isSignup ? "register" : "login",
+                );
+                signIn("google", {
+                  callbackUrl: "/",
+                  redirect: true,
+                });
+              }}
+              className="w-full border cursor-pointer py-2 rounded-md 
+              flex items-center justify-center gap-3 hover:bg-gray-50"
+            >
               {isSignup ? "Sign up with Google" : "Login with Google"}
               <Image
                 src="https://www.svgrepo.com/show/475656/google-color.svg"

@@ -1,6 +1,8 @@
+"use client";
+import { AppContext } from "@/context/AppContext";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useContext } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
 const features = [
@@ -52,6 +54,8 @@ const features = [
 ];
 
 const AIEnhancement = () => {
+  const { user } = useContext(AppContext);
+
   return (
     <div className="w-auto">
       <main className="bg-white mt-14 sm:mt-16 lg:mt-15">
@@ -62,7 +66,7 @@ const AIEnhancement = () => {
             </h1>
 
             <h2 className="mt-4 sm:mt-6 lg:mt-10 text-[22px] sm:text-[24px] lg:text-[28px] font-semibold text-black leading-tight">
-              Welcome Back, Google  User
+              Welcome Back, Google User
             </h2>
 
             <p className="mt-2 text-black text-[14px] sm:text-[16px]">
@@ -72,10 +76,12 @@ const AIEnhancement = () => {
 
           <button className="flex items-center gap-2 rounded-lg bg-[#034F75] px-3 py-2 text-white w-full sm:w-auto lg:mt-16 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start">
             <span className="text-base mb-1">💳</span>
-            <span className="text-[16px] font-medium">Credits : 12</span>
+            <span className="text-[16px] font-medium">
+              Credits: {user?.credits !== undefined ? Number(user.credits) : 15}
+            </span>
           </button>
         </div>
-    
+
         <section className="mt-6 sm:mt-8 lg:mt-10 mb-6">
           <h3 className="text-[20px] sm:text-[28px] font-semibold text-black">
             AI Enhancement Features
