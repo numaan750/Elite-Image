@@ -52,11 +52,25 @@ export const signupUser = async (req, res) => {
     const hash = bcrypt.hashSync(password, 10);
 
     const user = await loginUserSchema.create({
-      email,
-      password: hash,
-      username,
-    });
-    res.status(201).json(user);
+  email,
+  password: hash,
+  username,
+  credits: 15,  // Default credits
+});
+console.log("✅ User created:", {
+  _id: user._id,
+  username: user.username,
+  credits: user.credits
+});
+// ✅ Password field response se remove karo
+const userResponse = {
+  _id: user._id,
+  username: user.username,
+  email: user.email,
+  credits: user.credits,
+};
+
+res.status(201).json(userResponse);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -91,17 +105,25 @@ export const loginUser = async (req, res) => {
         error: "Password does not match",
       });
     }
+
+    if (user.credits === undefined || user.credits === null) {
+      user.credits = 15;
+      await user.save();
+      console.log("✅ Credits added to existing user:", user.email);
+    }
+
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.status(200).json({
-      status: "success",
-      message: "Login successful",
-      token,
-      user: {
-        _id: user._id,
-        name: user.username, // 👈 frontend name expect karta hai
-        email: user.email,
-      },
-    });
+  status: "success",
+  message: "Login successful",
+  token,
+  user: {
+    _id: user._id,
+username: user.username,
+    email: user.email,
+     credits: Number(user.credits) || 15,  // ✅ Credits add kiye
+  },
+});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -158,6 +180,39 @@ export const deleteUser = async (req, res) => {
   try {
     const user = await loginUserSchema.findByIdAndDelete(req.params.id);
     res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ✅ YE NAYA FUNCTION ADD KARO
+export const deductCredits = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { creditsToDeduct } = req.body;
+
+    // User find karo
+    const user = await loginUserSchema.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check karo ke enough credits hain
+    if (user.credits < creditsToDeduct) {
+      return res.status(400).json({ 
+        message: "Insufficient credits",
+        currentCredits: user.credits 
+      });
+    }
+
+    // Credits deduct karo
+    user.credits -= creditsToDeduct;
+    await user.save();
+
+    res.status(200).json({
+      message: "Credits deducted successfully",
+      remainingCredits: user.credits,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

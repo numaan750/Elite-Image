@@ -14,6 +14,10 @@ const loginUserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+     credits: {
+        type: Number,
+        default: 15,  // Free signup credits
+    },
 });
 
 const loginUser = mongoose.model("loginUser", loginUserSchema);

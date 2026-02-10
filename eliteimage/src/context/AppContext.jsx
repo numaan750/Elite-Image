@@ -1,8 +1,7 @@
 "use client";
 
 import { createContext, useEffect, useState } from "react";
-import toast from "react-hot-toast"; // ← YE LINE ADD KARO
-
+import toast from "react-hot-toast";
 export const AppContext = createContext();
 
 const AppProvider = ({ children }) => {
@@ -12,19 +11,18 @@ const AppProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [draftProjects, setDraftProjects] = useState([]);
   const [images, setImages] = useState([]);
-  const [projectCache, setProjectCache] = useState({}); // ← YE LINE ADD KARO (Line 17)
+  const [projectCache, setProjectCache] = useState({});
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user"); // ← YE LINE ADD KARO
+    const savedUser = localStorage.getItem("user"); 
 
     if (savedToken) {
       setToken(savedToken);
     }
 
     if (savedUser) {
-      // ← YE BLOCK ADD KARO
       try {
         setUser(JSON.parse(savedUser));
       } catch (error) {
@@ -34,7 +32,6 @@ const AppProvider = ({ children }) => {
     }
 
     setLoading(false);
-    // Load drafts from localStorage
     const savedDrafts = localStorage.getItem("draftProjects");
     if (savedDrafts) {
       try {
@@ -88,13 +85,12 @@ const AppProvider = ({ children }) => {
 
   const logoutUser = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user"); // ← YE LINE ADD KARO
+    localStorage.removeItem("user"); 
     setToken(null);
     setUser(null);
     window.location.href = "/";
   };
 
-  // Fetch all aiImages from backend
   const getAiImages = async () => {
     setLoading(true);
     setError(null);
@@ -120,7 +116,6 @@ const AppProvider = ({ children }) => {
   };
 
   const deleteImages = async (id) => {
-    // UI se remove (optimistic)
     setImages((prev) => prev.filter((img) => img._id !== id));
 
     const res = await fetch(`${API_URL}/api/aiImagesmodels/${id}`, {
@@ -132,21 +127,16 @@ const AppProvider = ({ children }) => {
     });
 
     if (!res.ok) {
-      await getAiImages(); // restore list
+      await getAiImages();
       throw new Error("Failed to delete project");
     }
   };
 
-  // ✅ ADD THIS NEW FUNCTION
-  // ✅ UPDATED getProjectById with CACHE
   const getProjectById = async (projectId, useCache = true) => {
-    // ✅ STEP 1: Pehle cache check karo
     if (useCache && projectCache[projectId]) {
       console.log("✅ Loading from cache (instant)");
       return projectCache[projectId];
     }
-
-    // ✅ STEP 2: Cache mein nahi hai to API call karo
     console.log("📡 Fetching from API...");
     try {
       const res = await fetch(`${API_URL}/api/aiImagesmodels/${projectId}`, {
@@ -161,7 +151,6 @@ const AppProvider = ({ children }) => {
 
       const project = await res.json();
 
-      // ✅ STEP 3: Cache mein save karo
       setProjectCache((prev) => ({
         ...prev,
         [projectId]: project,
@@ -173,8 +162,6 @@ const AppProvider = ({ children }) => {
       throw err;
     }
   };
-
-  // ✅ UPDATE THIS FUNCTION (modify existing saveGeneratedImage)
   const saveGeneratedImage = async (
     imageData,
     token,
@@ -184,7 +171,6 @@ const AppProvider = ({ children }) => {
     try {
       const isBulkSave = Array.isArray(imageData);
 
-      // UPDATE mode
       if (isUpdate && projectId) {
         const response = await fetch(
           `${API_URL}/api/aiImagesmodels/${projectId}`,
@@ -210,8 +196,6 @@ const AppProvider = ({ children }) => {
             img._id === projectId ? updatedProject : img
           )
         );
-
-        // ✅ FIX: Delete draft after update
         try {
           const allDrafts = JSON.parse(
             localStorage.getItem("draftProjects") || "[]"
@@ -234,8 +218,6 @@ const AppProvider = ({ children }) => {
         toast.success("Project updated successfully!");
         return updatedProject;
       }
-
-      // BULK SAVE mode
       if (isBulkSave) {
         const savedImages = [];
         for (const data of imageData) {
@@ -258,14 +240,11 @@ const AppProvider = ({ children }) => {
         }
 
         setImages((prevImages) => [...savedImages, ...prevImages]);
-
-        // ✅ FIX: Delete all related drafts after bulk save
         try {
           const allDrafts = JSON.parse(
             localStorage.getItem("draftProjects") || "[]"
           );
           const updatedDrafts = allDrafts.filter((draft) => {
-            // Check if draft matches any saved project
             const matches = savedImages.some(
               (saved) =>
                 draft.userId === saved.userid &&
@@ -291,7 +270,6 @@ const AppProvider = ({ children }) => {
 
         return savedImages;
       } else {
-        // SINGLE SAVE mode
         const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
           method: "POST",
           headers: {
@@ -310,7 +288,6 @@ const AppProvider = ({ children }) => {
 
         setImages((prevImages) => [savedProject, ...prevImages]);
 
-        // ✅ FIX: Improved draft cleanup for single save
         try {
           const allDrafts = JSON.parse(
             localStorage.getItem("draftProjects") || "[]"
@@ -322,7 +299,7 @@ const AppProvider = ({ children }) => {
                 draft.featureType === imageData.featureType &&
                 Math.abs(new Date(draft.lastEdited).getTime() - Date.now()) <
                   300000
-              ) // 5 minutes
+              )
           );
 
           if (allDrafts.length !== updatedDrafts.length) {
@@ -345,7 +322,6 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  //profile k liya
   const updateProfile = async (userId, userData) => {
     setLoading(true);
     try {
@@ -388,7 +364,6 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  // Update Password Function
   const updatePassword = async (userId, passwordData) => {
     setLoading(true);
     try {
@@ -417,12 +392,8 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  // Save draft function
-  // Save draft function
-  // Save draft function - ✅ IMPROVED VERSION
   const saveDraft = (formData, currentStep) => {
     try {
-      // ✅ Get existing draftId from URL or formData
       const existingDraftId = formData.draftId;
       const draftId =
         existingDraftId ||
@@ -437,7 +408,6 @@ const AppProvider = ({ children }) => {
         progress: calculateProgress(currentStep, formData.totalSteps),
       };
 
-      // ✅ FIX: Direct localStorage operation without state update during render
       const savedDrafts = localStorage.getItem("draftProjects");
       const currentDrafts = savedDrafts ? JSON.parse(savedDrafts) : [];
 
@@ -445,17 +415,14 @@ const AppProvider = ({ children }) => {
       let updatedDrafts;
 
       if (existingIndex > -1) {
-        // Update existing draft
         updatedDrafts = [...currentDrafts];
         updatedDrafts[existingIndex] = draftProject;
         console.log("📝 Draft updated:", draftId);
       } else {
-        // Add new draft
         updatedDrafts = [draftProject, ...currentDrafts];
         console.log("📝 New draft created:", draftId);
       }
 
-      // Remove duplicates based on userId + featureType
       const uniqueDrafts = updatedDrafts.filter((draft, index, self) => {
         const firstIndex = self.findIndex(
           (d) =>
@@ -466,10 +433,7 @@ const AppProvider = ({ children }) => {
         return index === firstIndex;
       });
 
-      // Save to localStorage
       localStorage.setItem("draftProjects", JSON.stringify(uniqueDrafts));
-
-      // ✅ Schedule state update for next tick (avoid render-time setState)
       setTimeout(() => {
         setDraftProjects(uniqueDrafts);
       }, 0);
@@ -479,8 +443,6 @@ const AppProvider = ({ children }) => {
       return formData.draftId || null;
     }
   };
-
-  // Delete draft function
   const deleteDraft = (draftId) => {
     setDraftProjects((prev) => {
       const updated = prev.filter((d) => d.id !== draftId);
@@ -488,8 +450,6 @@ const AppProvider = ({ children }) => {
       return updated;
     });
   };
-
-  // Calculate progress helper
   const calculateProgress = (currentStep, totalSteps) => {
     const stepMap = {
       step1: 1,
@@ -500,7 +460,7 @@ const AppProvider = ({ children }) => {
     };
 
     const stepNumber = stepMap[currentStep] || 1;
-    const total = totalSteps > 0 ? totalSteps + 2 : 5; // +2 for step4 and step5
+    const total = totalSteps > 0 ? totalSteps + 2 : 5; 
     return Math.round((stepNumber / total) * 100);
   };
 
@@ -527,7 +487,7 @@ const AppProvider = ({ children }) => {
         logoutUser,
         updateProfile,
         updatePassword,
-        getProjectById, // ← YE LINE ADD KARO
+        getProjectById,
         saveDraft,
         deleteDraft,
       }}
