@@ -9,10 +9,10 @@ import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 const Step3 = ({ formData, setFormData, next, back, featureType }) => {
-  const { token, saveGeneratedImage, user, saveDraft } = useContext(AppContext);
+  const { token, saveGeneratedImage, user, saveDraft, deductUserCredits } =
+    useContext(AppContext);
   const router = useRouter();
 
-  // ✅ ADD THIS:
   useEffect(() => {
     if (!formData.featureType) {
       toast.error("Please select a feature first");
@@ -26,7 +26,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  // Auto-save on style change
   useEffect(() => {
     if (selected) {
       const timeoutId = setTimeout(() => {
@@ -49,10 +48,15 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [selected]); // ✅ Remove formData and saveDraft from dependencies
+  }, [selected]);
 
   const handleGenerate = async () => {
-    // ✅ STEP 1: Validation (instant - 0ms)
+  const imageCount = formData.uploadedImages.length;
+  const creditsNeeded = imageCount * 5;
+  const canProceed = await deductUserCredits(creditsNeeded);
+  if (!canProceed) {
+    return;
+  }
     if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
       toast.error("Please upload at least one image first!");
       return;
@@ -62,98 +66,103 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
       toast.error("Please login to save images");
       return;
     }
-
-    // ✅ STEP 2: Update local state immediately (instant UI update)
     setFormData((prev) => ({
       ...prev,
       selectedStyle: selected,
     }));
 
-    // ✅ STEP 3: Show success toast INSTANTLY
     toast.success(`Processing ${formData.uploadedImages.length} image(s)...`, {
       id: "processing",
       duration: 2000,
     });
 
-    // ✅ STEP 4: Navigate to next page IMMEDIATELY (no waiting!)
     next();
 
-    // ✅ STEP 5: Process & save in BACKGROUND (async, non-blocking)
     setIsSaving(true);
 
     (async () => {
       try {
         const CLOUD_NAME = "drh7q62eh";
-  const UPLOAD_PRESET = "unsigned_preset";
+        const UPLOAD_PRESET = "unsigned_preset";
 
         const uploadToCloudinary = async (imageSource, index) => {
-  let imageBlob;
+          let imageBlob;
 
-  try {
-    console.log(`🚀 [${index + 1}] Uploading to Cloudinary...`);
+          try {
+            console.log(`🚀 [${index + 1}] Uploading to Cloudinary...`);
 
-    if (typeof imageSource === "string" && imageSource.startsWith("blob:")) {
-      const localFile = formData.localFiles?.[index];
-      if (localFile) {
-        imageBlob = localFile;
-      } else {
-        const response = await fetch(imageSource);
-        imageBlob = await response.blob();
-      }
-    } else if (typeof imageSource === "string" && imageSource.startsWith("http")) {
-      return imageSource; // Already uploaded
-    } else if (typeof imageSource === "string" && imageSource.startsWith("data:")) {
-      const response = await fetch(imageSource);
-      imageBlob = await response.blob();
-    } else if (imageSource instanceof File || imageSource instanceof Blob) {
-      imageBlob = imageSource;
-    } else {
-      throw new Error("Unsupported image format");
-    }
+            if (
+              typeof imageSource === "string" &&
+              imageSource.startsWith("blob:")
+            ) {
+              const localFile = formData.localFiles?.[index];
+              if (localFile) {
+                imageBlob = localFile;
+              } else {
+                const response = await fetch(imageSource);
+                imageBlob = await response.blob();
+              }
+            } else if (
+              typeof imageSource === "string" &&
+              imageSource.startsWith("http")
+            ) {
+              return imageSource;
+            } else if (
+              typeof imageSource === "string" &&
+              imageSource.startsWith("data:")
+            ) {
+              const response = await fetch(imageSource);
+              imageBlob = await response.blob();
+            } else if (
+              imageSource instanceof File ||
+              imageSource instanceof Blob
+            ) {
+              imageBlob = imageSource;
+            } else {
+              throw new Error("Unsupported image format");
+            }
 
-    const fd = new FormData();
-    fd.append("file", imageBlob);
-    fd.append("upload_preset", UPLOAD_PRESET);
+            const fd = new FormData();
+            fd.append("file", imageBlob);
+            fd.append("upload_preset", UPLOAD_PRESET);
 
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-      { method: "POST", body: fd },
-    );
+            const response = await fetch(
+              `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+              { method: "POST", body: fd },
+            );
 
-    console.log(`📡 [${index + 1}] Response status:`, response.status);
+            console.log(`📡 [${index + 1}] Response status:`, response.status);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error(`❌ [${index + 1}] Upload failed:`, errorData);
-      throw new Error(`Upload failed: ${errorData.error?.message || "Unknown error"}`);
-    }
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error(`❌ [${index + 1}] Upload failed:`, errorData);
+              throw new Error(
+                `Upload failed: ${errorData.error?.message || "Unknown error"}`,
+              );
+            }
 
-    const data = await response.json();
-    console.log(`✅ [${index + 1}] Upload success:`, data.secure_url);
+            const data = await response.json();
+            console.log(`✅ [${index + 1}] Upload success:`, data.secure_url);
 
-    if (!data.secure_url) {
-      throw new Error("No secure_url in response");
-    }
+            if (!data.secure_url) {
+              throw new Error("No secure_url in response");
+            }
 
-    return data.secure_url;
-  } catch (error) {
-    console.error(`❌ [${index + 1}] Upload error:`, error);
-    throw error;
-  }
-};
+            return data.secure_url;
+          } catch (error) {
+            console.error(`❌ [${index + 1}] Upload error:`, error);
+            throw error;
+          }
+        };
 
         const allProcessedData = [];
 
-        // ✅ PARALLEL processing - all images at once
         const processingPromises = formData.uploadedImages.map(
           async (uploadedImage, i) => {
             try {
-              // Upload original image
               const originalUrl = await uploadToCloudinary(uploadedImage, i);
 
-              // ✅ For now, use same image as processed (simulate processing)
-              // In real app, you'd call your AI processing API here
-              const processedUrl = originalUrl; // or await processImage(originalUrl)
+              const processedUrl = originalUrl;
 
               return {
                 originalImage: originalUrl,
@@ -177,7 +186,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
         const results = await Promise.all(processingPromises);
 
-        // Filter out any failed uploads
         const successfulResults = results.filter((result) => result !== null);
 
         if (successfulResults.length === 0) {
@@ -186,7 +194,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
         allProcessedData.push(...successfulResults);
 
-        // Save to backend
         const backendPayload = {
           userid: user?._id || formData.userId,
           title: `${formData.featureType} - ${successfulResults.length} Images - ${new Date().toLocaleDateString()}`,
@@ -202,7 +209,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
           image: allProcessedData[0].processedImage,
         };
 
-        // Update state for Step4
         setFormData((prev) => ({
           ...prev,
           beforeAfterData: allProcessedData,
@@ -211,7 +217,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
         await saveGeneratedImage(backendPayload, token);
 
-        // Delete draft
         const urlParams = new URLSearchParams(window.location.search);
         const draftId = urlParams.get("draftId") || formData.draftId;
 
@@ -318,7 +323,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
       </div>
 
       <div className=" flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
-        {/* Back Button (Left) */}
         <button
           onClick={back}
           className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
@@ -327,7 +331,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
           Back
         </button>
 
-        {/* Generate Button (Right) */}
         <button
           onClick={handleGenerate}
           disabled={!selected || isSaving}

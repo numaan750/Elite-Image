@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 const EditProjectPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { token, saveGeneratedImage, getProjectById } = useContext(AppContext);
+  const { token, saveGeneratedImage, getProjectById, deductUserCredits } = useContext(AppContext);
 
   const [formData, setFormData] = useState({
     uploadedImages: [],
@@ -96,6 +96,13 @@ const EditProjectPage = () => {
   }, [isDragging]);
 
   const handleGenerate = async () => {
+  const imageCount = formData.uploadedImages.length;
+  const creditsNeeded = imageCount * 5;
+  const canProceed = await deductUserCredits(creditsNeeded);
+  if (!canProceed) {
+    return;
+  }
+    
     if (!token) {
       toast.error("Please login to save images");
       return;

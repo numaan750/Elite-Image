@@ -9,7 +9,6 @@ import { AppContext } from "@/context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 
-// import { useSearchParams } from "next/navigation"; // ✅ ADD THIS
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { useRouter } from "next/navigation";
@@ -20,7 +19,7 @@ const UPLOAD_PRESET = "unsigned_preset";
 const uploadToCloudinary = async (imageUrl) => {
   try {
     console.log("🚀 Uploading to Cloudinary...");
-    
+
     const formData = new FormData();
 
     let imageBlob;
@@ -85,17 +84,14 @@ const processImage = async (imageUrl, options) => {
 
 const downloadImagesAsZip = async (formData) => {
   try {
-    // ✅ SKY REPLACEMENT KE LIYE SPECIAL HANDLING
     if (formData.featureType === "Sky Replacement" && formData.projectId) {
-      // Prepare payload for backend
       const backendPayload = {
-        beforeAfterData: formData.beforeAfterData, // processed images
-        uploadedImages: formData.uploadedImages, // original images
-        selectedFeature: formData.selectedFeatures, // selected sky
+        beforeAfterData: formData.beforeAfterData,
+        uploadedImages: formData.uploadedImages,
+        selectedFeature: formData.selectedFeatures,
         featureType: "Sky Replacement",
         finalNotes: formData.finalNotes || "",
       };
-      // await saveGeneratedImage(backendPayload, token, true, formData.projectId);
 
       toast.success("Sky Replacement images saved!", { id: "processing" });
 
@@ -108,7 +104,6 @@ const downloadImagesAsZip = async (formData) => {
           const blob = await response.blob();
 
           if (window.showSaveFilePicker) {
-            // Open save dialog first, immediately on click
             let fileHandle;
             try {
               fileHandle = await window.showSaveFilePicker({
@@ -123,10 +118,10 @@ const downloadImagesAsZip = async (formData) => {
             } catch (error) {
               if (error.name === "AbortError") {
                 toast.error("Download cancelled", { id: "zip" });
-                return; // stop execution if user cancels
+                return;
               } else {
                 console.error("Save dialog error:", error);
-                fileHandle = null; // fallback to saveAs
+                fileHandle = null;
               }
             }
 
@@ -136,7 +131,6 @@ const downloadImagesAsZip = async (formData) => {
 
             toast.success("Image downloaded!", { id: "download" });
           } else {
-            // fallback
             saveAs(blob, "sky-replacement-image.jpg");
             toast.success("Image downloaded!", { id: "download" });
           }
@@ -150,10 +144,8 @@ const downloadImagesAsZip = async (formData) => {
 
         return;
       }
-      // ✅ MULTIPLE IMAGES - ZIP DOWNLOAD
       toast.loading("Select download location...", { id: "download-init" });
 
-      // Location select PEHLE
       let fileHandle;
       try {
         fileHandle = await window.showSaveFilePicker({
@@ -170,7 +162,6 @@ const downloadImagesAsZip = async (formData) => {
           toast.error("Download cancelled", { id: "download-init" });
           return;
         }
-        // Agar showSaveFilePicker support nahi karta
         if (!window.showSaveFilePicker) {
           toast.loading("Creating ZIP file...", { id: "download-init" });
 
@@ -201,7 +192,6 @@ const downloadImagesAsZip = async (formData) => {
         throw error;
       }
 
-      // Ab ZIP create karo with progress
       toast.loading("Creating ZIP file...", { id: "download-init" });
       const zip = new JSZip();
       const folder = zip.folder("Elite-Image-AI-Sky-Replacement");
@@ -227,7 +217,6 @@ const downloadImagesAsZip = async (formData) => {
       toast.loading("Finalizing download...", { id: "download-init" });
       const zipBlob = await zip.generateAsync({ type: "blob" });
 
-      // Write to selected location
       const writableStream = await fileHandle.createWritable();
       await writableStream.write(zipBlob);
       await writableStream.close();
@@ -240,7 +229,6 @@ const downloadImagesAsZip = async (formData) => {
     }
     const processedData = formData.beforeAfterData;
 
-    // Check if data exists
     if (
       !processedData ||
       (Array.isArray(processedData) && processedData.length === 0)
@@ -248,10 +236,6 @@ const downloadImagesAsZip = async (formData) => {
       toast.error("No images to download");
       return;
     }
-
-    // toast.loading("Preparing download...", { id: "zip" });
-
-    // Handle both array and single object
     const dataArray = Array.isArray(processedData)
       ? processedData
       : [processedData];
@@ -295,7 +279,6 @@ const downloadImagesAsZip = async (formData) => {
       return;
     }
 
-    // Location select PEHLE karo
     toast.loading("Select download location...", { id: "download-init" });
 
     let fileHandle;
@@ -314,7 +297,6 @@ const downloadImagesAsZip = async (formData) => {
         toast.error("Download cancelled", { id: "download-init" });
         return;
       }
-      // Fallback for old browsers
       if (!window.showSaveFilePicker) {
         toast.loading("Creating ZIP file...", { id: "download-init" });
 
@@ -343,7 +325,6 @@ const downloadImagesAsZip = async (formData) => {
       throw error;
     }
 
-    // Ab ZIP create karo with progress
     toast.loading("Creating ZIP file...", { id: "download-init" });
     const zip = new JSZip();
     const folder = zip.folder("Elite-Image-AI");
@@ -368,7 +349,6 @@ const downloadImagesAsZip = async (formData) => {
     toast.loading("Finalizing download...", { id: "download-init" });
     const zipBlob = await zip.generateAsync({ type: "blob" });
 
-    // Write to selected location
     const writableStream = await fileHandle.createWritable();
     await writableStream.write(zipBlob);
     await writableStream.close();
@@ -417,10 +397,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   const { saveDraft } = useContext(AppContext);
   const searchParams = useSearchParams();
 
-  // LINE 56-61: useEffect ko update karo
-
-  // LINE 56-78: Pehle jo useEffect tha use REPLACE karo is se:
-
   useEffect(() => {
     if (!formData.featureType) {
       toast.error("Please select a feature first");
@@ -428,9 +404,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
     }
   }, [formData.featureType, router]);
 
-  // ✅ REPLACE the new useEffect with this corrected version:
   useEffect(() => {
-    // Pre-load images to prevent loading delay (browser only)
     if (typeof window !== "undefined" && formData.beforeAfterData) {
       const dataArray = Array.isArray(formData.beforeAfterData)
         ? formData.beforeAfterData
@@ -438,7 +412,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
       dataArray.forEach((data) => {
         if (data.processedImage) {
-          // ✅ Use window.Image instead of new Image()
           const img = window.Image ? new window.Image() : null;
           if (img) {
             img.src = data.processedImage;
@@ -471,7 +444,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
     };
   }, [isDragging]);
 
-  // Save to draft when processing completes
   useEffect(() => {
     if (
       formData.beforeAfterData &&
@@ -494,9 +466,8 @@ const Step4 = ({ formData, setFormData, next, back }) => {
         console.error("Error saving draft:", error);
       }
     }
-  }, [formData.beforeAfterData]); // ✅ Only watch beforeAfterData
+  }, [formData.beforeAfterData]);
 
-  // Remove draft when user reaches Step 4
   useEffect(() => {
     const removeDraftFromList = () => {
       try {
@@ -524,7 +495,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
     };
 
     removeDraftFromList();
-  }, []); // Component mount hone par ek baar chalega
+  }, []);
 
   // ✅ ADD THIS COMPLETE useEffect
   // useEffect(() => {
@@ -702,8 +673,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
-      {/* <Toaster position="top-right" reverseOrder={false} /> */}
-
       <div className="w-full flex justify-start">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
           {/* <div className="flex items-center gap-2">
@@ -836,8 +805,8 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                     >
                       <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
-                cursor-ew-resize border-2 border-[#034F75]"
+                          w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
+                          cursor-ew-resize border-2 border-[#034F75]"
                         onMouseDown={() => setIsDragging(index)}
                         onTouchStart={() => setIsDragging(index)}
                       >
@@ -916,14 +885,14 @@ const Step4 = ({ formData, setFormData, next, back }) => {
               formData.beforeAfterData.length === 0)
           }
           className={`w-full sm:w-[280px] flex items-center justify-center gap-2 text-[16px] sm:text-[18px] py-2.5 sm:py-3 rounded-lg transition-colors
-    ${
-      formData.beforeAfterData &&
-      ((Array.isArray(formData.beforeAfterData) &&
-        formData.beforeAfterData.length > 0) ||
-        formData.beforeAfterData.processedImage)
-        ? "bg-[#034F75] text-white hover:bg-[#023d5c] cursor-pointer"
-        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-    }`}
+            ${
+              formData.beforeAfterData &&
+              ((Array.isArray(formData.beforeAfterData) &&
+                formData.beforeAfterData.length > 0) ||
+                formData.beforeAfterData.processedImage)
+                ? "bg-[#034F75] text-white hover:bg-[#023d5c] cursor-pointer"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
         >
           <PiDownload size={20} className="sm:w-5 sm:h-5" />
           <span>

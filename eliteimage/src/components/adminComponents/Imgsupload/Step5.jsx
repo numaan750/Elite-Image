@@ -9,12 +9,17 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 
 const Step5 = ({ formData, setFormData, back }) => {
-  const { token, saveGeneratedImage, saveDraft, deleteDraft } =
-    useContext(AppContext);
+  const {
+    token,
+    saveGeneratedImage,
+    saveDraft,
+    deleteDraft,
+    deductUserCredits,
+  } = useContext(AppContext);
   const searchParams = useSearchParams();
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
-  const [isSaving, setIsSaving] = useState(false); // ✅ ADD THIS
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,7 +29,6 @@ const Step5 = ({ formData, setFormData, back }) => {
     }
   }, [formData.featureType, router]);
 
-  // Initialize slider positions for each image
   useEffect(() => {
     const initialPositions = {};
     formData.uploadedImages.forEach((_, index) => {
@@ -56,37 +60,36 @@ const Step5 = ({ formData, setFormData, back }) => {
     };
   }, [isDragging]);
 
-const handleGenerate = async () => {
-    // STEP 1: Validation
+  const handleGenerate = async () => {
+  const imageCount = formData.uploadedImages.length;
+  const creditsNeeded = imageCount * 5;
+  const canProceed = await deductUserCredits(creditsNeeded);
+  if (!canProceed) {
+    return;
+  }
     if (!token) {
       toast.error("Please login to save images");
       return;
     }
-
-    // STEP 2: Prepare updated data
     const finalData = {
       ...formData,
       finalNotes: editDescription,
       lastModified: new Date().toISOString(),
     };
-
-    // STEP 3: Update beforeAfterData with edit prompt
-    const updatedBeforeAfterData = formData.beforeAfterData 
-      ? (Array.isArray(formData.beforeAfterData) 
-          ? formData.beforeAfterData.map(item => ({
-              ...item,
-              editPrompt: editDescription,
-              editedAt: new Date().toISOString()
-            }))
-          : {
-              ...formData.beforeAfterData,
-              editPrompt: editDescription,
-              editedAt: new Date().toISOString()
-            }
-        )
+    const updatedBeforeAfterData = formData.beforeAfterData
+      ? Array.isArray(formData.beforeAfterData)
+        ? formData.beforeAfterData.map((item) => ({
+            ...item,
+            editPrompt: editDescription,
+            editedAt: new Date().toISOString(),
+          }))
+        : {
+            ...formData.beforeAfterData,
+            editPrompt: editDescription,
+            editedAt: new Date().toISOString(),
+          }
       : [];
 
-    // STEP 4: Update formData with new data
     setFormData((prev) => ({
       ...prev,
       beforeAfterData: updatedBeforeAfterData,
@@ -94,10 +97,7 @@ const handleGenerate = async () => {
       lastModified: new Date().toISOString(),
     }));
 
-    // STEP 5: Navigate back to Step 4 INSTANTLY (NO loading!)
-    back(); // ✅ Step 4 par wapis chala jayega
-
-    // STEP 6: Save in BACKGROUND (optional - user ko dikhega nahi)
+    back();
     (async () => {
       try {
         const backendPayload = {
@@ -106,22 +106,34 @@ const handleGenerate = async () => {
           description: editDescription,
           featureType: finalData.featureType,
           uploadedImages: finalData.uploadedImages,
-          selectedFeature: finalData.selectedFeature ? [finalData.selectedFeature] : [],
-          selectedStyle: finalData.selectedStyle ? [finalData.selectedStyle] : [],
-          beforeAfterData: Array.isArray(updatedBeforeAfterData) ? updatedBeforeAfterData : [updatedBeforeAfterData],
+          selectedFeature: finalData.selectedFeature
+            ? [finalData.selectedFeature]
+            : [],
+          selectedStyle: finalData.selectedStyle
+            ? [finalData.selectedStyle]
+            : [],
+          beforeAfterData: Array.isArray(updatedBeforeAfterData)
+            ? updatedBeforeAfterData
+            : [updatedBeforeAfterData],
           finalNotes: editDescription,
-          image: (Array.isArray(updatedBeforeAfterData) 
-            ? updatedBeforeAfterData[0]?.processedImage 
-            : updatedBeforeAfterData?.processedImage) || finalData.uploadedImages[0],
+          image:
+            (Array.isArray(updatedBeforeAfterData)
+              ? updatedBeforeAfterData[0]?.processedImage
+              : updatedBeforeAfterData?.processedImage) ||
+            finalData.uploadedImages[0],
         };
 
         if (formData.projectId) {
-          await saveGeneratedImage(backendPayload, token, true, formData.projectId);
+          await saveGeneratedImage(
+            backendPayload,
+            token,
+            true,
+            formData.projectId,
+          );
         } else {
           await saveGeneratedImage(backendPayload, token);
         }
 
-        // Delete draft silently in background
         const urlParams = new URLSearchParams(window.location.search);
         const draftId = urlParams.get("draftId") || formData.draftId;
 
@@ -129,15 +141,18 @@ const handleGenerate = async () => {
           const savedDrafts = localStorage.getItem("draftProjects");
           if (savedDrafts) {
             const drafts = JSON.parse(savedDrafts);
-            const updatedDrafts = drafts.filter((draft) => draft.id !== draftId);
-            localStorage.setItem("draftProjects", JSON.stringify(updatedDrafts));
+            const updatedDrafts = drafts.filter(
+              (draft) => draft.id !== draftId,
+            );
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(updatedDrafts),
+            );
           }
         }
         localStorage.removeItem("currentDraft");
-
       } catch (error) {
         console.error("❌ Background save failed:", error);
-        // Don't show error to user - save failed silently
       }
     })();
   };
@@ -181,7 +196,8 @@ const handleGenerate = async () => {
           Edit Your Image Instantly
         </h3>
         <p className="text-[12px] sm:text-[16px] lg:text-[18px] text-black mb-3 sm:mb-4">
-         The image is ready to edit. Enter your prompt below to apply changes instantly.
+          The image is ready to edit. Enter your prompt below to apply changes
+          instantly.
         </p>
 
         <div className="relative w-full rounded-xl overflow-hidden flex items-center justify-center ">
@@ -204,7 +220,7 @@ const handleGenerate = async () => {
                 <div className="flex flex-col gap-3 sm:gap-4">
                   <div
                     className="relative w-full h-[220px] sm:h-[300px] lg:h-[420px]
- bg-gray-100 rounded-lg overflow-hidden cursor-ew-resize select-none"
+                     bg-gray-100 rounded-lg overflow-hidden cursor-ew-resize select-none"
                     onMouseMove={(e) => {
                       if (isDragging !== index) return;
                       const rect = e.currentTarget.getBoundingClientRect();
@@ -226,7 +242,6 @@ const handleGenerate = async () => {
                       }));
                     }}
                   >
-                    {/* Before Image (Full) */}
                     <div className="absolute inset-0">
                       <Image
                         src={img}
@@ -238,7 +253,6 @@ const handleGenerate = async () => {
                       />
                     </div>
 
-                    {/* After Image (Clipped) */}
                     <div
                       className="absolute inset-0"
                       style={{
@@ -263,7 +277,7 @@ const handleGenerate = async () => {
                       style={{ left: `${sliderPositions[index] || 50}%` }}
                     >
                       {/* Slider Handle */}
-                      {/* <div
+                    {/* <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
                         w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow-xl flex items-center justify-center
                         cursor-ew-resize border-2 border-[#034F75]"
@@ -306,7 +320,6 @@ const handleGenerate = async () => {
         </div>
 
         <div className="flex justify-between gap-3 w-full">
-          {/* Back Button (LEFT) */}
           <button
             onClick={back}
             className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
@@ -314,7 +327,6 @@ const handleGenerate = async () => {
             Cancel
           </button>
 
-          {/* Generate Button (RIGHT) */}
           <button
             onClick={handleGenerate}
             disabled={isSaving}

@@ -13,6 +13,7 @@ const AppProvider = ({ children }) => {
   const [draftProjects, setDraftProjects] = useState([]);
   const [images, setImages] = useState([]);
   const [projectCache, setProjectCache] = useState({});
+  const [userCredits, setUserCredits] = useState(0);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const { data: session } = useSession();
@@ -34,11 +35,13 @@ const AppProvider = ({ children }) => {
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
+        const credits = Number(parsedUser.credits); // ✅ No fallback at all
 
         setUser({
           ...parsedUser,
-          credits: Number(parsedUser.credits) || 15,
+          credits: credits,
         });
+        setUserCredits(credits);
       } catch (error) {
         console.error("Error parsing user:", error);
         localStorage.removeItem("user");
@@ -72,7 +75,7 @@ const AppProvider = ({ children }) => {
           _id: data._id,
           name: data.username,
           email: data.email,
-          credits: Number(data.credits) || 15,
+          credits: Number(data.credits),
         };
 
         setUser(userToSave);
@@ -90,15 +93,21 @@ const AppProvider = ({ children }) => {
   };
 
   const loginUser = async (email, password) => {
-    const res = await fetch("https://elite-image.vercel.app/api/loginUser/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    const res = await fetch(
+      "https://elite-image.vercel.app/api/loginUser/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      },
+    );
 
     const data = await res.json();
 
     if (data.token) {
+      // ✅ Pehle purana user localStorage se hatao
+      localStorage.removeItem("user");
+
       localStorage.setItem("token", data.token);
       setToken(data.token);
       if (data.user) {
@@ -106,9 +115,10 @@ const AppProvider = ({ children }) => {
           _id: data.user._id,
           name: data.user.username || data.user.name,
           email: data.user.email,
-          credits: Number(data.user.credits) || 15,
+          credits: Number(data.user.credits), // ✅ No fallback - trust backend
         };
         setUser(userToSave);
+        setUserCredits(Number(data.user.credits));
         localStorage.setItem("user", JSON.stringify(userToSave));
       }
       window.location.href = "/admin/dashboard";
@@ -398,7 +408,7 @@ const AppProvider = ({ children }) => {
         _id: data.user._id || user._id,
         name: data.user.username || data.user.name,
         email: data.user.email,
-        credits: Number(data.user.credits) || Number(user.credits) || 15,
+        credits: Number(data.user.credits) ?? Number(user.credits) ?? 0,
       };
 
       setUser(updatedUser);
@@ -501,6 +511,62 @@ const AppProvider = ({ children }) => {
     });
   };
 
+  const deductUserCredits = async (creditsToDeduct = 5) => {
+    try {
+      if (!user?._id) {
+        toast.error("User not logged in");
+        return false;
+      }
+
+      const currentCredits = Number(user.credits) || 0;
+      const deductAmount = Number(creditsToDeduct) || 0;
+
+      if (currentCredits < deductAmount) {
+        const imagesCount = deductAmount / 5;
+        toast.error(
+          `You need ${deductAmount} credits for ${imagesCount} image${imagesCount > 1 ? "s" : ""}. You have ${currentCredits}. Please buy more.`
+        );
+        return false;
+      }
+
+      const response = await fetch(
+        `${API_URL}/api/loginUser/${user._id}/deduct-credits`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ creditsToDeduct }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to deduct credits");
+      }
+
+      const updatedUser = {
+        ...user,
+        credits: data.remainingCredits,
+      };
+
+      setUser(updatedUser);
+      setUserCredits(data.remainingCredits);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      toast.success(
+        `${creditsToDeduct} credits deducted. Remaining: ${data.remainingCredits}`,
+      );
+      return true;
+    } catch (error) {
+      console.error("Credit deduction error:", error);
+      toast.error(error.message || "Failed to deduct credits");
+      return false;
+    }
+  };
+
   const handleGoogleLogin = async (session) => {
     try {
       console.log("🟢 handleGoogleLogin called:", session);
@@ -514,7 +580,7 @@ const AppProvider = ({ children }) => {
         _id: session.user._id,
         name: session.user.username || session.user.name,
         email: session.user.email,
-        credits: Number(session.user.credits) || 15,
+        credits: Number(session.user.credits),
       };
 
       console.log("🟢 Saving user:", userToSave);
@@ -568,6 +634,7 @@ const AppProvider = ({ children }) => {
         error,
         images,
         draftProjects,
+        userCredits,
         getAiImages,
         deleteImages,
         saveGeneratedImage,
@@ -580,6 +647,7 @@ const AppProvider = ({ children }) => {
         saveDraft,
         deleteDraft,
         handleGoogleLogin,
+        deductUserCredits,
       }}
     >
       {children}

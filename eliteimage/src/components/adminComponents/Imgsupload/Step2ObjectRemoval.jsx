@@ -9,10 +9,9 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
-  const { token, saveGeneratedImage, user } = useContext(AppContext);
+  const { token, saveGeneratedImage, user, deductUserCredits } =
+    useContext(AppContext);
   const { saveDraft } = useContext(AppContext);
-
-  // ✅ ADD THIS:
   useEffect(() => {
     if (!formData.featureType) {
       toast.error("Please select a feature first");
@@ -84,8 +83,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
     setIsDragging(false);
   };
-
-  // Auto-save on area selection
   useEffect(() => {
     if (Object.keys(selectedAreas).length > 0) {
       const timeoutId = setTimeout(() => {
@@ -108,8 +105,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [selectedAreas]); // ✅ Remove formData and saveDraft from dependencies
-
+  }, [selectedAreas]);
   const getSelectionStyle = () => {
     if (!dragStart || !dragEnd) return {};
 
@@ -134,7 +130,12 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     next();
   };
   const handleRemoveObject = async () => {
-    // ✅ STEP 1: Validation (instant - 0ms)
+  const imageCount = formData.uploadedImages.length;
+  const creditsNeeded = imageCount * 5;
+  const canProceed = await deductUserCredits(creditsNeeded);
+  if (!canProceed) {
+    return;
+  }
     if (!token) {
       toast.error("Please login first");
       return;
@@ -145,69 +146,64 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
       return;
     }
 
-    // ✅ STEP 2: Show success toast INSTANTLY
     toast.loading("Processing images...", { id: "remove" });
 
-    // ✅ STEP 3: Navigate to next page IMMEDIATELY
-    // next();
-
-    // ✅ STEP 4: Process & save in BACKGROUND (async, non-blocking)
     (async () => {
       try {
         const allUploadedImages = [];
         const allBeforeAfterData = [];
         const CLOUD_NAME = "drh7q62eh";
-  const UPLOAD_PRESET = "unsigned_preset";
+        const UPLOAD_PRESET = "unsigned_preset";
 
+        const uploadToCloudinary = async (img) => {
+          let blob;
 
-       const uploadToCloudinary = async (img) => {
-  let blob;
-  
-  try {
-    console.log("🚀 Uploading image to Cloudinary...");
-    
-    if (img.startsWith("blob:")) {
-      const idx = formData.uploadedImages.indexOf(img);
-      blob = formData.localFiles?.[idx] || (await fetch(img).then((r) => r.blob()));
-    } else {
-      blob = await fetch(img).then((r) => r.blob());
-    }
+          try {
+            console.log("🚀 Uploading image to Cloudinary...");
 
-    const fd = new FormData();
-    fd.append("file", blob);
-    fd.append("upload_preset", UPLOAD_PRESET);
+            if (img.startsWith("blob:")) {
+              const idx = formData.uploadedImages.indexOf(img);
+              blob =
+                formData.localFiles?.[idx] ||
+                (await fetch(img).then((r) => r.blob()));
+            } else {
+              blob = await fetch(img).then((r) => r.blob());
+            }
 
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-      { method: "POST", body: fd },
-    );
+            const fd = new FormData();
+            fd.append("file", blob);
+            fd.append("upload_preset", UPLOAD_PRESET);
 
-    console.log("📡 Response status:", res.status);
+            const res = await fetch(
+              `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+              { method: "POST", body: fd },
+            );
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("❌ Upload failed:", errorText);
-      throw new Error(`Upload failed: ${res.status}`);
-    }
+            console.log("📡 Response status:", res.status);
 
-    const data = await res.json();
-    console.log("✅ Upload success:", data.secure_url);
+            if (!res.ok) {
+              const errorText = await res.text();
+              console.error("❌ Upload failed:", errorText);
+              throw new Error(`Upload failed: ${res.status}`);
+            }
 
-    if (!data.secure_url) {
-      throw new Error("No secure_url in response");
-    }
+            const data = await res.json();
+            console.log("✅ Upload success:", data.secure_url);
 
-    return data.secure_url;
-  } catch (error) {
-    console.error("❌ Cloudinary upload error:", error);
-    throw error;
-  }
-};
+            if (!data.secure_url) {
+              throw new Error("No secure_url in response");
+            }
 
-        // Upload all images in parallel
+            return data.secure_url;
+          } catch (error) {
+            console.error("❌ Cloudinary upload error:", error);
+            throw error;
+          }
+        };
+
         const uploadPromises = formData.uploadedImages.map(async (img, i) => {
           const originalUrl = await uploadToCloudinary(img);
-          const processedUrl = originalUrl; // Replace with actual processing
+          const processedUrl = originalUrl;
 
           return {
             originalImage: originalUrl,
@@ -236,7 +232,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
         const savedData = await saveGeneratedImage([singlePayload], token);
 
-        // ✅ IMPORTANT: Update formData BEFORE navigation
         setFormData((prev) => ({
           ...prev,
           beforeAfterData: Array.isArray(savedData)
@@ -244,7 +239,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             : savedData.beforeAfterData || [],
         }));
 
-        // ✅ Delete draft COMPLETELY
         const urlParams = new URLSearchParams(window.location.search);
         const draftId = urlParams.get("draftId") || formData.draftId;
 
@@ -265,7 +259,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
         toast.success("Objects removed successfully!", { id: "remove" });
 
-        // ✅ Ab navigate karo - Data ready hai
         next();
       } catch (err) {
         console.error(err);
@@ -389,13 +382,12 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
       <div
         className="
    
-  flex flex-col sm:flex-row 
-  items-stretch sm:items-center
-  justify-between
-  gap-3
-"
+         flex flex-col sm:flex-row 
+         items-stretch sm:items-center
+         justify-between
+         gap-3
+        "
       >
-        {/* Back Button */}
         <button
           onClick={back}
           className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
@@ -421,15 +413,15 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
                 }));
               }}
               className="
-        w-full sm:w-auto
-        px-3 sm:px-3 py-2
-        text-[14px] sm:text-[16px] lg:text-[18px]
-        border-2 border-[#034F75] 
-        text-[#034F75] 
-        rounded-lg 
-        hover:bg-[#034F75] hover:text-white
-        transition-colors
-      "
+               w-full sm:w-auto
+               px-3 sm:px-3 py-2
+               text-[14px] sm:text-[16px] lg:text-[18px]
+               border-2 border-[#034F75] 
+               text-[#034F75] 
+               rounded-lg 
+               hover:bg-[#034F75] hover:text-white
+                      transition-colors
+             "
             >
               Clear All Selections
             </button>
@@ -439,18 +431,18 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             onClick={handleRemoveObject}
             disabled={!allImagesHaveSelection}
             className={`
-      w-full sm:w-auto
-      flex items-center justify-center gap-2
-      px-5 sm:px-7 py-2 
-      text-[14px] sm:text-[16px] lg:text-[18px]
-      rounded-lg 
-      transition-colors
-      ${
-        allImagesHaveSelection
-          ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
-          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-      }
-    `}
+             w-full sm:w-auto
+             flex items-center justify-center gap-2
+             px-5 sm:px-7 py-2 
+             text-[14px] sm:text-[16px] lg:text-[18px]
+             rounded-lg 
+             transition-colors
+             ${
+               allImagesHaveSelection
+                 ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
+                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
+             }
+           `}
           >
             Remove Object
           </button>

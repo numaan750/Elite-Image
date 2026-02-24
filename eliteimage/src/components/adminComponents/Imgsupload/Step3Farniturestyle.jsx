@@ -43,7 +43,6 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
   const { saveDraft } = useContext(AppContext);
 
-  // Auto-save on furniture selection
   useEffect(() => {
     if (selectedFurniture) {
       const timeoutId = setTimeout(() => {
@@ -66,9 +65,8 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [selectedFurniture]); // ✅ Remove formData and saveDraft from dependencies
+  }, [selectedFurniture]);
 
-  // ✅ ADD THIS:
   useEffect(() => {
     if (!formData.featureType) {
       toast.error("Please select a feature first");
@@ -81,9 +79,6 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
       ...prev,
       selectedFurniture: selectedFurniture,
     }));
-
-    // ✅ YE REMOVE KAREIN - Furniture selection ke baad draft delete nahi karna
-    // Draft sirf final save par hi delete hoga
 
     next();
   };
@@ -129,7 +124,6 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
         </div>
       )}
 
-      {/* Furniture Options Grid */}
       <div className=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 mb-4 sm:mb-5 lg:mb-6">
         {FURNITURE_TYPES.map((item) => (
           <div
@@ -170,11 +164,11 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
       <div
         className="
     
-    flex flex-col sm:flex-row
-    items-stretch sm:items-center
-    justify-between
-    gap-3 sm:gap-4
-  "
+         flex flex-col sm:flex-row
+         items-stretch sm:items-center
+         justify-between
+         gap-3 sm:gap-4
+       "
       >
         <button
           onClick={back}
@@ -184,20 +178,19 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
           Back
         </button>
 
-        {/* Generate Button */}
         <button
           onClick={handleContinue}
           className={`
-    w-full sm:w-auto
-    flex items-center justify-center gap-2
-    bg-[#034F75] hover:bg-[#023a5c]
-    text-white
-    text-[14px] sm:text-[16px] lg:text-[18px]
-    px-5 sm:px-6 py-2
-    rounded-lg
-    transition-colors
-    ${!selectedFurniture ? "opacity-50" : ""}
-  `}
+           w-full sm:w-auto
+           flex items-center justify-center gap-2
+           bg-[#034F75] hover:bg-[#023a5c]
+           text-white
+           text-[14px] sm:text-[16px] lg:text-[18px]
+           px-5 sm:px-6 py-2
+           rounded-lg
+           transition-colors
+           ${!selectedFurniture ? "opacity-50" : ""}
+         `}
         >
           Continue
           <ChevronRight size={18} />

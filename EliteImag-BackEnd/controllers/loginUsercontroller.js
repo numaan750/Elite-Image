@@ -106,21 +106,21 @@ export const loginUser = async (req, res) => {
     }
 
     if (user.credits === undefined || user.credits === null) {
-      user.credits = 15;
+      user.credits = 0; // Existing user with no credits field gets 0, not 15
       await user.save();
-      console.log("✅ Credits added to existing user:", user.email);
     }
 
+    const freshUser = await loginUserSchema.findById(user._id);
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.status(200).json({
       status: "success",
       message: "Login successful",
       token,
       user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        credits: Number(user.credits) || 15,
+        _id: freshUser._id,
+        username: freshUser.username,
+        email: freshUser.email,
+        credits: Number(freshUser.credits), // ✅ DB ki exact value - no fallback
       },
     });
   } catch (error) {
@@ -184,21 +184,28 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+// LINE 180 se shuru karein (existing code ke BAAD)
+
 export const deductCredits = async (req, res) => {
   try {
     const { id } = req.params;
     const { creditsToDeduct } = req.body;
 
+    // User dhundo
     const user = await loginUserSchema.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    // Check karein credits sufficient hain ya nahi
     if (user.credits < creditsToDeduct) {
       return res.status(400).json({
         message: "Insufficient credits",
         currentCredits: user.credits,
       });
     }
+
+    // Credits deduct karo
     user.credits -= creditsToDeduct;
     await user.save();
 
@@ -225,21 +232,22 @@ export const googleLogin = async (req, res) => {
     let isNewUser = false;
 
     if (user) {
-      if (!user.googleId) {
-        user.googleId = googleId;
-        await user.save();
-      }
-      isNewUser = false;
-    } else {
-      user = await loginUserSchema.create({
-        email,
-        username: username || email.split("@")[0],
-        googleId,
-        credits: 15,
-        password: null,
-      });
-      isNewUser = true;
-    }
+  if (!user.googleId) {
+    user.googleId = googleId;
+    await user.save();
+  }
+  isNewUser = false;
+} else {
+  user = await loginUserSchema.create({
+    email,
+    username: username || email.split("@")[0],
+    googleId,
+    credits: 15,
+    password: null,
+  });
+  isNewUser = true;
+}
+    const freshUser = await loginUserSchema.findById(user._id);
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res.status(200).json({
       status: "success",
@@ -247,10 +255,10 @@ export const googleLogin = async (req, res) => {
       token,
       isNewUser,
       user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        credits: Number(user.credits) || 15,
+        _id: freshUser._id,
+        username: freshUser.username,
+        email: freshUser.email,
+        credits: Number(freshUser.credits), // ✅ DB ki exact value
       },
     });
   } catch (error) {

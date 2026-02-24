@@ -23,7 +23,6 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
     }
   }, [formData.featureType, router]);
 
-  // Auto-save on selection change
   useEffect(() => {
     if (selected.length > 0) {
       const timeoutId = setTimeout(() => {
@@ -46,7 +45,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
 
       return () => clearTimeout(timeoutId);
     }
-  }, [selected]); // ✅ Remove saveDraft and formData from dependencies
+  }, [selected]);
 
   // const handleContinue = async () => {
   //   setFormData((prev) => ({
@@ -123,9 +122,6 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
       ...prev,
       selectedFeatures: selected,
     }));
-
-    // ✅ YE CONDITION REMOVE KAREIN - Draft delete nahi karna Step 2 mein
-    // Sirf last step mein hi draft delete hoga
 
     next();
   };
@@ -206,7 +202,6 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
       </div>
 
       <div className=" flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 max-w-7xl mx-auto">
-        {/* Back Button */}
         <button
           onClick={back}
           className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"

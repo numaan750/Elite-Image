@@ -15,7 +15,8 @@ const UPLOAD_PRESET = "unsigned_preset";
 const Step1 = ({ formData, setFormData, next }) => {
   const router = useRouter();
 
-  const { token, saveGeneratedImage, saveDraft } = useContext(AppContext);
+  const { token, saveGeneratedImage, saveDraft, deductUserCredits } =
+    useContext(AppContext);
   const searchParams = useSearchParams();
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -67,6 +68,12 @@ const Step1 = ({ formData, setFormData, next }) => {
   ]);
 
   const handleGenerateAndSave = async () => {
+  const imageCount = formData.uploadedImages.filter(img => !img.startsWith("loading-")).length;
+  const creditsNeeded = imageCount * 5;
+  const canProceed = await deductUserCredits(creditsNeeded);
+  if (!canProceed) {
+    return;
+  }
     if (!formData.featureType) {
       toast.error("Please select a feature first");
       router.push("/admin/dashboard");
@@ -173,117 +180,116 @@ const Step1 = ({ formData, setFormData, next }) => {
     })();
   };
 
-const handleFileUpload = async (e) => {
-  const files = Array.from(e.target.files);
-  if (!files.length) return;
-  const validFiles = [];
-  for (const file of files) {
-    if (!file.type.startsWith("image/")) {
-      toast.error(`${file.name}: Only image files allowed`);
-      continue;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error(`${file.name}: Image must be under 5MB`);
-      continue;
-    }
-    validFiles.push(file);
-  }
-
-  if (validFiles.length === 0) return;
-
-  setUploadingImage(true);
-  const placeholderIds = validFiles.map(
-    (_, idx) => `loading-${Date.now()}-${idx}`,
-  );
-  setUploadingUrls((prev) => new Set([...prev, ...placeholderIds]));
-  setLoadingCount((prev) => prev + validFiles.length);
-
-  setFormData((prev) => ({
-    ...prev,
-    uploadedImages: [...prev.uploadedImages, ...placeholderIds],
-  }));
-  
-  const uploadPromises = validFiles.map(async (file, idx) => {
-    const uploadForm = new FormData();
-    uploadForm.append("file", file);
-    uploadForm.append("upload_preset", UPLOAD_PRESET);
-
-    try {
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        { method: "POST", body: uploadForm },
-      );
-
-      // ✅ Check if response is OK
-      if (!res.ok) {
-        console.error("❌ Upload failed - Response not OK:", res.status);
-        throw new Error(`Upload failed with status ${res.status}`);
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    const validFiles = [];
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name}: Only image files allowed`);
+        continue;
       }
-
-      const data = await res.json();
-
-      // ✅ Log response
-      console.log("📦 Cloudinary Response:", data);
-
-      // ✅ Check if secure_url exists
-      if (!data.secure_url) {
-        console.error("❌ No secure_url in response:", data);
-        throw new Error(data.error?.message || "Upload failed - no URL returned");
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name}: Image must be under 5MB`);
+        continue;
       }
-
-      const optimizedUrl = data.secure_url.replace(
-        "/upload/",
-        "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
-      );
-
-      return {
-        success: true,
-        url: optimizedUrl,
-        placeholderId: placeholderIds[idx],
-        localUrl: URL.createObjectURL(file),
-      };
-    } catch (err) {
-      console.error(`❌ Upload failed for ${file.name}:`, err);
-      console.error("Full error:", err.message);
-      
-      return {
-        success: false,
-        placeholderId: placeholderIds[idx],
-        error: err.message,
-      };
+      validFiles.push(file);
     }
-  });
-  
-  const results = await Promise.allSettled(uploadPromises);
-  setFormData((prev) => {
-    let newImages = [...prev.uploadedImages];
 
-    results.forEach((result) => {
-      if (result.status === "fulfilled" && result.value.success) {
-        const { placeholderId, url } = result.value;
-        const placeholderIdx = newImages.indexOf(placeholderId);
-        if (placeholderIdx !== -1) {
-          newImages[placeholderIdx] = url;
+    if (validFiles.length === 0) return;
+
+    setUploadingImage(true);
+    const placeholderIds = validFiles.map(
+      (_, idx) => `loading-${Date.now()}-${idx}`,
+    );
+    setUploadingUrls((prev) => new Set([...prev, ...placeholderIds]));
+    setLoadingCount((prev) => prev + validFiles.length);
+
+    setFormData((prev) => ({
+      ...prev,
+      uploadedImages: [...prev.uploadedImages, ...placeholderIds],
+    }));
+
+    const uploadPromises = validFiles.map(async (file, idx) => {
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
+      uploadForm.append("upload_preset", UPLOAD_PRESET);
+
+      try {
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          { method: "POST", body: uploadForm },
+        );
+
+        if (!res.ok) {
+          console.error("❌ Upload failed - Response not OK:", res.status);
+          throw new Error(`Upload failed with status ${res.status}`);
         }
-      } else if (result.status === "fulfilled") {
-        const placeholderIdx = newImages.indexOf(result.value.placeholderId);
-        if (placeholderIdx !== -1) {
-          newImages.splice(placeholderIdx, 1);
+
+        const data = await res.json();
+
+        console.log("📦 Cloudinary Response:", data);
+
+        if (!data.secure_url) {
+          console.error("❌ No secure_url in response:", data);
+          throw new Error(
+            data.error?.message || "Upload failed - no URL returned",
+          );
         }
+
+        const optimizedUrl = data.secure_url.replace(
+          "/upload/",
+          "/upload/f_auto,q_auto,w_800,h_600,c_limit/",
+        );
+
+        return {
+          success: true,
+          url: optimizedUrl,
+          placeholderId: placeholderIds[idx],
+          localUrl: URL.createObjectURL(file),
+        };
+      } catch (err) {
+        console.error(`❌ Upload failed for ${file.name}:`, err);
+        console.error("Full error:", err.message);
+
+        return {
+          success: false,
+          placeholderId: placeholderIds[idx],
+          error: err.message,
+        };
       }
     });
 
-    return { ...prev, uploadedImages: newImages };
-  });
-  setUploadingUrls(new Set());
-  setLoadingCount(0);
-  setAllImagesLoaded(true);
-  setUploadingImage(false);
+    const results = await Promise.allSettled(uploadPromises);
+    setFormData((prev) => {
+      let newImages = [...prev.uploadedImages];
 
-  toast.success(`${validFiles.length} image(s) uploaded successfully!`);
+      results.forEach((result) => {
+        if (result.status === "fulfilled" && result.value.success) {
+          const { placeholderId, url } = result.value;
+          const placeholderIdx = newImages.indexOf(placeholderId);
+          if (placeholderIdx !== -1) {
+            newImages[placeholderIdx] = url;
+          }
+        } else if (result.status === "fulfilled") {
+          const placeholderIdx = newImages.indexOf(result.value.placeholderId);
+          if (placeholderIdx !== -1) {
+            newImages.splice(placeholderIdx, 1);
+          }
+        }
+      });
 
-  e.target.value = "";
-};
+      return { ...prev, uploadedImages: newImages };
+    });
+    setUploadingUrls(new Set());
+    setLoadingCount(0);
+    setAllImagesLoaded(true);
+    setUploadingImage(false);
+
+    toast.success(`${validFiles.length} image(s) uploaded successfully!`);
+
+    e.target.value = "";
+  };
 
   const handleDragEnter = (e) => {
     e.preventDefault();
