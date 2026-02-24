@@ -49,7 +49,7 @@ const EditProjectPage = () => {
           featureType: project.featureType || "",
           selectedFeature: project.selectedFeature?.[0] || "",
           selectedStyle: project.selectedStyle?.[0] || "",
-          beforeAfterData: project.beforeAfterData?.[0] || {},
+beforeAfterData: project.beforeAfterData || [],
           finalNotes: project.finalNotes || "",
           userId: project.userid,
           projectId: projectId,

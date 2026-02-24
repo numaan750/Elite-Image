@@ -777,12 +777,21 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                       }}
                     >
                       {(() => {
-                        const afterSrc =
-                          formData.featureType === "Sky Replacement"
-                            ? img
-                            : Array.isArray(formData.beforeAfterData)
-                              ? formData.beforeAfterData[index]?.processedImage
-                              : formData.beforeAfterData?.processedImage;
+                        let afterSrc;
+                        if (formData.featureType === "Sky Replacement") {
+                          afterSrc = img;
+                        } else if (
+                          Array.isArray(formData.beforeAfterData) &&
+                          formData.beforeAfterData[index]
+                        ) {
+                          afterSrc =
+                            formData.beforeAfterData[index]?.processedImage ||
+                            img;
+                        } else if (formData.beforeAfterData?.processedImage) {
+                          afterSrc = formData.beforeAfterData.processedImage;
+                        } else {
+                          afterSrc = img; // fallback
+                        }
 
                         if (!afterSrc) return null;
 

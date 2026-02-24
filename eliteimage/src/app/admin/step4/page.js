@@ -142,11 +142,12 @@ const Step4Page = () => {
           selectedFeature: project.selectedFeature?.[0] || "",
           selectedStyle: project.selectedStyle?.[0] || "",
           beforeAfterData:
-            project.beforeAfterData && project.beforeAfterData.length > 0
-              ? project.beforeAfterData
-              : project.image
-                ? [{ processedImage: project.image }]
-                : [],
+  project.beforeAfterData && project.beforeAfterData.length > 0
+    ? project.beforeAfterData  // ✅ DB se AI processed images aayengi
+    : project.image
+      ? [{ processedImage: project.image, originalImage: project.uploadedImages?.[0] || project.image }]
+      : [],
+uploadedImages: project.uploadedImages || [],
           finalNotes: project.finalNotes || "",
           userId: project.userid || user?._id,
         });
@@ -428,9 +429,10 @@ const Step4Page = () => {
                     >
                       <Image
                         src={
-                          formData.beforeAfterData?.[index]?.processedImage ||
-                          img
-                        }
+  (Array.isArray(formData.beforeAfterData) 
+    ? formData.beforeAfterData[index]?.processedImage 
+    : formData.beforeAfterData?.processedImage) || img
+}
                         alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
