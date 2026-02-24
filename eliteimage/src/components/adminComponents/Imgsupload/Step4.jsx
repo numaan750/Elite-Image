@@ -674,19 +674,67 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       formData.uploadedImages?.[0] ||
       "";
 
-    if (navigator.share) {
-      try {
+    // Single image
+    if (processedData.length <= 1) {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "Elite Image AI",
+            text: "Check out my AI enhanced image!",
+            url: shareUrl,
+          });
+        } catch (err) {
+          if (err.name !== "AbortError") toast.error("Share failed");
+        }
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard!");
+      }
+      return;
+    }
+
+    // Multiple images - files share karo
+    try {
+      toast.loading("Preparing images...", { id: "share" });
+
+      const processedData =
+        formData.beforeAfterData && formData.beforeAfterData.length > 0
+          ? formData.beforeAfterData
+          : formData.uploadedImages.map((img) => ({ processedImage: img }));
+
+      const files = [];
+      for (let i = 0; i < processedData.length; i++) {
+        const response = await fetch(processedData[i].processedImage);
+        const blob = await response.blob();
+        const file = new File([blob], `elite-image-${i + 1}.jpg`, {
+          type: "image/jpeg",
+        });
+        files.push(file);
+      }
+
+      toast.dismiss("share");
+
+      // Check karo browser files share support karta hai ya nahi
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files })
+      ) {
         await navigator.share({
           title: "Elite Image AI",
-          text: "Check out my AI enhanced image!",
-          url: shareUrl,
+          text: "Check out my AI enhanced images!",
+          files: files,
         });
-      } catch (err) {
-        if (err.name !== "AbortError") toast.error("Share failed");
+      } else {
+        // Fallback: pehli image ka link copy karo
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success(
+          "Link copied! (File sharing not supported on this device)",
+        );
       }
-    } else {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success("Link copied to clipboard!");
+    } catch (err) {
+      toast.dismiss("share");
+      if (err.name !== "AbortError") toast.error("Share failed");
     }
   };
 
