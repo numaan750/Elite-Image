@@ -121,7 +121,8 @@ export const processImageWithAI = async (req, res) => {
         "X-DashScope-Async": "disable",
       },
       body: JSON.stringify({
-        model: "qwen-image-edit-plus-2025-12-15",
+        // model: "qwen-image-edit-plus-2025-12-15",
+        model: "qwen-vl-plus",
         input: {
           messages: [
             {
