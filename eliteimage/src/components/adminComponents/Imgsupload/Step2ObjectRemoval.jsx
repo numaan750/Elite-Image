@@ -9,8 +9,13 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
-  const { token, saveGeneratedImage, user, deductUserCredits } =
-    useContext(AppContext);
+  const {
+    token,
+    saveGeneratedImage,
+    user,
+    deductUserCredits,
+    processImageWithAI,
+  } = useContext(AppContext);
   const { saveDraft } = useContext(AppContext);
   useEffect(() => {
     if (!formData.featureType) {
@@ -130,12 +135,12 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     next();
   };
   const handleRemoveObject = async () => {
-  const imageCount = formData.uploadedImages.length;
-  const creditsNeeded = imageCount * 5;
-  const canProceed = await deductUserCredits(creditsNeeded);
-  if (!canProceed) {
-    return;
-  }
+    const imageCount = formData.uploadedImages.length;
+    const creditsNeeded = imageCount * 5;
+    const canProceed = await deductUserCredits(creditsNeeded);
+    if (!canProceed) {
+      return;
+    }
     if (!token) {
       toast.error("Please login first");
       return;
@@ -203,7 +208,27 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
         const uploadPromises = formData.uploadedImages.map(async (img, i) => {
           const originalUrl = await uploadToCloudinary(img);
-          const processedUrl = originalUrl;
+
+          // ✅ Real AI Object Removal
+          let processedUrl;
+          try {
+            toast.loading(`Removing objects from image ${i + 1}...`, {
+              id: `ai-obj-${i}`,
+            });
+            processedUrl = await processImageWithAI(
+              originalUrl,
+              "Object Removal",
+              null,
+              null,
+              null,
+            );
+            toast.success(`Objects removed from image ${i + 1}!`, {
+              id: `ai-obj-${i}`,
+            });
+          } catch (aiError) {
+            toast.error(`AI failed for image ${i + 1}`, { id: `ai-obj-${i}` });
+            processedUrl = originalUrl;
+          }
 
           return {
             originalImage: originalUrl,

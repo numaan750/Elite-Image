@@ -567,6 +567,37 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  // ✅ Qwen AI se image process karo
+  const processImageWithAI = async (imageUrl, featureType, selectedFeature, selectedStyle, finalNotes) => {
+    try {
+      const response = await fetch(`${API_URL}/api/process-image`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          imageUrl,
+          featureType,
+          selectedFeature: selectedFeature || "",
+          selectedStyle: selectedStyle || "",
+          finalNotes: finalNotes || "",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "AI processing failed");
+      }
+
+      return data.processedImageUrl; // Cloudinary permanent URL
+    } catch (error) {
+      console.error("❌ processImageWithAI error:", error);
+      throw error;
+    }
+  };
+
   const handleGoogleLogin = async (session) => {
     try {
       console.log("🟢 handleGoogleLogin called:", session);
@@ -648,6 +679,8 @@ const AppProvider = ({ children }) => {
         deleteDraft,
         handleGoogleLogin,
         deductUserCredits,
+        processImageWithAI,
+
       }}
     >
       {children}

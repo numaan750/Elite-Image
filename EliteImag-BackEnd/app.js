@@ -5,6 +5,7 @@ import connectDB from "./config/db.js"
 import loginUser from "./routers/loginUser.js"
 import aiImagesroutes from "./routers/aiImagesroutes.js"
 import paymentroutes from "./routers/paymentrout.js"
+import aiProcessingRoutes from "./routers/aiProcessingRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -21,6 +22,8 @@ app.use("/api", aiImagesroutes);
 
 
 app.use("/api", paymentroutes);
+app.use("/api", aiProcessingRoutes);
+
 
 
 

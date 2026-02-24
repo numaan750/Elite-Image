@@ -506,7 +506,17 @@ const Step4Page = () => {
             Edit
           </button>
           <button
-            onClick={() => alert("Share functionality coming soon!")}
+            onClick={() => {
+              const imageUrl =
+                formData.beforeAfterData?.[0]?.processedImage ||
+                formData.uploadedImages?.[0];
+              if (imageUrl) {
+                navigator.clipboard.writeText(imageUrl);
+                toast.success("Image link copied to clipboard!");
+              } else {
+                toast.error("No image link available");
+              }
+            }}
             className="
   w-full sm:w-auto
   flex items-center justify-center gap-2

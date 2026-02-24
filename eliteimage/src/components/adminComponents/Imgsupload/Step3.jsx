@@ -9,8 +9,14 @@ import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 const Step3 = ({ formData, setFormData, next, back, featureType }) => {
-  const { token, saveGeneratedImage, user, saveDraft, deductUserCredits } =
-    useContext(AppContext);
+  const {
+    token,
+    saveGeneratedImage,
+    user,
+    saveDraft,
+    deductUserCredits,
+    processImageWithAI,
+  } = useContext(AppContext);
   const router = useRouter();
 
   useEffect(() => {
@@ -51,12 +57,12 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   }, [selected]);
 
   const handleGenerate = async () => {
-  const imageCount = formData.uploadedImages.length;
-  const creditsNeeded = imageCount * 5;
-  const canProceed = await deductUserCredits(creditsNeeded);
-  if (!canProceed) {
-    return;
-  }
+    const imageCount = formData.uploadedImages.length;
+    const creditsNeeded = imageCount * 5;
+    const canProceed = await deductUserCredits(creditsNeeded);
+    if (!canProceed) {
+      return;
+    }
     if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
       toast.error("Please upload at least one image first!");
       return;
@@ -162,7 +168,28 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
             try {
               const originalUrl = await uploadToCloudinary(uploadedImage, i);
 
-              const processedUrl = originalUrl;
+              // ✅ Real AI Processing
+              let processedUrl;
+              try {
+                toast.loading(
+                  `AI processing image ${i + 1} of ${formData.uploadedImages.length}...`,
+                  { id: `ai-${i}` },
+                );
+                processedUrl = await processImageWithAI(
+                  originalUrl,
+                  formData.featureType,
+                  formData.selectedFeature,
+                  selected,
+                  formData.finalNotes,
+                );
+                toast.success(`Image ${i + 1} processed!`, { id: `ai-${i}` });
+              } catch (aiError) {
+                toast.error(
+                  `AI failed for image ${i + 1}: ${aiError.message}`,
+                  { id: `ai-${i}` },
+                );
+                processedUrl = originalUrl; // Fallback: original image dikhao
+              }
 
               return {
                 originalImage: originalUrl,

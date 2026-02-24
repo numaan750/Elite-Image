@@ -15,8 +15,13 @@ const UPLOAD_PRESET = "unsigned_preset";
 const Step1 = ({ formData, setFormData, next }) => {
   const router = useRouter();
 
-  const { token, saveGeneratedImage, saveDraft, deductUserCredits } =
-    useContext(AppContext);
+  const {
+    token,
+    saveGeneratedImage,
+    saveDraft,
+    deductUserCredits,
+    processImageWithAI,
+  } = useContext(AppContext);
   const searchParams = useSearchParams();
   const [isSaving, setIsSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -68,12 +73,14 @@ const Step1 = ({ formData, setFormData, next }) => {
   ]);
 
   const handleGenerateAndSave = async () => {
-  const imageCount = formData.uploadedImages.filter(img => !img.startsWith("loading-")).length;
-  const creditsNeeded = imageCount * 5;
-  const canProceed = await deductUserCredits(creditsNeeded);
-  if (!canProceed) {
-    return;
-  }
+    const imageCount = formData.uploadedImages.filter(
+      (img) => !img.startsWith("loading-"),
+    ).length;
+    const creditsNeeded = imageCount * 5;
+    const canProceed = await deductUserCredits(creditsNeeded);
+    if (!canProceed) {
+      return;
+    }
     if (!formData.featureType) {
       toast.error("Please select a feature first");
       router.push("/admin/dashboard");
@@ -92,10 +99,36 @@ const Step1 = ({ formData, setFormData, next }) => {
     const allProcessedData = [];
     const allUploadedImages = [];
 
-    formData.uploadedImages.forEach((uploadedImage) => {
+    // ✅ Real AI Processing for Straighten and Watermark Remove
+    toast.loading(
+      `AI processing ${formData.uploadedImages.length} image(s)...`,
+      { id: "ai-step1" },
+    );
+
+    for (let i = 0; i < formData.uploadedImages.length; i++) {
+      const uploadedImage = formData.uploadedImages[i];
+      let processedImage = uploadedImage;
+
+      try {
+        processedImage = await processImageWithAI(
+          uploadedImage,
+          formData.featureType,
+          null,
+          null,
+          null,
+        );
+        toast.success(`Image ${i + 1} processed!`, { id: `ai-step1-${i}` });
+      } catch (aiError) {
+        console.error(`AI failed for image ${i + 1}:`, aiError);
+        toast.error(`AI failed for image ${i + 1}, using original`, {
+          id: `ai-step1-${i}`,
+        });
+        processedImage = uploadedImage;
+      }
+
       const processedData = {
         originalImage: uploadedImage,
-        processedImage: uploadedImage,
+        processedImage: processedImage, // ✅ AI processed image
         processedAt: new Date().toISOString(),
         status: "completed",
         userId: formData.userId,
@@ -103,7 +136,9 @@ const Step1 = ({ formData, setFormData, next }) => {
       };
       allProcessedData.push(processedData);
       allUploadedImages.push(uploadedImage);
-    });
+    }
+
+    toast.dismiss("ai-step1");
 
     const singlePayload = {
       userid: formData.userId,
