@@ -30,8 +30,8 @@ export default function Payment() {
     }
   }, []);
 
-const handleSubmit = async (event) => {
-  event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (loading) return;
     if (amount <= 0) {
@@ -87,6 +87,9 @@ const handleSubmit = async (event) => {
       }
 
       if (confirmRes.paymentIntent.status === "succeeded") {
+        const plan = searchParams.get("plan");
+        const creditsToAdd = PLAN_CREDITS[plan] || 0;
+
         await fetch(`${API_URL}/api/payment/confirm`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -96,9 +99,6 @@ const handleSubmit = async (event) => {
             userId: user._id,
           }),
         });
-
-        const plan = searchParams.get("plan");
-        const creditsToAdd = PLAN_CREDITS[plan] || 0;
 
         // if (creditsToAdd > 0 && user?._id) {
         //   await fetch(`${API_URL}/api/loginUser/${user._id}/add-credits`, {
@@ -117,10 +117,10 @@ const handleSubmit = async (event) => {
         setLoading(false);
       }
     } catch (paymentError) {
-  console.error("❌ Payment Error:", paymentError);
-  toast.error(paymentError.message || "Payment failed");
-  setLoading(false);
-}
+      console.error("❌ Payment Error:", paymentError);
+      toast.error(paymentError.message || "Payment failed");
+      setLoading(false);
+    }
   };
 
   return (
