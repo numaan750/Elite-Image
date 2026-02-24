@@ -9,6 +9,7 @@ import { PiDownload } from "react-icons/pi";
 import { AppContext } from "@/context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import ShareModal from "@/components/ShareModal";
@@ -34,6 +35,7 @@ const Step4Page = () => {
 
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
+  // const [isSaving, setIsSaving] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [projectId, setProjectId] = useState(null);
   const [isViewMode, setIsViewMode] = useState(false);
@@ -41,6 +43,7 @@ const Step4Page = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [confirmDownload, setConfirmDownload] = useState(false);
 
+  // Load project data
   useEffect(() => {
     const loadProjectData = async () => {
       const mode = searchParams.get("mode");
@@ -70,7 +73,7 @@ const Step4Page = () => {
           selectedStyle: project.selectedStyle?.[0] || "",
           beforeAfterData:
             project.beforeAfterData && project.beforeAfterData.length > 0
-              ? project.beforeAfterData
+              ? project.beforeAfterData // ✅ DB se AI processed images aayengi
               : project.image
                 ? [
                     {
@@ -84,6 +87,7 @@ const Step4Page = () => {
           finalNotes: project.finalNotes || "",
           userId: project.userid || user?._id,
         });
+        // ✅ Toast removed - no more "Project loaded successfully"
       } catch (error) {
         toast.error("Failed to load project");
         console.error(error);
@@ -93,6 +97,7 @@ const Step4Page = () => {
     loadProjectData();
   }, [searchParams]);
 
+  // Initialize slider positions
   useEffect(() => {
     const initialPositions = {};
     formData.uploadedImages.forEach((_, index) => {
@@ -101,28 +106,35 @@ const Step4Page = () => {
     setSliderPositions(initialPositions);
   }, [formData.uploadedImages.length]);
 
+  // Handle mouse/touch events
   useEffect(() => {
     const handleMouseUp = () => setIsDragging(null);
     const handleTouchEnd = () => setIsDragging(null);
+
     if (isDragging !== null) {
       document.addEventListener("mouseup", handleMouseUp);
       document.addEventListener("touchend", handleTouchEnd);
     }
+
     return () => {
       document.removeEventListener("mouseup", handleMouseUp);
       document.removeEventListener("touchend", handleTouchEnd);
     };
   }, [isDragging]);
+
   const showDownloadConfirmToast = () => {
     handleDownloadConfirmed();
   };
+
   const handleDownloadConfirmed = async () => {
     const processedData =
       formData.beforeAfterData && formData.beforeAfterData.length > 0
         ? formData.beforeAfterData
         : formData.uploadedImages.map((img) => ({
-            processedImage: img,
+            processedImage: img, // Sky Replacement ke liye uploaded image hi download hogi
           }));
+
+    // ✅ NAYA CODE: Agar sirf 1 image hai to seedha download karo (no ZIP)
     if (processedData.length === 1) {
       toast.loading("Downloading image...", { id: "download" });
 
@@ -141,7 +153,7 @@ const Step4Page = () => {
                 },
               ],
             })
-            .catch(() => null);
+            .catch(() => null); // ✅ Cancel ko handle karein
 
           if (!fileHandle) {
             toast("Download cancelled", { id: "download", duration: 2000 });
@@ -164,6 +176,7 @@ const Step4Page = () => {
           }
         } else {
           saveAs(blob, "elite-image-1.jpg");
+          // ✅ Success toast with auto-dismiss
           toast.success("Download complete", {
             id: "download",
             duration: 2000,
@@ -171,18 +184,23 @@ const Step4Page = () => {
         }
       } catch (err) {
         console.error(err);
+        // ✅ Error toast with auto-dismiss
         toast.error("Download failed", { id: "download", duration: 3000 });
       }
       return;
     }
+
     if (!processedData || processedData.length === 0) {
       toast.error("No images to download");
       return;
     }
+
     toast.loading("Preparing ZIP...", { id: "zip" });
+
     try {
       const zip = new JSZip();
       const folder = zip.folder("Elite-Image-AI");
+
       for (let i = 0; i < processedData.length; i++) {
         const response = await fetch(processedData[i].processedImage);
         const blob = await response.blob();
@@ -202,11 +220,13 @@ const Step4Page = () => {
               },
             ],
           })
-          .catch(() => null);
+          .catch(() => null); // ✅ Cancel ko handle karein
+
         if (!fileHandle) {
           toast("Download cancelled", { id: "zip", duration: 2000 });
           return;
         }
+
         try {
           const writable = await fileHandle.createWritable();
           await writable.write(zipBlob);
@@ -226,10 +246,34 @@ const Step4Page = () => {
       toast.error("Download failed", { id: "zip", duration: 3000 });
     }
   };
+
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#034F75]"></div>
+  //     </div>
+  //   );
+  // }
+
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
       <div className="w-full flex justify-start mb-4">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
+          {/* <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.back()}
+              className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={() => router.push("/admin/dashboard")}
+              className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div> */}
+
           <span className="font-medium text-black text-[16px] sm:text-[20px] mb-4 sm:mb-5 lg:mb-6 mt-8">
             Elite Image AI -{" "}
             {isViewMode ? "View" : isEditMode ? "Edit" : "Generate"} Mode
@@ -244,7 +288,8 @@ const Step4Page = () => {
             : isEditMode
               ? "Edit Project"
               : "Processing Complete"}
-        </h2>{" "}
+        </h2>
+        {/* ✅ ADD THIS NEW LINE */}
         <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-5 lg:mb-6 ">
           Total Images: {formData.uploadedImages.length}
         </p>
@@ -361,13 +406,39 @@ const Step4Page = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-full sm:max-w-[820px]flex flex-col items-center gap-4 sm:gap-5">
-        <div className="flex flex-col sm:flex-row w-full justify-center gap-2 sm:gap-3">
+      <div
+        className="
+  w-full
+  max-w-full sm:max-w-[820px]
+  flex flex-col
+  items-center
+  gap-4 sm:gap-5
+"
+      >
+        <div
+          className="
+  flex
+  flex-col sm:flex-row
+  w-full
+  justify-center
+  gap-2 sm:gap-3
+"
+        >
           <button
             onClick={() => {
               router.push(`/admin/edit-project?projectId=${projectId}`);
             }}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 border border-[#034F75] text-[16px] sm:text-[16px] lg:text-[18px] px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors"
+            className="
+  w-full sm:w-auto
+  flex items-center justify-center gap-2
+  border border-[#034F75]
+  text-[16px] sm:text-[16px] lg:text-[18px]
+  px-4 sm:px-6
+  py-2.5 sm:py-3
+  rounded-lg
+  hover:bg-[#034F75] hover:text-white
+  transition-colors
+"
           >
             <TbEdit size={17} />
             Edit
@@ -400,6 +471,8 @@ const Step4Page = () => {
                 }
                 return;
               }
+
+              // Multiple images
               try {
                 toast.loading("Preparing images...", { id: "share" });
                 const files = [];
@@ -435,7 +508,17 @@ const Step4Page = () => {
                 if (err.name !== "AbortError") toast.error("Share failed");
               }
             }}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 border border-[#034F75] text-[16px] sm:text-[16px] lg:text-[18px] px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-[#034F75] hover:text-white transition-colors"
+            className="
+  w-full sm:w-auto
+  flex items-center justify-center gap-2
+  border border-[#034F75]
+  text-[16px] sm:text-[16px] lg:text-[18px]
+  px-4 sm:px-6
+  py-2.5 sm:py-3
+  rounded-lg
+  hover:bg-[#034F75] hover:text-white
+  transition-colors
+"
           >
             <IoShareSocial size={17} />
             Share Link
