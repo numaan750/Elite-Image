@@ -30,8 +30,8 @@ export default function Payment() {
     }
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (event) => {
+  event.preventDefault();
 
     if (loading) return;
     if (amount <= 0) {
@@ -116,11 +116,11 @@ export default function Payment() {
 
         setLoading(false);
       }
-    } catch (err) {
-      console.error("❌ Payment Error:", err);
-      toast.error(err.message || "Payment failed");
-      setLoading(false);
-    }
+    } catch (paymentError) {
+  console.error("❌ Payment Error:", paymentError);
+  toast.error(paymentError.message || "Payment failed");
+  setLoading(false);
+}
   };
 
   return (
