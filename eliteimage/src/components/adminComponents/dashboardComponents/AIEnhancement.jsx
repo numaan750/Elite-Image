@@ -74,12 +74,15 @@ const AIEnhancement = () => {
             </p>
           </div>
 
-          <button className="flex items-center gap-2 rounded-lg bg-[#034F75] px-3 py-2 text-white w-full sm:w-auto lg:mt-16 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start">
+          <Link
+            href="/admin/pricing"
+            className="flex items-center gap-2 rounded-lg bg-[#034F75] px-3 py-2 text-white w-full sm:w-auto lg:mt-16 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start"
+          >
             <span className="text-base mb-1">💳</span>
             <span className="text-[16px] font-medium">
               Credits: {user?.credits !== undefined ? Number(user.credits) : 15}
             </span>
-          </button>
+          </Link>
         </div>
 
         <section className="mt-6 sm:mt-8 lg:mt-10 mb-6">

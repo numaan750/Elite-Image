@@ -1,5 +1,5 @@
 import express from "express";
-import { deductCredits, deleteUser, getAllUsers, getUserById, googleLogin, loginUser, signupUser, updateUser } from "../controllers/loginUsercontroller.js";
+import { addCredits, deductCredits, deleteUser, getAllUsers, getUserById, googleLogin, loginUser, signupUser, updateUser } from "../controllers/loginUsercontroller.js";
 
 const router = express.Router();
 
@@ -12,5 +12,7 @@ router.post("/loginUser/google", googleLogin);
 router.put("/loginUser/:id",  updateUser);
 router.put("/loginUser/:id/deduct-credits", deductCredits);
 router.delete("/loginUser/:id", deleteUser);
+router.put("/loginUser/:id/add-credits", addCredits);
+
 
 export default router;

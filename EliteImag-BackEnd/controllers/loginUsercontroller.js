@@ -269,3 +269,21 @@ export const googleLogin = async (req, res) => {
     });
   }
 };
+export const addCredits = async (req, res) => {
+  try {
+    const { creditsToAdd } = req.body;
+    const user = await loginUserSchema.findById(req.params.id);
+    
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.credits = (Number(user.credits) || 0) + Number(creditsToAdd);
+    await user.save();
+
+    res.status(200).json({ 
+      success: true, 
+      newCredits: user.credits 
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

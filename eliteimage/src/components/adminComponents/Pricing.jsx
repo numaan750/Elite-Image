@@ -118,7 +118,7 @@ const Pricing = () => {
               </ul>
 
               <Link
-                href="/admin/pricing/payment"
+href="/admin/pricing/payment?plan=Basic&amount=22"
                 className="inline-flex w-full items-center justify-center bg-[#034F75] text-[#D3E7F0] font-semibold text-[14px] sm:text-[17.18px] py-3 sm:py-4 rounded-xl cursor-pointer hover:bg-[#023d5c] transition-colors mt-5 sm:mt-7"
               >
                 Choose Plan
@@ -273,7 +273,7 @@ const Pricing = () => {
               </ul>
 
               <Link
-                href="/admin/pricing/payment"
+href="/admin/pricing/payment?plan=Pro&amount=49.99"
                 className="inline-flex w-full items-center justify-center bg-white text-[#034F75] font-semibold text-[16px] sm:text-[17.18px] py-3 sm:py-4 rounded-xl border border-[#034F75] hover:bg-gray-50 transition cursor-pointer"
               >
                 Choose Plan
@@ -380,7 +380,7 @@ const Pricing = () => {
               </ul>
 
               <Link
-                href="/admin/pricing/payment"
+href="/admin/pricing/payment?plan=Agency&amount=99.99"
                 className="inline-flex w-full items-center justify-center bg-[#034F75] text-[#D3E7F0] font-semibold text-[14px] sm:text-[17.18px] py-3 sm:py-4 rounded-xl cursor-pointer hover:bg-[#023d5c] transition-colors mt-6 sm:mt-10"
               >
                 Choose Plan

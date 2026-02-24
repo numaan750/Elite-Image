@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { AppContext } from "@/context/AppContext";
 import { toast } from "react-hot-toast";
@@ -14,6 +15,20 @@ export default function Payment() {
   const [loading, setLoading] = useState(false);
   const [cardHolder, setCardHolder] = useState("");
   const [cardKey, setCardKey] = useState(Date.now());
+  const searchParams = useSearchParams();
+
+  const PLAN_CREDITS = {
+  Basic: 20,
+  Pro: 60,
+  Agency: 150,
+};
+
+useEffect(() => {
+  const planAmount = searchParams.get("amount");
+  if (planAmount) {
+    setAmount(Number(planAmount));
+  }
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,6 +95,17 @@ export default function Payment() {
           }),
         });
 
+        const plan = searchParams.get("plan");
+const creditsToAdd = PLAN_CREDITS[plan] || 0;
+
+if (creditsToAdd > 0 && user?._id) {
+  await fetch(`${API_URL}/api/loginUser/${user._id}/add-credits`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ creditsToAdd }),
+  });
+}
+
         toast.success("Payment Successful! 🎉");
         setCardHolder("");
         setAmount(0);
@@ -125,11 +151,12 @@ export default function Payment() {
               Amount (USD)
             </label>
             <input
-              type="number"
-              min="1"
-              value={amount === 0 ? "" : amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-              placeholder="Enter amount"
+  type="number"
+  min="1"
+  value={amount === 0 ? "" : amount}
+  onChange={(e) => setAmount(Number(e.target.value))}
+  placeholder="Select a plan first"
+  readOnly
               className="w-full rounded-md border border-[#034F75] bg-[#D3E7F0] px-3 sm:px-4 py-2 text-[14px] sm:text-[18.76px] focus:outline-none focus:ring-2 focus:ring-[#034F75]"
             />
           </div>
