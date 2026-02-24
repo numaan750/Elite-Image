@@ -594,7 +594,7 @@ const AppProvider = ({ children }) => {
 
       setTimeout(() => {
         if (session.user.isNewUser) {
-          window.location.href = "/register";
+          window.location.href = "/admin/dashboard";
         } else {
           window.location.href = "/admin/dashboard";
         }
