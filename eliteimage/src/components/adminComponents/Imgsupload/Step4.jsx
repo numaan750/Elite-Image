@@ -12,7 +12,6 @@ import { useSearchParams } from "next/navigation";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { useRouter } from "next/navigation";
-import ShareModal from "@/components/ShareModal";
 
 const CLOUD_NAME = "drh7q62eh";
 const UPLOAD_PRESET = "unsigned_preset";
@@ -397,8 +396,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
   const { saveDraft } = useContext(AppContext);
   const searchParams = useSearchParams();
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-
   useEffect(() => {
     if (!formData.featureType) {
       toast.error("Please select a feature first");
@@ -981,11 +978,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
           </span>
         </button>
       </div>
-      <ShareModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        formData={formData}
-      />
     </div>
   );
 };
