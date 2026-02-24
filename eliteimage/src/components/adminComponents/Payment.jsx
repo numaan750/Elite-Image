@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 export default function Payment() {
   const stripe = useStripe();
   const elements = useElements();
-  const { user } = useContext(AppContext);
+  const { user, refreshUserCredits } = useContext(AppContext);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const [amount, setAmount] = useState(0);
@@ -18,17 +18,17 @@ export default function Payment() {
   const searchParams = useSearchParams();
 
   const PLAN_CREDITS = {
-  Basic: 20,
-  Pro: 60,
-  Agency: 150,
-};
+    Basic: 20,
+    Pro: 60,
+    Agency: 150,
+  };
 
-useEffect(() => {
-  const planAmount = searchParams.get("amount");
-  if (planAmount) {
-    setAmount(Number(planAmount));
-  }
-}, []);
+  useEffect(() => {
+    const planAmount = searchParams.get("amount");
+    if (planAmount) {
+      setAmount(Number(planAmount));
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,21 +92,24 @@ useEffect(() => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             paymentIntentId: confirmRes.paymentIntent.id,
+            creditsToAdd: creditsToAdd,
+            userId: user._id,
           }),
         });
 
         const plan = searchParams.get("plan");
-const creditsToAdd = PLAN_CREDITS[plan] || 0;
+        const creditsToAdd = PLAN_CREDITS[plan] || 0;
 
-if (creditsToAdd > 0 && user?._id) {
-  await fetch(`${API_URL}/api/loginUser/${user._id}/add-credits`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ creditsToAdd }),
-  });
-}
+        // if (creditsToAdd > 0 && user?._id) {
+        //   await fetch(`${API_URL}/api/loginUser/${user._id}/add-credits`, {
+        //     method: "PUT",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ creditsToAdd }),
+        //   });
+        // }
 
         toast.success("Payment Successful! 🎉");
+        await refreshUserCredits();
         setCardHolder("");
         setAmount(0);
         setCardKey(Date.now());
@@ -151,12 +154,12 @@ if (creditsToAdd > 0 && user?._id) {
               Amount (USD)
             </label>
             <input
-  type="number"
-  min="1"
-  value={amount === 0 ? "" : amount}
-  onChange={(e) => setAmount(Number(e.target.value))}
-  placeholder="Select a plan first"
-  readOnly
+              type="number"
+              min="1"
+              value={amount === 0 ? "" : amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+              placeholder="Select a plan first"
+              readOnly
               className="w-full rounded-md border border-[#034F75] bg-[#D3E7F0] px-3 sm:px-4 py-2 text-[14px] sm:text-[18.76px] focus:outline-none focus:ring-2 focus:ring-[#034F75]"
             />
           </div>

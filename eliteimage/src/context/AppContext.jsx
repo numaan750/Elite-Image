@@ -524,7 +524,7 @@ const AppProvider = ({ children }) => {
       if (currentCredits < deductAmount) {
         const imagesCount = deductAmount / 5;
         toast.error(
-          `You need ${deductAmount} credits for ${imagesCount} image${imagesCount > 1 ? "s" : ""}. You have ${currentCredits}. Please buy more.`
+          `You need ${deductAmount} credits for ${imagesCount} image${imagesCount > 1 ? "s" : ""}. You have ${currentCredits}. Please buy more.`,
         );
         return false;
       }
@@ -567,8 +567,32 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  const refreshUserCredits = async () => {
+    try {
+      if (!user?._id) return;
+      const response = await fetch(`${API_URL}/api/loginUser/${user._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data?.credits !== undefined) {
+        const updatedUser = { ...user, credits: Number(data.credits) };
+        setUser(updatedUser);
+        setUserCredits(Number(data.credits));
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+    } catch (error) {
+      console.error("refreshUserCredits error:", error);
+    }
+  };
+
   // ✅ Qwen AI se image process karo
-  const processImageWithAI = async (imageUrl, featureType, selectedFeature, selectedStyle, finalNotes) => {
+  const processImageWithAI = async (
+    imageUrl,
+    featureType,
+    selectedFeature,
+    selectedStyle,
+    finalNotes,
+  ) => {
     try {
       const response = await fetch(`${API_URL}/api/process-image`, {
         method: "POST",
@@ -679,8 +703,8 @@ const AppProvider = ({ children }) => {
         deleteDraft,
         handleGoogleLogin,
         deductUserCredits,
+        refreshUserCredits,
         processImageWithAI,
-
       }}
     >
       {children}

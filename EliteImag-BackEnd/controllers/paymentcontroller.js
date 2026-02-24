@@ -31,7 +31,7 @@ export const getSinglePayment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-    
+
 export const createPaymentIntent = async (req, res) => {
   try {
     const { amount, userId, email, cardHolder } = req.body;
@@ -62,30 +62,49 @@ export const createPaymentIntent = async (req, res) => {
   }
 };
 
+// YE PURI confirmPayment function REPLACE karo:
+
 export const confirmPayment = async (req, res) => {
   try {
-    const { paymentIntentId } = req.body;
+    const { paymentIntentId, creditsToAdd, userId } = req.body; // ADD creditsToAdd, userId
 
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    const paymentIntent = await stripe.paymentIntents.retrieve(
+      paymentIntentId,
+      {
+        expand: ["latest_charge"], // ADD THIS - charges expand karo
+      },
+    );
 
     if (paymentIntent.status !== "succeeded") {
       return res.status(400).json({ message: "Payment not successful" });
     }
 
+    const charge = paymentIntent.latest_charge; // CHANGE - charges.data[0] ki jagah
+
     await Payment.findOneAndUpdate(
       { stripePaymentIntentId: paymentIntentId },
       {
         status: "succeeded",
-        cardBrand:
-          paymentIntent.charges.data[0].payment_method_details.card.brand,
-        last4: paymentIntent.charges.data[0].payment_method_details.card.last4,
-        cardHolderName: paymentIntent.charges.data[0].billing_details.name,
-        email: paymentIntent.charges.data[0].billing_details.email,
-      }
+        cardBrand: charge?.payment_method_details?.card?.brand || "",
+        last4: charge?.payment_method_details?.card?.last4 || "",
+        cardHolderName: charge?.billing_details?.name || "",
+        email: charge?.billing_details?.email || "",
+      },
     );
+
+    // Credits add karo agar userId aur creditsToAdd mile
+    if (userId && creditsToAdd && creditsToAdd > 0) {
+      const loginUserSchema = (await import("../models/loginUser.js")).default;
+      const user = await loginUserSchema.findById(userId);
+      if (user) {
+        user.credits = (Number(user.credits) || 0) + Number(creditsToAdd);
+        await user.save();
+      }
+    }
 
     res.status(200).json({ success: true });
   } catch (error) {
+    console.error("confirmPayment error:", error); // ADD logging
     res.status(500).json({ message: error.message });
   }
 };
