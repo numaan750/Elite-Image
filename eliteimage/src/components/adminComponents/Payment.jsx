@@ -17,11 +17,11 @@ export default function Payment() {
   const [cardKey, setCardKey] = useState(Date.now());
   const searchParams = useSearchParams();
 
-  const PLAN_CREDITS = {
-    Basic: 20,
-    Pro: 60,
-    Agency: 150,
-  };
+    const PLAN_CREDITS = {
+      Basic: 20,
+      Pro: 60,
+      Agency: 150,
+    };
 
   useEffect(() => {
     const planAmount = searchParams.get("amount");

@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import ShareModal from "@/components/ShareModal";
 
 // const CLOUD_NAME = "dhtpqla2b";
 // const UPLOAD_PRESET = "unsigned_preset";
@@ -110,7 +111,7 @@ const Step4Page = () => {
   const [projectId, setProjectId] = useState(null);
   const [isViewMode, setIsViewMode] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [confirmDownload, setConfirmDownload] = useState(false);
 
   // Load project data
@@ -142,12 +143,18 @@ const Step4Page = () => {
           selectedFeature: project.selectedFeature?.[0] || "",
           selectedStyle: project.selectedStyle?.[0] || "",
           beforeAfterData:
-  project.beforeAfterData && project.beforeAfterData.length > 0
-    ? project.beforeAfterData  // ✅ DB se AI processed images aayengi
-    : project.image
-      ? [{ processedImage: project.image, originalImage: project.uploadedImages?.[0] || project.image }]
-      : [],
-uploadedImages: project.uploadedImages || [],
+            project.beforeAfterData && project.beforeAfterData.length > 0
+              ? project.beforeAfterData // ✅ DB se AI processed images aayengi
+              : project.image
+                ? [
+                    {
+                      processedImage: project.image,
+                      originalImage:
+                        project.uploadedImages?.[0] || project.image,
+                    },
+                  ]
+                : [],
+          uploadedImages: project.uploadedImages || [],
           finalNotes: project.finalNotes || "",
           userId: project.userid || user?._id,
         });
@@ -429,10 +436,10 @@ uploadedImages: project.uploadedImages || [],
                     >
                       <Image
                         src={
-  (Array.isArray(formData.beforeAfterData) 
-    ? formData.beforeAfterData[index]?.processedImage 
-    : formData.beforeAfterData?.processedImage) || img
-}
+                          (Array.isArray(formData.beforeAfterData)
+                            ? formData.beforeAfterData[index]?.processedImage
+                            : formData.beforeAfterData?.processedImage) || img
+                        }
                         alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
@@ -508,15 +515,25 @@ uploadedImages: project.uploadedImages || [],
             Edit
           </button>
           <button
-            onClick={() => {
-              const imageUrl =
+            onClick={async () => {
+              const shareUrl =
                 formData.beforeAfterData?.[0]?.processedImage ||
-                formData.uploadedImages?.[0];
-              if (imageUrl) {
-                navigator.clipboard.writeText(imageUrl);
-                toast.success("Image link copied to clipboard!");
+                formData.uploadedImages?.[0] ||
+                "";
+
+              if (navigator.share) {
+                try {
+                  await navigator.share({
+                    title: "Elite Image AI",
+                    text: "Check out my AI enhanced image!",
+                    url: shareUrl,
+                  });
+                } catch (err) {
+                  if (err.name !== "AbortError") toast.error("Share failed");
+                }
               } else {
-                toast.error("No image link available");
+                await navigator.clipboard.writeText(shareUrl);
+                toast.success("Link copied to clipboard!");
               }
             }}
             className="
@@ -581,6 +598,11 @@ uploadedImages: project.uploadedImages || [],
           <span>Download </span>
         </button>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        formData={formData}
+      />
     </div>
   );
 };

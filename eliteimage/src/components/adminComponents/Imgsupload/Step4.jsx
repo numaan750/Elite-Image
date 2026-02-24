@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { useRouter } from "next/navigation";
+import ShareModal from "@/components/ShareModal";
 
 const CLOUD_NAME = "drh7q62eh";
 const UPLOAD_PRESET = "unsigned_preset";
@@ -396,6 +397,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
   const { saveDraft } = useContext(AppContext);
   const searchParams = useSearchParams();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     if (!formData.featureType) {
@@ -666,9 +668,26 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       toast.success("Downloaded 1 image!");
     }
   };
-  const handleShare = () => {
-    console.log("Sharing link...");
-    alert("Share functionality will be implemented here!");
+  const handleShare = async () => {
+    const shareUrl =
+      formData.beforeAfterData?.[0]?.processedImage ||
+      formData.uploadedImages?.[0] ||
+      "";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Elite Image AI",
+          text: "Check out my AI enhanced image!",
+          url: shareUrl,
+        });
+      } catch (err) {
+        if (err.name !== "AbortError") toast.error("Share failed");
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Link copied to clipboard!");
+    }
   };
 
   return (
@@ -914,6 +933,11 @@ const Step4 = ({ formData, setFormData, next, back }) => {
           </span>
         </button>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        formData={formData}
+      />
     </div>
   );
 };
