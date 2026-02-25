@@ -356,7 +356,7 @@ const Step4Page = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-full sm:max-w-[820px]flex flex-col items-center gap-4 sm:gap-5">
+      <div className="w-full max-w-full sm:max-w-[820px] flex flex-col items-center gap-4 sm:gap-5">
         <div className="flex flex-col sm:flex-row w-full justify-center gap-2 sm:gap-3">
           <button
             onClick={() => {
