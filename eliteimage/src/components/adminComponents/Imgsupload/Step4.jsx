@@ -823,8 +823,19 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                   >
                     <div className="absolute inset-0">
                       <Image
-                        src={img}
-                        alt={`Before ${index + 1}`}
+                        src={(() => {
+                          if (
+                            Array.isArray(formData.beforeAfterData) &&
+                            formData.beforeAfterData[index]?.processedImage
+                          ) {
+                            return formData.beforeAfterData[index]
+                              .processedImage;
+                          } else if (formData.beforeAfterData?.processedImage) {
+                            return formData.beforeAfterData.processedImage;
+                          }
+                          return img;
+                        })()}
+                        alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
                         className="object-contain"
@@ -841,24 +852,11 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                       }}
                     >
                       {(() => {
-  let afterSrc;
-  if (
-    Array.isArray(formData.beforeAfterData) &&
-    formData.beforeAfterData[index]?.processedImage
-  ) {
-    afterSrc = formData.beforeAfterData[index].processedImage;
-  } else if (formData.beforeAfterData?.processedImage) {
-    afterSrc = formData.beforeAfterData.processedImage;
-  } else {
-    afterSrc = img;
-  }
-
-                        if (!afterSrc) return null;
-
+                        if (!img) return null;
                         return (
                           <Image
-                            src={afterSrc}
-                            alt={`After ${index + 1}`}
+                            src={img}
+                            alt={`Before ${index + 1}`}
                             fill
                             sizes="(max-width: 768px) 100vw, 800px"
                             className="object-contain"
@@ -874,8 +872,8 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                     >
                       <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                          w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
-                          cursor-ew-resize border-2 border-[#034F75]"
+      w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
+      cursor-ew-resize border-2 border-[#034F75]"
                         onMouseDown={() => setIsDragging(index)}
                         onTouchStart={() => setIsDragging(index)}
                       >
