@@ -122,7 +122,7 @@ export const processImageWithAI = async (req, res) => {
       },
       body: JSON.stringify({
         // model: "qwen-image-edit-plus-2025-12-15",
-        model:"gpt-3.5-turbo",
+        model: process.env.DASHSCOPE_MODEL,
         input: {
           messages: [
             {
