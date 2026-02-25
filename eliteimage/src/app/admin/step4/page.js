@@ -296,8 +296,12 @@ const Step4Page = () => {
                   >
                     <div className="absolute inset-0">
                       <Image
-                        src={img}
-                        alt={`Before ${index + 1}`}
+                        src={
+                          (Array.isArray(formData.beforeAfterData)
+                            ? formData.beforeAfterData[index]?.processedImage
+                            : formData.beforeAfterData?.processedImage) || img
+                        }
+                        alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
                         className="object-contain"
@@ -314,12 +318,8 @@ const Step4Page = () => {
                       }}
                     >
                       <Image
-                        src={
-                          (Array.isArray(formData.beforeAfterData)
-                            ? formData.beforeAfterData[index]?.processedImage
-                            : formData.beforeAfterData?.processedImage) || img
-                        }
-                        alt={`After ${index + 1}`}
+                        src={img}
+                        alt={`Before ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
                         className="object-contain"
