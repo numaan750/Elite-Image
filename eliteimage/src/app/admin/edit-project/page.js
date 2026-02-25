@@ -185,6 +185,11 @@ const EditProjectPage = () => {
 
       await saveGeneratedImage(backendPayload, token, true, formData.projectId);
       toast.success("Project updated successfully!", { duration: 2000 });
+      setTimeout(() => {
+        router.push(
+          `/admin/step4?projectId=${formData.projectId}&mode=view&t=${Date.now()}`,
+        );
+      }, 1500);
     } catch (error) {
       console.error("❌ Generate error:", error);
       toast.error(`Error: ${error.message}`);

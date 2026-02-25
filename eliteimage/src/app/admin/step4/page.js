@@ -58,24 +58,29 @@ const Step4Page = () => {
       try {
         const project = await getProjectById(pid, true);
 
+        const beforeAfterData =
+          project.beforeAfterData && project.beforeAfterData.length > 0
+            ? project.beforeAfterData
+            : project.image
+              ? [
+                  {
+                    processedImage: project.image,
+                    originalImage: project.uploadedImages?.[0] || project.image,
+                  },
+                ]
+              : [];
+
+        const uploadedImages =
+          beforeAfterData.length > 0 && beforeAfterData[0].originalImage
+            ? beforeAfterData.map((d) => d.originalImage)
+            : project.uploadedImages || [];
+
         setFormData({
-          uploadedImages: project.uploadedImages || [],
+          uploadedImages: uploadedImages,
           featureType: project.featureType || "",
           selectedFeature: project.selectedFeature?.[0] || "",
           selectedStyle: project.selectedStyle?.[0] || "",
-          beforeAfterData:
-            project.beforeAfterData && project.beforeAfterData.length > 0
-              ? project.beforeAfterData
-              : project.image
-                ? [
-                    {
-                      processedImage: project.image,
-                      originalImage:
-                        project.uploadedImages?.[0] || project.image,
-                    },
-                  ]
-                : [],
-          uploadedImages: project.uploadedImages || [],
+          beforeAfterData: beforeAfterData,
           finalNotes: project.finalNotes || "",
           userId: project.userid || user?._id,
         });
@@ -298,10 +303,10 @@ const Step4Page = () => {
                       <Image
                         src={
                           (Array.isArray(formData.beforeAfterData)
-                            ? formData.beforeAfterData[index]?.processedImage
-                            : formData.beforeAfterData?.processedImage) || img
+                            ? formData.beforeAfterData[index]?.originalImage
+                            : formData.beforeAfterData?.originalImage) || img
                         }
-                        alt={`After ${index + 1}`}
+                        alt={`Before ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
                         className="object-contain"
@@ -318,8 +323,12 @@ const Step4Page = () => {
                       }}
                     >
                       <Image
-                        src={img}
-                        alt={`Before ${index + 1}`}
+                        src={
+                          (Array.isArray(formData.beforeAfterData)
+                            ? formData.beforeAfterData[index]?.processedImage
+                            : formData.beforeAfterData?.processedImage) || img
+                        }
+                        alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
                         className="object-contain"
