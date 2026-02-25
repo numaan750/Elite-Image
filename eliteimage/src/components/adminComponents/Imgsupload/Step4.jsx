@@ -671,8 +671,15 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       formData.uploadedImages?.[0] ||
       "";
 
+    // ✅ pehle define karo
+    const processedData =
+      formData.beforeAfterData && formData.beforeAfterData.length > 0
+        ? formData.beforeAfterData
+        : formData.uploadedImages.map((img) => ({ processedImage: img }));
+
     // Single image
     if (processedData.length <= 1) {
+      // ✅ ab theek hai
       if (navigator.share) {
         try {
           await navigator.share({
@@ -690,14 +697,9 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       return;
     }
 
-    // Multiple images - files share karo
+    // Multiple images
     try {
       toast.loading("Preparing images...", { id: "share" });
-
-      const processedData =
-        formData.beforeAfterData && formData.beforeAfterData.length > 0
-          ? formData.beforeAfterData
-          : formData.uploadedImages.map((img) => ({ processedImage: img }));
 
       const files = [];
       for (let i = 0; i < processedData.length; i++) {
@@ -711,7 +713,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
       toast.dismiss("share");
 
-      // Check karo browser files share support karta hai ya nahi
       if (
         navigator.share &&
         navigator.canShare &&
@@ -723,7 +724,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
           files: files,
         });
       } else {
-        // Fallback: pehli image ka link copy karo
         await navigator.clipboard.writeText(shareUrl);
         toast.success(
           "Link copied! (File sharing not supported on this device)",
