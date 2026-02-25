@@ -21,6 +21,11 @@ const Step5 = ({ formData, setFormData, back }) => {
   const [isDragging, setIsDragging] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
+  const [isTyping, setIsTyping] = useState(false);
+  {
+    /* ✅ naya */
+  }
+  const typingTimerRef = React.useRef(null);
 
   useEffect(() => {
     if (!formData.featureType) {
@@ -61,12 +66,12 @@ const Step5 = ({ formData, setFormData, back }) => {
   }, [isDragging]);
 
   const handleGenerate = async () => {
-  const imageCount = formData.uploadedImages.length;
-  const creditsNeeded = imageCount * 5;
-  const canProceed = await deductUserCredits(creditsNeeded);
-  if (!canProceed) {
-    return;
-  }
+    const imageCount = formData.uploadedImages.length;
+    const creditsNeeded = imageCount * 5;
+    const canProceed = await deductUserCredits(creditsNeeded);
+    if (!canProceed) {
+      return;
+    }
     if (!token) {
       toast.error("Please login to save images");
       return;
@@ -242,27 +247,15 @@ const Step5 = ({ formData, setFormData, back }) => {
                       }));
                     }}
                   >
+                    {/* ✅ Background = Generated/Processed Image */}
                     <div className="absolute inset-0">
                       <Image
-                        src={img}
-                        alt={`Before ${index + 1}`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 800px"
-                        className="object-contain"
-                        priority
-                      />
-                    </div>
-
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        clipPath: `inset(0 ${
-                          100 - (sliderPositions[index] || 50)
-                        }% 0 0)`,
-                      }}
-                    >
-                      <Image
-                        src={formData.beforeAfterData?.processedImage || img}
+                        src={
+                          Array.isArray(formData.beforeAfterData) &&
+                          formData.beforeAfterData[index]?.processedImage
+                            ? formData.beforeAfterData[index].processedImage
+                            : formData.beforeAfterData?.processedImage || img
+                        }
                         alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
@@ -270,6 +263,21 @@ const Step5 = ({ formData, setFormData, back }) => {
                         priority
                       />
                     </div>
+
+                    {/* ✅ Shimmer Overlay - typing ke waqt dikhega */}
+                    {isTyping && (
+                      <div className="absolute inset-0 z-10 overflow-hidden rounded-lg">
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            background:
+                              "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%)",
+                            backgroundSize: "200% 100%",
+                            animation: "shimmerMove 1.2s ease-in-out infinite",
+                          }}
+                        />
+                      </div>
+                    )}
 
                     {/* Slider Line */}
                     {/* <div
@@ -311,7 +319,14 @@ const Step5 = ({ formData, setFormData, back }) => {
         <div className="w-full rounded-lg border border-dashed border-[#034F75] bg-[#DFF0F7] p-3 sm:p-4 mb-2 sm:mb-4 lg:mb-6">
           <textarea
             value={editDescription}
-            onChange={(e) => setEditDescription(e.target.value)}
+            onChange={(e) => {
+              setEditDescription(e.target.value);
+              setIsTyping(true);
+              if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
+              typingTimerRef.current = setTimeout(() => {
+                setIsTyping(false);
+              }, 1000);
+            }}
             placeholder="Enter Here"
             className="w-full h-20 sm:h-24 lg:h-28 resize-none rounded border-none bg-transparent 
             text-[14px] sm:text-[18px] text-gray-800 placeholder:text-gray-400
@@ -346,5 +361,12 @@ const Step5 = ({ formData, setFormData, back }) => {
     </div>
   );
 };
+
+<style jsx global>{`
+  @keyframes shimmerMove {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+`}</style>
 
 export default Step5;
