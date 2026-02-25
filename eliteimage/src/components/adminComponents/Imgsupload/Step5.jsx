@@ -15,6 +15,7 @@ const Step5 = ({ formData, setFormData, back }) => {
     saveDraft,
     deleteDraft,
     deductUserCredits,
+    processImageWithAI,
   } = useContext(AppContext);
   const searchParams = useSearchParams();
   const [sliderPositions, setSliderPositions] = useState({});
@@ -22,9 +23,7 @@ const Step5 = ({ formData, setFormData, back }) => {
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const [isTyping, setIsTyping] = useState(false);
-  {
-    /* ✅ naya */
-  }
+  const [isGenerating, setIsGenerating] = useState(false);
   const typingTimerRef = React.useRef(null);
 
   useEffect(() => {
@@ -66,100 +65,122 @@ const Step5 = ({ formData, setFormData, back }) => {
   }, [isDragging]);
 
   const handleGenerate = async () => {
+    if (!editDescription.trim()) {
+      toast.error("Pehle kuch likho textarea mein!");
+      return;
+    }
+
     const imageCount = formData.uploadedImages.length;
     const creditsNeeded = imageCount * 5;
     const canProceed = await deductUserCredits(creditsNeeded);
-    if (!canProceed) {
-      return;
-    }
+    if (!canProceed) return;
+
     if (!token) {
       toast.error("Please login to save images");
       return;
     }
-    const finalData = {
-      ...formData,
-      finalNotes: editDescription,
-      lastModified: new Date().toISOString(),
-    };
-    const updatedBeforeAfterData = formData.beforeAfterData
-      ? Array.isArray(formData.beforeAfterData)
-        ? formData.beforeAfterData.map((item) => ({
-            ...item,
-            editPrompt: editDescription,
-            editedAt: new Date().toISOString(),
-          }))
-        : {
-            ...formData.beforeAfterData,
-            editPrompt: editDescription,
-            editedAt: new Date().toISOString(),
-          }
-      : [];
 
-    setFormData((prev) => ({
-      ...prev,
-      beforeAfterData: updatedBeforeAfterData,
-      finalNotes: editDescription,
-      lastModified: new Date().toISOString(),
-    }));
+    setIsGenerating(true);
+    setIsTyping(true); // shimmer on
 
-    back();
-    (async () => {
-      try {
-        const backendPayload = {
-          userid: finalData.userId,
-          title: `${finalData.featureType} - Edited - ${new Date().toLocaleDateString()}`,
-          description: editDescription,
-          featureType: finalData.featureType,
-          uploadedImages: finalData.uploadedImages,
-          selectedFeature: finalData.selectedFeature
-            ? [finalData.selectedFeature]
-            : [],
-          selectedStyle: finalData.selectedStyle
-            ? [finalData.selectedStyle]
-            : [],
-          beforeAfterData: Array.isArray(updatedBeforeAfterData)
-            ? updatedBeforeAfterData
-            : [updatedBeforeAfterData],
-          finalNotes: editDescription,
-          image:
-            (Array.isArray(updatedBeforeAfterData)
-              ? updatedBeforeAfterData[0]?.processedImage
-              : updatedBeforeAfterData?.processedImage) ||
-            finalData.uploadedImages[0],
-        };
+    try {
+      const allProcessedData = [];
 
-        if (formData.projectId) {
-          await saveGeneratedImage(
-            backendPayload,
-            token,
-            true,
-            formData.projectId,
+      for (let i = 0; i < formData.uploadedImages.length; i++) {
+        const originalImage = formData.uploadedImages[i];
+
+        toast.loading(
+          `AI processing image ${i + 1} of ${formData.uploadedImages.length}...`,
+          { id: `gen-${i}` },
+        );
+
+        let processedUrl;
+        try {
+          // ✅ Real AI Call - textarea ki value jayegi as finalNotes
+          processedUrl = await processImageWithAI(
+            originalImage,
+            formData.featureType,
+            formData.selectedFeature || null,
+            formData.selectedStyle || null,
+            editDescription, // ✅ yeh textarea wali value hai
           );
-        } else {
-          await saveGeneratedImage(backendPayload, token);
+          toast.success(`Image ${i + 1} ready!`, { id: `gen-${i}` });
+        } catch (aiError) {
+          console.error(`AI failed for image ${i + 1}:`, aiError);
+          toast.error(`AI failed for image ${i + 1}`, { id: `gen-${i}` });
+          processedUrl = originalImage; // fallback
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const draftId = urlParams.get("draftId") || formData.draftId;
-
-        if (draftId) {
-          const savedDrafts = localStorage.getItem("draftProjects");
-          if (savedDrafts) {
-            const drafts = JSON.parse(savedDrafts);
-            const updatedDrafts = drafts.filter(
-              (draft) => draft.id !== draftId,
-            );
-            localStorage.setItem(
-              "draftProjects",
-              JSON.stringify(updatedDrafts),
-            );
-          }
-        }
-        localStorage.removeItem("currentDraft");
-      } catch (error) {
-        console.error("❌ Background save failed:", error);
+        allProcessedData.push({
+          originalImage: originalImage,
+          processedImage: processedUrl, // ✅ AI wali nayi image
+          editPrompt: editDescription,
+          editedAt: new Date().toISOString(),
+          status: "completed",
+        });
       }
-    })();
+
+      // ✅ formData update karo nayi processed images se
+      setFormData((prev) => ({
+        ...prev,
+        beforeAfterData: allProcessedData,
+        finalNotes: editDescription,
+      }));
+
+      // ✅ Database mein save karo
+      const backendPayload = {
+        userid: formData.userId,
+        title: `${formData.featureType} - Edited - ${new Date().toLocaleDateString()}`,
+        description: editDescription,
+        featureType: formData.featureType,
+        uploadedImages: formData.uploadedImages,
+        selectedFeature: formData.selectedFeature
+          ? [formData.selectedFeature]
+          : [],
+        selectedStyle: formData.selectedStyle ? [formData.selectedStyle] : [],
+        beforeAfterData: allProcessedData,
+        finalNotes: editDescription,
+        image:
+          allProcessedData[0]?.processedImage || formData.uploadedImages[0],
+      };
+
+      if (formData.projectId) {
+        await saveGeneratedImage(
+          backendPayload,
+          token,
+          true,
+          formData.projectId,
+        );
+      } else {
+        await saveGeneratedImage(backendPayload, token);
+      }
+
+      // ✅ Draft clean karo
+      const urlParams = new URLSearchParams(window.location.search);
+      const draftId = urlParams.get("draftId") || formData.draftId;
+      if (draftId) {
+        const savedDrafts = localStorage.getItem("draftProjects");
+        if (savedDrafts) {
+          const drafts = JSON.parse(savedDrafts);
+          localStorage.setItem(
+            "draftProjects",
+            JSON.stringify(drafts.filter((d) => d.id !== draftId)),
+          );
+        }
+      }
+      localStorage.removeItem("currentDraft");
+
+      toast.success("Images generate ho gayi!", { duration: 2000 });
+
+      // ✅ Step 4 par wapas jao nayi images ke saath
+      back();
+    } catch (error) {
+      console.error("❌ Generate error:", error);
+      toast.error(`Error: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+      setIsTyping(false); // shimmer off
+    }
   };
 
   return (
@@ -344,17 +365,23 @@ const Step5 = ({ formData, setFormData, back }) => {
 
           <button
             onClick={handleGenerate}
-            disabled={isSaving}
+            disabled={isSaving || isGenerating}
             className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg transition-colors
-              ${
-                isSaving
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#023d5c]"
-              }
-            `}
+  ${
+    isSaving || isGenerating
+      ? "opacity-50 cursor-not-allowed"
+      : "hover:bg-[#023d5c]"
+  }
+`}
           >
             <FaMagic size={15} />
-            <span>{isSaving ? "Saving..." : "Generate"}</span>
+            <span>
+              {isGenerating
+                ? "AI Processing..."
+                : isSaving
+                  ? "Saving..."
+                  : "Generate"}
+            </span>
           </button>
         </div>
       </div>
@@ -364,9 +391,13 @@ const Step5 = ({ formData, setFormData, back }) => {
 
 <style jsx global>{`
   @keyframes shimmerMove {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
   }
-`}</style>
+`}</style>;
 
 export default Step5;
