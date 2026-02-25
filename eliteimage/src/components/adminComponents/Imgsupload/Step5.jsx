@@ -66,7 +66,7 @@ const Step5 = ({ formData, setFormData, back }) => {
 
   const handleGenerate = async () => {
     if (!editDescription.trim()) {
-      toast.error("Pehle kuch likho textarea mein!");
+      toast.error("Please enter a description of the edits you want.");
       return;
     }
 

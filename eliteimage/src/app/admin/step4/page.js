@@ -303,10 +303,10 @@ const Step4Page = () => {
                       <Image
                         src={
                           (Array.isArray(formData.beforeAfterData)
-                            ? formData.beforeAfterData[index]?.originalImage
-                            : formData.beforeAfterData?.originalImage) || img
+                            ? formData.beforeAfterData[index]?.processedImage
+                            : formData.beforeAfterData?.processedImage) || img
                         }
-                        alt={`Before ${index + 1}`}
+                        alt={`After ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
                         className="object-contain"
@@ -325,10 +325,10 @@ const Step4Page = () => {
                       <Image
                         src={
                           (Array.isArray(formData.beforeAfterData)
-                            ? formData.beforeAfterData[index]?.processedImage
-                            : formData.beforeAfterData?.processedImage) || img
+                            ? formData.beforeAfterData[index]?.originalImage
+                            : formData.beforeAfterData?.originalImage) || img
                         }
-                        alt={`After ${index + 1}`}
+                        alt={`Before ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, 800px"
                         className="object-contain"
