@@ -96,39 +96,34 @@ const Step5 = ({ formData, setFormData, back }) => {
 
         let processedUrl;
         try {
-          // ✅ Real AI Call - textarea ki value jayegi as finalNotes
           processedUrl = await processImageWithAI(
             originalImage,
             formData.featureType,
             formData.selectedFeature || null,
             formData.selectedStyle || null,
-            editDescription, // ✅ yeh textarea wali value hai
+            editDescription,
           );
           toast.success(`Image ${i + 1} ready!`, { id: `gen-${i}` });
         } catch (aiError) {
           console.error(`AI failed for image ${i + 1}:`, aiError);
           toast.error(`AI failed for image ${i + 1}`, { id: `gen-${i}` });
-          processedUrl = originalImage; // fallback
+          processedUrl = originalImage;
         }
 
         allProcessedData.push({
           originalImage: originalImage,
-          processedImage: processedUrl, // ✅ AI wali nayi image
+          processedImage: processedUrl,
           editPrompt: editDescription,
           editedAt: new Date().toISOString(),
           status: "completed",
         });
       }
-
-      // ✅ formData update karo nayi processed images se
       setFormData((prev) => ({
         ...prev,
         beforeAfterData: allProcessedData,
         finalNotes: editDescription,
-         uploadedImages: allProcessedData.map((item) => item.originalImage),
+        uploadedImages: allProcessedData.map((item) => item.processedImage),
       }));
-
-      // ✅ Database mein save karo
       const backendPayload = {
         userid: formData.userId,
         title: `${formData.featureType} - Edited - ${new Date().toLocaleDateString()}`,
@@ -155,8 +150,6 @@ const Step5 = ({ formData, setFormData, back }) => {
       } else {
         await saveGeneratedImage(backendPayload, token);
       }
-
-      // ✅ Draft clean karo
       const urlParams = new URLSearchParams(window.location.search);
       const draftId = urlParams.get("draftId") || formData.draftId;
       if (draftId) {
@@ -172,15 +165,13 @@ const Step5 = ({ formData, setFormData, back }) => {
       localStorage.removeItem("currentDraft");
 
       toast.success("Images generate ho gayi!", { duration: 2000 });
-
-      // ✅ Step 4 par wapas jao nayi images ke saath
       back();
     } catch (error) {
       console.error("❌ Generate error:", error);
       toast.error(`Error: ${error.message}`);
     } finally {
       setIsGenerating(false);
-      setIsTyping(false); // shimmer off
+      setIsTyping(false);
     }
   };
 
@@ -188,18 +179,6 @@ const Step5 = ({ formData, setFormData, back }) => {
     <div className="w-full bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
       <div className="w-full flex justify-start">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
-          {/* <div className="flex items-center gap-2">
-            <button
-              onClick={back}
-              className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors">
-              <ChevronRight size={16} />
-            </button>
-          </div> */}
-
           <span className="font-medium text-black text-[16px] sm:text-[20px] mb-6 sm:mb-8">
             Elite Image Ai
           </span>
@@ -269,7 +248,6 @@ const Step5 = ({ formData, setFormData, back }) => {
                       }));
                     }}
                   >
-                    {/* ✅ Background = Generated/Processed Image */}
                     <div className="absolute inset-0">
                       <Image
                         src={
@@ -285,8 +263,6 @@ const Step5 = ({ formData, setFormData, back }) => {
                         priority
                       />
                     </div>
-
-                    {/* ✅ Shimmer Overlay - typing ke waqt dikhega */}
                     {isTyping && (
                       <div className="absolute inset-0 z-10 overflow-hidden rounded-lg">
                         <div
@@ -300,31 +276,6 @@ const Step5 = ({ formData, setFormData, back }) => {
                         />
                       </div>
                     )}
-
-                    {/* Slider Line */}
-                    {/* <div
-                      className="absolute top-0 bottom-0 w-1 bg-white shadow-lg z-10"
-                      style={{ left: `${sliderPositions[index] || 50}%` }}
-                    >
-                      {/* Slider Handle */}
-                    {/* <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                        w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow-xl flex items-center justify-center
-                        cursor-ew-resize border-2 border-[#034F75]"
-                        onMouseDown={() => setIsDragging(index)}
-                        onTouchStart={() => setIsDragging(index)}
-                      >
-                        <MoveHorizontal size={20} className="text-[#034F75]" />
-                      </div>
-                    </div> */}
-
-                    {/* Labels
-                    <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
-                      Before
-                    </div>
-                    <div className="absolute top-2 right-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
-                      After
-                    </div> */}
                   </div>
                 </div>
               </div>
@@ -368,12 +319,12 @@ const Step5 = ({ formData, setFormData, back }) => {
             onClick={handleGenerate}
             disabled={isSaving || isGenerating}
             className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg transition-colors
-  ${
-    isSaving || isGenerating
-      ? "opacity-50 cursor-not-allowed"
-      : "hover:bg-[#023d5c]"
-  }
-`}
+               ${
+                 isSaving || isGenerating
+                   ? "opacity-50 cursor-not-allowed"
+                   : "hover:bg-[#023d5c]"
+               }
+             `}
           >
             <FaMagic size={15} />
             <span>
