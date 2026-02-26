@@ -30,6 +30,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedAreas, setSelectedAreas] = useState({});
   const imageRef = useRef(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const totalSelectedObjects = Object.values(selectedAreas).reduce(
     (total, areas) => total + areas.length,
@@ -135,12 +136,13 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     next();
   };
   const handleRemoveObject = async () => {
+    if (isProcessing) return;
+
     const imageCount = formData.uploadedImages.length;
     const creditsNeeded = imageCount * 5;
     const canProceed = await deductUserCredits(creditsNeeded);
-    if (!canProceed) {
-      return;
-    }
+    if (!canProceed) return;
+
     if (!token) {
       toast.error("Please login first");
       return;
@@ -151,175 +153,134 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
       return;
     }
 
+    setIsProcessing(true);
     toast.loading("Processing images...", { id: "remove" });
 
-    (async () => {
-      try {
-        const allUploadedImages = [];
-        const allBeforeAfterData = [];
-        const CLOUD_NAME = "drh7q62eh";
-        const UPLOAD_PRESET = "unsigned_preset";
+    try {
+      const CLOUD_NAME = "drh7q62eh";
+      const UPLOAD_PRESET = "unsigned_preset";
 
-        const uploadToCloudinary = async (img) => {
-          let blob;
+      const uploadToCloudinary = async (img) => {
+        let blob;
+        if (img.startsWith("blob:")) {
+          const idx = formData.uploadedImages.indexOf(img);
+          blob =
+            formData.localFiles?.[idx] ||
+            (await fetch(img).then((r) => r.blob()));
+        } else {
+          blob = await fetch(img).then((r) => r.blob());
+        }
+        const fd = new FormData();
+        fd.append("file", blob);
+        fd.append("upload_preset", UPLOAD_PRESET);
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+          { method: "POST", body: fd },
+        );
+        if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+        const data = await res.json();
+        if (!data.secure_url) throw new Error("No secure_url");
+        return data.secure_url;
+      };
 
-          try {
-            console.log("🚀 Uploading image to Cloudinary...");
+      const buildSelectionPrompt = (areas) => {
+        if (!areas || areas.length === 0) {
+          return "Remove any unwanted objects, clutter, or distracting elements from this photo.";
+        }
 
-            if (img.startsWith("blob:")) {
-              const idx = formData.uploadedImages.indexOf(img);
-              blob =
-                formData.localFiles?.[idx] ||
-                (await fetch(img).then((r) => r.blob()));
-            } else {
-              blob = await fetch(img).then((r) => r.blob());
-            }
+        const containerEl = document.querySelector(".cursor-crosshair");
+        const displayWidth = containerEl?.offsetWidth || 800;
+        const displayHeight = containerEl?.offsetHeight || 600;
 
-            const fd = new FormData();
-            fd.append("file", blob);
-            fd.append("upload_preset", UPLOAD_PRESET);
+        const areaDescriptions = areas.map((area, idx) => {
+          const xPct = Math.round((area.x / displayWidth) * 100);
+          const yPct = Math.round((area.y / displayHeight) * 100);
+          const wPct = Math.round((area.width / displayWidth) * 100);
+          const hPct = Math.round((area.height / displayHeight) * 100);
 
-            const res = await fetch(
-              `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-              { method: "POST", body: fd },
-            );
+          const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
+          const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
 
-            console.log("📡 Response status:", res.status);
-
-            if (!res.ok) {
-              const errorText = await res.text();
-              console.error("❌ Upload failed:", errorText);
-              throw new Error(`Upload failed: ${res.status}`);
-            }
-
-            const data = await res.json();
-            console.log("✅ Upload success:", data.secure_url);
-
-            if (!data.secure_url) {
-              throw new Error("No secure_url in response");
-            }
-
-            return data.secure_url;
-          } catch (error) {
-            console.error("❌ Cloudinary upload error:", error);
-            throw error;
-          }
-        };
-
-        const uploadPromises = formData.uploadedImages.map(async (img, i) => {
-          const originalUrl = await uploadToCloudinary(img);
-          let processedUrl;
-          try {
-            toast.loading(`Removing objects from image ${i + 1}...`, {
-              id: `ai-obj-${i}`,
-            });
-            const areas = selectedAreas[i] || [];
-            const imageElement = document.querySelector(
-              'img[alt="Select object to remove"]',
-            );
-            const imgWidth =
-              imageElement?.naturalWidth || imageElement?.width || 800;
-            const imgHeight =
-              imageElement?.naturalHeight || imageElement?.height || 600;
-
-            const areaDescriptions = areas.map((area, areaIndex) => {
-              const xPercent = Math.round((area.x / imgWidth) * 100);
-              const yPercent = Math.round((area.y / imgHeight) * 100);
-              const wPercent = Math.round((area.width / imgWidth) * 100);
-              const hPercent = Math.round((area.height / imgHeight) * 100);
-              let position = "";
-              if (yPercent < 33) position = "top";
-              else if (yPercent > 66) position = "bottom";
-              else position = "middle";
-
-              let side = "";
-              if (xPercent < 33) side = "left";
-              else if (xPercent > 66) side = "right";
-              else side = "center";
-
-              return `object ${areaIndex + 1} located at ${position} ${side} area of the image (approximately ${xPercent}% from left, ${yPercent}% from top, covering ${wPercent}% width and ${hPercent}% height)`;
-            });
-
-            const selectionDescription =
-              areaDescriptions.length > 0
-                ? `Remove the following selected objects: ${areaDescriptions.join(". Also remove ")}.`
-                : "Remove any unwanted objects from this photo.";
-
-            processedUrl = await processImageWithAI(
-              originalUrl,
-              "Object Removal",
-              selectionDescription,
-              null,
-              null,
-            );
-            toast.success(`Objects removed from image ${i + 1}!`, {
-              id: `ai-obj-${i}`,
-            });
-          } catch (aiError) {
-            toast.error(`AI failed for image ${i + 1}`, { id: `ai-obj-${i}` });
-            processedUrl = originalUrl;
-          }
-
-          return {
-            originalImage: originalUrl,
-            processedImage: processedUrl,
-            removedAreas: selectedAreas[i] || [],
-            processedAt: new Date().toISOString(),
-            status: "completed",
-          };
+          return `Selection ${idx + 1}: in the ${vertPos}-${horizPos} portion of the image, starting at ${xPct}% from left and ${yPct}% from top, spanning ${wPct}% of image width and ${hPct}% of image height`;
         });
 
-        const results = await Promise.all(uploadPromises);
-        allBeforeAfterData.push(...results);
-        allUploadedImages.push(...results.map((r) => r.originalImage));
+        return `There ${areas.length === 1 ? "is" : "are"} ${areas.length} selected region${areas.length > 1 ? "s" : ""} that must be removed:\n${areaDescriptions.join("\n")}\n\nFor each selected region: identify the object or content inside that exact region, completely erase it, and fill the area naturally with the surrounding background (wall, floor, sky, grass, etc.) as if the object was never there. Do NOT remove anything outside these selected regions. Keep everything else in the photo completely unchanged.`;
+      };
+      const uploadPromises = formData.uploadedImages.map(async (img, i) => {
+        const originalUrl = await uploadToCloudinary(img);
 
-        const singlePayload = {
-          userid: user?._id || formData.userid,
-          title: `Object Removal - ${new Date().toLocaleDateString()}`,
-          description: `Object removal with ${totalSelectedObjects} selected area(s)`,
-          featureType: "object-removal",
-          uploadedImages: allUploadedImages,
-          selectedFeature: ["object-removal"],
-          beforeAfterData: allBeforeAfterData,
-          finalNotes: `Removed ${totalSelectedObjects} object(s)`,
-          image: allUploadedImages[0],
-        };
+        const areas = selectedAreas[i] || [];
+        const selectionPrompt = buildSelectionPrompt(areas);
 
-        const savedData = await saveGeneratedImage([singlePayload], token);
-
-        setFormData((prev) => ({
-          ...prev,
-          beforeAfterData: Array.isArray(savedData)
-            ? savedData.flatMap((item) => item.beforeAfterData || [])
-            : savedData.beforeAfterData || [],
-        }));
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const draftId = urlParams.get("draftId") || formData.draftId;
-
-        if (draftId) {
-          const savedDrafts = localStorage.getItem("draftProjects");
-          if (savedDrafts) {
-            const drafts = JSON.parse(savedDrafts);
-            const updatedDrafts = drafts.filter(
-              (draft) => draft.id !== draftId,
-            );
-            localStorage.setItem(
-              "draftProjects",
-              JSON.stringify(updatedDrafts),
-            );
-          }
+        let processedUrl;
+        try {
+          processedUrl = await processImageWithAI(
+            originalUrl,
+            "Object Removal",
+            selectionPrompt,
+            null,
+            null,
+          );
+        } catch (aiError) {
+          console.error(`AI failed for image ${i + 1}:`, aiError);
+          processedUrl = originalUrl;
         }
-        localStorage.removeItem("currentDraft");
 
-        toast.success("Objects removed successfully!", { id: "remove" });
+        return {
+          originalImage: originalUrl,
+          processedImage: processedUrl,
+          removedAreas: areas,
+          processedAt: new Date().toISOString(),
+          status: "completed",
+        };
+      });
 
-        next();
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to remove objects", { id: "remove" });
+      const results = await Promise.all(uploadPromises);
+      const allUploadedImages = results.map((r) => r.originalImage);
+
+      const singlePayload = {
+        userid: user?._id || formData.userid,
+        title: `Object Removal - ${new Date().toLocaleDateString()}`,
+        description: `Object removal with ${totalSelectedObjects} selected area(s)`,
+        featureType: "object-removal",
+        uploadedImages: allUploadedImages,
+        selectedFeature: ["object-removal"],
+        beforeAfterData: results,
+        finalNotes: `Removed ${totalSelectedObjects} object(s)`,
+        image: allUploadedImages[0],
+      };
+
+      const savedData = await saveGeneratedImage([singlePayload], token);
+
+      setFormData((prev) => ({
+        ...prev,
+        beforeAfterData: Array.isArray(savedData)
+          ? savedData.flatMap((item) => item.beforeAfterData || [])
+          : savedData.beforeAfterData || [],
+      }));
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const draftId = urlParams.get("draftId") || formData.draftId;
+      if (draftId) {
+        const savedDrafts = localStorage.getItem("draftProjects");
+        if (savedDrafts) {
+          const drafts = JSON.parse(savedDrafts);
+          localStorage.setItem(
+            "draftProjects",
+            JSON.stringify(drafts.filter((d) => d.id !== draftId)),
+          );
+        }
       }
-    })();
+      localStorage.removeItem("currentDraft");
+
+      toast.success("Objects removed successfully!", { id: "remove" });
+      next();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove objects", { id: "remove" });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -470,7 +431,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
           <button
             onClick={handleRemoveObject}
-            disabled={!allImagesHaveSelection}
+            disabled={!allImagesHaveSelection || isProcessing}
             className={`
              w-full sm:w-auto
              flex items-center justify-center gap-2
@@ -485,7 +446,14 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
              }
            `}
           >
-            Remove Object
+            {isProcessing ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Processing...
+              </>
+            ) : (
+              "Remove Object"
+            )}{" "}
           </button>
         </div>
       </div>
