@@ -108,8 +108,8 @@ const buildPrompt = (
       4. Blending must be PERFECT - no visible edges, no blur artifacts
       5. DO NOT remove or change ANYTHING outside the described regions
       6. DO NOT alter colors, brightness, or quality of non-selected areas
-      7. Result must look like the removed objects were NEVER THERE
-      8. If a mask is provided, you MUST edit ONLY inside the mask and nowhere else.`
+      7. Result must look like the removed objects were NEVER THERE`
+      
           : feature && feature.includes("Selection")
             ? `${feature}
       
@@ -315,7 +315,6 @@ export const processImageWithAI = async (req, res) => {
       imageUrl,
       featureType,
       selectedFeature,
-      mask,
       selectedStyle,
       finalNotes,
     } = req.body;
@@ -334,7 +333,6 @@ export const processImageWithAI = async (req, res) => {
     }
 
     console.log(`🤖 AI Processing: ${featureType} for image: ${imageUrl}`);
-    console.log("🎭 Mask received:", mask ? "YES" : "NO");
 
     const prompt = buildPrompt(
       featureType,
@@ -361,13 +359,6 @@ export const processImageWithAI = async (req, res) => {
                 {
                   image: imageUrl,
                 },
-                ...(mask
-                  ? [
-                      {
-                        image: mask,
-                      },
-                    ]
-                  : []),
                 {
                   text: prompt,
                 },

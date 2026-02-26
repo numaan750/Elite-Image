@@ -162,9 +162,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
       const uploadToCloudinary = async (img) => {
         let blob;
-        if (typeof img === "string" && img.startsWith("data:image")) {
-          blob = await fetch(img).then((r) => r.blob());
-        } else if (typeof img === "string" && img.startsWith("blob:")) {
+        if (img.startsWith("blob:")) {
           const idx = formData.uploadedImages.indexOf(img);
           blob =
             formData.localFiles?.[idx] ||
@@ -226,8 +224,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
         const areas = selectedAreas[i] || [];
         const selectionPrompt = buildSelectionPrompt(areas);
-        const maskBase64 = createMaskFromAreas(areas);
-        const maskUrl = await uploadToCloudinary(maskBase64);
 
         let processedUrl;
         try {
@@ -235,7 +231,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             originalUrl,
             "Object Removal",
             selectionPrompt,
-            maskUrl,
+            null,
             null,
           );
         } catch (aiError) {
@@ -298,35 +294,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const createMaskFromAreas = (areas, width = 1024, height = 1024) => {
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = "white";
-
-    const containerEl = document.querySelector(".cursor-crosshair");
-    const displayWidth = containerEl?.offsetWidth || width;
-    const displayHeight = containerEl?.offsetHeight || height;
-
-    const scaleX = width / displayWidth;
-    const scaleY = height / displayHeight;
-
-    areas.forEach((area) => {
-      ctx.fillRect(
-        area.x * scaleX,
-        area.y * scaleY,
-        area.width * scaleX,
-        area.height * scaleY,
-      );
-    });
-
-    return canvas.toDataURL("image/png");
   };
 
   return (

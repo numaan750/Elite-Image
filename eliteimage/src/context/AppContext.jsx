@@ -590,7 +590,6 @@ const AppProvider = ({ children }) => {
     imageUrl,
     featureType,
     selectedFeature,
-    maskUrl = null,
     selectedStyle,
     finalNotes,
   ) => {
@@ -605,7 +604,6 @@ const AppProvider = ({ children }) => {
           imageUrl,
           featureType,
           selectedFeature: selectedFeature || "",
-          mask: maskUrl,
           selectedStyle: selectedStyle || "",
           finalNotes: finalNotes || "",
         }),
