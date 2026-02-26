@@ -187,6 +187,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         if (!areas || areas.length === 0) {
           return "Remove any unwanted objects or distracting elements from this photo.";
         }
+
         const containerEl = document.querySelector(".cursor-crosshair");
         const displayWidth = containerEl?.offsetWidth || 800;
         const displayHeight = containerEl?.offsetHeight || 600;
@@ -201,20 +202,22 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
           const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
 
-          return `Selection ${idx + 1}: Remove the object located in the ${vertPos}-${horizPos} area. Region starts at ${xPct}% from left and ${yPct}% from top, spans ${wPct}% width and ${hPct}% height. Center point: ${centerXPct}% from left, ${centerYPct}% from top.`;
+          return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Coordinates: starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
         });
 
-        return `OBJECT REMOVAL TASK - ${areas.length} region${areas.length > 1 ? "s" : ""} selected:
+        return `PRECISE OBJECT REMOVAL - ${areas.length} region(s) selected by user:
 
-        ${areaDescriptions.join("\n\n")}
+              ${areaDescriptions.join("\n\n")}
 
-        STRICT INSTRUCTIONS:
-        1. Remove ONLY the content inside each described region - erase completely
-        2. Fill each region with realistic seamless background matching surrounding area
-        3. Reconstruction must be invisible - match exact texture color lighting and perspective
-        4. DO NOT remove alter or modify ANYTHING outside the specified regions
-        5. DO NOT change brightness colors or quality anywhere else
-        6. Final result must look completely natural`;
+              CRITICAL EXECUTION RULES:
+              1. Remove ONLY the content inside each described REGION above - nothing else
+              2. There are exactly ${areas.length} region(s) to remove - remove ALL of them
+              3. Fill each removed region with seamless background matching surrounding area exactly
+              4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
+              5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
+              6. DO NOT alter brightness, colors, or quality of any area outside the regions
+              7. Final result must look completely natural as if those objects were never there
+              8. This is SURGICAL removal - only the selected regions, nothing more`;
       };
       const uploadPromises = formData.uploadedImages.map(async (img, i) => {
         const originalUrl = await uploadToCloudinary(img);
