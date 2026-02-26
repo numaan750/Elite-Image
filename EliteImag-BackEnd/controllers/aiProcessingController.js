@@ -38,16 +38,10 @@ const buildPrompt = (
 
       return `In this real estate photo, ${grassAction} ${styleEffect}. Keep ALL structures, buildings, pathways, driveways, fences, trees, and non-grass elements EXACTLY unchanged. Only modify the grass and lawn areas. Make it look completely photorealistic and natural. Do not enhance or change anything except the grass.`;
     })(),
-    "Object Removal": (() => {
-      if (
-        selectedFeature &&
-        selectedFeature !== "null" &&
-        selectedFeature !== ""
-      ) {
-        return `Remove the specific object or area from this real estate photo as described: ${selectedFeature}. Fill the removed area naturally and seamlessly with the surrounding background, wall, floor, or sky — whatever is contextually appropriate. Make the removal completely invisible and photorealistic. Keep all other architectural and design elements exactly unchanged.`;
-      }
-      return `Remove any unwanted objects, clutter, vehicles, people, or distracting elements from this real estate photo. Fill the removed areas naturally and seamlessly with the surrounding background. Keep all important architectural and design elements intact. Make it look clean and professional.`;
-    })(),
+    "Object Removal":
+      selectedFeature && selectedFeature.includes("Selection")
+        ? `You are given a real estate photo. Your task is to remove specific objects from selected regions only.\n\n${selectedFeature}\n\nIMPORTANT RULES:\n1. Only remove content inside the described regions\n2. Fill each removed region with realistic background (wall, floor, sky, grass)\n3. Make the removal seamless and invisible\n4. Do NOT change anything outside the selected regions\n5. Final image must look like a professional real estate photo`
+        : `Remove any unwanted objects, clutter, vehicles, people, or distracting elements from this real estate photo. Fill the removed areas naturally with the surrounding background. Keep all architectural elements intact. Make it look clean and professional.`,
     "Sky Replacement": `Replace the sky in this real estate photo with a beautiful ${selectedFeature || "Clear Sky"} sky. Apply ${selectedStyle || "vibrant"} edit style. Keep all buildings, trees, landscape and ground elements exactly the same. Only change the sky portion. Make it look photorealistic.`,
 
     "Virtual Staging": `Virtually stage this empty ${selectedFeature || "Living Room"} with ${selectedStyle || "Modern Furniture"} style furniture. Add realistic furniture, decorations and accessories appropriate for the space. Keep walls, floors, windows, doors and architectural elements exactly unchanged. Make it look like a professional real estate photo.`,
