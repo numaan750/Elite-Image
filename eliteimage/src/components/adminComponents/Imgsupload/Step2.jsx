@@ -47,102 +47,18 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
     }
   }, [selected]);
 
-  // const handleContinue = async () => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     selectedFeatures: selected,
-  //   }));
-  //   // if (featureType === "Sky Replacement") {
-  //   //   try {
-  //   //     const token = localStorage.getItem("token");
-
-  //   //     if (!token) {
-  //   //       toast.error("Please login first");
-  //   //       return;
-  //   //     }
-
-  //   //     toast.loading("Saving your selection...", { id: "save-sky" });
-
-  //   //     const backendPayload = {
-  //   //       userid: formData.userId,
-  //   //       title: `Sky Replacement - ${new Date().toLocaleDateString()}`,
-  //   //       description: `Selected Sky: ${selected[0]}`,
-  //   //       featureType: "Sky Replacement",
-  //   //       uploadedImages: formData.uploadedImages,
-  //   //       selectedFeature: selected,
-  //   //       selectedStyle: [],
-  //   //       selectedFurniture: [],
-  //   //       beforeAfterData: [],
-  //   //       finalNotes: "",
-  //   //     };
-  //   //     const API_URL =
-  //   //       process.env.NEXT_PUBLIC_API_URL || "https://elite-image.vercel.app";
-
-  //   //     const response = await fetch(`${API_URL}/api/aiImagesmodels`, {
-  //   //       method: "POST",
-  //   //       headers: {
-  //   //         "Content-Type": "application/json",
-  //   //         Authorization: `Bearer ${token}`,
-  //   //       },
-  //   //       body: JSON.stringify(backendPayload),
-  //   //     });
-
-  //   //     if (!response.ok) {
-  //   //       const errorData = await response.json();
-  //   //       throw new Error(errorData.message || "Failed to save");
-  //   //     }
-
-  //   //     const data = await response.json();
-
-  //   //     toast.success("Selection saved!", { id: "save-sky" });
-  //   //     setFormData((prev) => ({
-  //   //       ...prev,
-  //   //       projectId: data._id,
-  //   //     }));
-  //   //   } catch (error) {
-  //   //     console.error("Save error:", error);
-  //   //     toast.error(`Failed: ${error.message}`, { id: "save-sky" });
-  //   //     return;
-  //   //   }
-  //   // }
-  //   if (featureType === "Sky Replacement") {
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       beforeAfterData: prev.uploadedImages.map((img) => ({
-  //         processedImage: img,
-  //       })),
-  //     }));
-  //   }
-
-  //   next();
-  // };
-
   const handleContinue = () => {
     setFormData((prev) => ({
       ...prev,
       selectedFeatures: selected,
+      selectedFeature: selected[0] || "",
     }));
-
     next();
   };
 
   return (
     <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <div className="flex items-center text-gray-700">
-        {/* <div className="flex items-center gap-2">
-          <button
-            onClick={back}
-            className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            onClick={handleContinue}
-            className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div> */}
         <span className="font-medium text-black text-[16px] sm:text-[18px] mb-6 sm:mb-8">
           Elite Image AI
         </span>
@@ -153,11 +69,6 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
       </h2>
       {formData.totalSteps > 0 && (
         <div className="mb-2 sm:mb-4 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-          {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-12 sm:w-16 lg:w-20 bg-[#CFE8F2]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
-        <div className="h-[2px] sm:h-[3px] w-12 sm:w-16 lg:w-20 bg-[#034F75]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" /> */}
           <ProgressBar currentStep={2} totalSteps={formData.totalSteps} />
         </div>
       )}

@@ -72,115 +72,129 @@ const Step1 = ({ formData, setFormData, next }) => {
     saveDraft,
   ]);
 
-const handleGenerateAndSave = async () => {
-  const imageCount = formData.uploadedImages.filter(img => !img.startsWith("loading-")).length;
-  const creditsNeeded = imageCount * 5;
-  const canProceed = await deductUserCredits(creditsNeeded);
-  if (!canProceed) return;
+  const handleGenerateAndSave = async () => {
+    const imageCount = formData.uploadedImages.filter(
+      (img) => !img.startsWith("loading-"),
+    ).length;
+    const creditsNeeded = imageCount * 5;
+    const canProceed = await deductUserCredits(creditsNeeded);
+    if (!canProceed) return;
 
-  if (!formData.featureType) {
-    toast.error("Please select a feature first");
-    router.push("/admin/dashboard");
-    return;
-  }
-  if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
-    toast.error("Please upload at least one image first!");
-    return;
-  }
-  if (!token) {
-    toast.error("Please login to save images");
-    return;
-  }
+    if (!formData.featureType) {
+      toast.error("Please select a feature first");
+      router.push("/admin/dashboard");
+      return;
+    }
+    if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
+      toast.error("Please upload at least one image first!");
+      return;
+    }
+    if (!token) {
+      toast.error("Please login to save images");
+      return;
+    }
 
-  setIsSaving(true);
+    setIsSaving(true);
 
-  try {
-    const allProcessedData = [];
-    const allProcessedImages = [];
+    try {
+      const allProcessedData = [];
+      const allProcessedImages = [];
 
-    for (let i = 0; i < formData.uploadedImages.length; i++) {
-      const uploadedImage = formData.uploadedImages[i];
+      for (let i = 0; i < formData.uploadedImages.length; i++) {
+        const uploadedImage = formData.uploadedImages[i];
 
-      toast.loading(`AI processing image ${i + 1} of ${formData.uploadedImages.length}...`, { id: "ai-step1" });
-
-      let processedImage = uploadedImage;
-      try {
-        processedImage = await processImageWithAI(
-          uploadedImage,
-          formData.featureType,
-          null, null, null
+        toast.loading(
+          `AI processing image ${i + 1} of ${formData.uploadedImages.length}...`,
+          { id: "ai-step1" },
         );
-        toast.success(`Image ${i + 1} processed!`, { id: `ai-step1-${i}` });
-      } catch (aiError) {
-        console.error(`AI failed for image ${i + 1}:`, aiError);
-        toast.error(`AI failed for image ${i + 1}, using original`, { id: `ai-step1-${i}` });
-        processedImage = uploadedImage;
+
+        let processedImage = uploadedImage;
+        try {
+          processedImage = await processImageWithAI(
+            uploadedImage,
+            formData.featureType,
+            formData.selectedFeature || null,
+            formData.selectedStyle || null,
+            formData.finalNotes || null,
+          );
+          toast.success(`Image ${i + 1} processed!`, { id: `ai-step1-${i}` });
+        } catch (aiError) {
+          console.error(`AI failed for image ${i + 1}:`, aiError);
+          toast.error(`AI failed for image ${i + 1}, using original`, {
+            id: `ai-step1-${i}`,
+          });
+          processedImage = uploadedImage;
+        }
+
+        allProcessedData.push({
+          originalImage: uploadedImage,
+          processedImage: processedImage,
+          processedAt: new Date().toISOString(),
+          status: "completed",
+          userId: formData.userId,
+          featureType: formData.featureType,
+        });
+        allProcessedImages.push(processedImage);
       }
 
-      allProcessedData.push({
-        originalImage: uploadedImage,
-        processedImage: processedImage, // ✅ AI processed
-        processedAt: new Date().toISOString(),
-        status: "completed",
-        userId: formData.userId,
+      toast.dismiss("ai-step1");
+      setFormData((prev) => ({
+        ...prev,
+        beforeAfterData: allProcessedData,
+        uploadedImages: allProcessedImages,
+      }));
+
+      const singlePayload = {
+        userid: formData.userId,
+        title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
+        description: formData.finalNotes || `${formData.featureType} applied`,
         featureType: formData.featureType,
-      });
-      allProcessedImages.push(processedImage);
-    }
-
-    toast.dismiss("ai-step1");
-
-    // ✅ Pehle formData update karo
-    setFormData((prev) => ({
-      ...prev,
-      beforeAfterData: allProcessedData,
-      uploadedImages: allProcessedImages, // ✅ processed images
-    }));
-
-    const singlePayload = {
-      userid: formData.userId,
-      title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
-      description: formData.finalNotes || `${formData.featureType} applied`,
-      featureType: formData.featureType,
-      uploadedImages: allProcessedImages,
-      selectedFeature: [],
-      selectedStyle: [],
-      beforeAfterData: allProcessedData,
-      finalNotes: formData.finalNotes || "",
-      image: allProcessedImages[0], // ✅ AI processed thumbnail
-    };
-
-    // ✅ Save karo
-    if (formData.projectId) {
-      await saveGeneratedImage(singlePayload, token, true, formData.projectId);
-    } else {
-      await saveGeneratedImage([singlePayload], token);
-    }
-
-    // ✅ Draft clean
-    const urlParams = new URLSearchParams(window.location.search);
-    const draftId = urlParams.get("draftId") || formData.draftId;
-    if (draftId) {
-      const savedDrafts = localStorage.getItem("draftProjects");
-      if (savedDrafts) {
-        const drafts = JSON.parse(savedDrafts);
-        localStorage.setItem("draftProjects", JSON.stringify(drafts.filter(d => d.id !== draftId)));
+        uploadedImages: allProcessedImages,
+        selectedFeature: [],
+        selectedStyle: [],
+        beforeAfterData: allProcessedData,
+        finalNotes: formData.finalNotes || "",
+        image: allProcessedImages[0],
+      };
+      if (formData.projectId) {
+        await saveGeneratedImage(
+          singlePayload,
+          token,
+          true,
+          formData.projectId,
+        );
+      } else {
+        await saveGeneratedImage([singlePayload], token);
       }
+      const urlParams = new URLSearchParams(window.location.search);
+      const draftId = urlParams.get("draftId") || formData.draftId;
+      if (draftId) {
+        const savedDrafts = localStorage.getItem("draftProjects");
+        if (savedDrafts) {
+          const drafts = JSON.parse(savedDrafts);
+          localStorage.setItem(
+            "draftProjects",
+            JSON.stringify(drafts.filter((d) => d.id !== draftId)),
+          );
+        }
+      }
+      localStorage.removeItem("currentDraft");
+
+      toast.success("Project saved to database!", {
+        id: "saving",
+        duration: 2000,
+      });
+      next();
+    } catch (error) {
+      console.error("❌ Database save error:", error);
+      toast.error(`Failed to save: ${error.message}`, {
+        id: "saving",
+        duration: 3000,
+      });
+    } finally {
+      setIsSaving(false);
     }
-    localStorage.removeItem("currentDraft");
-
-    toast.success("Project saved to database!", { id: "saving", duration: 2000 });
-
-    // ✅ LAST MEIN next() call karo
-    next();
-
-  } catch (error) {
-    console.error("❌ Database save error:", error);
-    toast.error(`Failed to save: ${error.message}`, { id: "saving", duration: 3000 });
-  } finally {
-    setIsSaving(false);
-  }
-};
+  };
 
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);

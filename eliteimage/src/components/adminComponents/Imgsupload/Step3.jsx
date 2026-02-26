@@ -113,8 +113,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
       };
 
       const allProcessedData = [];
-
-      // ✅ Pehle sab images process karo, PHIR next() call karo
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const uploadedImage = formData.uploadedImages[i];
 
@@ -130,7 +128,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
           processedUrl = await processImageWithAI(
             originalUrl,
             formData.featureType,
-            formData.selectedFeature,
+            formData.selectedFeature || formData.selectedFeatures?.[0] || "",
             selected,
             formData.finalNotes,
           );
@@ -142,7 +140,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
         allProcessedData.push({
           originalImage: originalUrl,
-          processedImage: processedUrl, // ✅ AI processed image
+          processedImage: processedUrl,
           processedAt: new Date().toISOString(),
           status: "completed",
           userId: user?._id || formData.userId,
@@ -153,12 +151,10 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
           },
         });
       }
-
-      // ✅ Pehle formData update karo processed images ke saath
       setFormData((prev) => ({
         ...prev,
         selectedStyle: selected,
-        beforeAfterData: allProcessedData, // ✅ AI images yahan set ho rahe hain
+        beforeAfterData: allProcessedData,
       }));
 
       const backendPayload = {
@@ -169,17 +165,15 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         uploadedImages: allProcessedData.map((d) => d.originalImage),
         selectedFeature: formData.selectedFeature
           ? [formData.selectedFeature]
-          : [],
+          : formData.selectedFeatures
+            ? [formData.selectedFeatures[0]]
+            : [],
         selectedStyle: [selected],
         beforeAfterData: allProcessedData,
         finalNotes: formData.finalNotes || "",
-        image: allProcessedData[0].processedImage, // ✅ AI processed thumbnail
+        image: allProcessedData[0].processedImage,
       };
-
-      // ✅ Save karo
       const savedProject = await saveGeneratedImage(backendPayload, token);
-
-      // ✅ Draft clean karo
       const urlParams = new URLSearchParams(window.location.search);
       const draftId = urlParams.get("draftId") || formData.draftId;
       if (draftId) {
@@ -197,8 +191,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
       toast.success(`${allProcessedData.length} image(s) saved successfully!`, {
         id: "processing",
       });
-
-      // ✅ LAST MEIN next() call karo - jab sab kuch ready ho
       next();
     } catch (error) {
       console.error("❌ Error:", error);
@@ -211,20 +203,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   return (
     <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <div className="flex items-center gap-3 text-gray-700">
-        {/* <div className="flex items-center gap-2">
-          <button
-            onClick={back}
-            className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            onClick={handleGenerate}
-            className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div> */}
         <span className="font-medium text-black text-[16px] sm:text-[18px] mb-6 sm:mb-8">
           Elite Image Ai
         </span>
@@ -235,12 +213,6 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
       </h2>
       {formData.totalSteps > 0 && (
         <div className="mb-2 sm:mb-4 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-          {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#CFE8F2]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#D3E7F0]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-12 lg:w-20 bg-[#034F75]" /> */}
           <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
         </div>
       )}

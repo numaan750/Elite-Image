@@ -78,28 +78,14 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
     setFormData((prev) => ({
       ...prev,
       selectedFurniture: selectedFurniture,
+      selectedStyle: selectedFurniture,
     }));
-
     next();
   };
 
   return (
     <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <div className="flex items-center gap-3 text-gray-700">
-        {/* <div className="flex items-center gap-2">
-          <button
-            onClick={back}
-            className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            onClick={handleContinue}
-            className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div> */}
         <span className="font-medium text-black text-[16px] sm:text-[20px] mb-6 sm:mb-8">
           Elite Image AI
         </span>
@@ -109,17 +95,6 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
       </h2>
       {formData.totalSteps > 0 && (
         <div className="mb-4 sm:mb-5 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-          {/* <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#CFE8F2]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#CFE8F2]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#034F75]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#034F75]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#D3E7F0]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" />
-        <div className="h-[2px] sm:h-[3px] w-8 sm:w-10 lg:w-12 bg-[#D3E7F0]" />
-        <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[#D3E7F0]" /> */}
           <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
         </div>
       )}
