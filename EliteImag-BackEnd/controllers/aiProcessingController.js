@@ -14,8 +14,30 @@ const buildPrompt = (
 
     HDR: `Apply ${selectedStyle || "vibrant"} HDR processing to this real estate photo. HDR technique: ${selectedFeature || "Tone Mapping"}. Enhance dynamic range, improve shadow and highlight details, boost colors naturally. Make it look like a professional HDR real estate photograph.`,
 
-    "Grass Replacement": `Replace the grass in this real estate photo. Grass replacement type: ${selectedFeature || "Lawn Renovation"}. Apply ${selectedStyle || "vibrant"} style. Make the lawn look lush and perfectly green. Keep all structures, pathways, and non-grass elements exactly unchanged. Make it look natural and photorealistic.`,
+    "Grass Replacement": (() => {
+      const grassPrompts = {
+        "Lawn Renovation": `completely replace and renovate the entire lawn area with fresh, lush, perfectly manicured green grass. Remove all dead patches, brown spots, and worn areas. Make it look like a brand new professional lawn`,
+        "Overgrown Removal": `remove all overgrown, wild, and untamed grass and vegetation. Replace with neat, trimmed, evenly cut short green lawn grass. Make it look clean and well-maintained`,
+        "Driveway Cleanup": `clean up and remove any grass or weeds growing on or around the driveway edges and pathways. Keep the driveway clean and replace surrounding lawn with neat green grass`,
+        "Texture Matching": `replace the grass with perfectly uniform, consistent texture green lawn that matches the surrounding landscape style. Make all grass areas look seamlessly consistent`,
+        "Season Change": `transform the grass to look like a beautiful lush summer green lawn. Replace any dry, dead, or winter-looking grass with vibrant healthy green grass`,
+        "Weed Reduction": `remove all visible weeds, dandelions, and unwanted plants from the lawn. Replace with clean, uniform, weed-free green grass throughout all lawn areas`,
+      };
 
+      const styleEffects = {
+        "Vibrant Edit":
+          "with highly saturated, vivid green colors and sharp crisp details",
+        "Soft Edit":
+          "with natural soft tones, gentle green colors and smooth realistic texture",
+      };
+
+      const grassAction =
+        grassPrompts[selectedFeature] || grassPrompts["Lawn Renovation"];
+      const styleEffect =
+        styleEffects[selectedStyle] || styleEffects["Vibrant Edit"];
+
+      return `In this real estate photo, ${grassAction} ${styleEffect}. Keep ALL structures, buildings, pathways, driveways, fences, trees, and non-grass elements EXACTLY unchanged. Only modify the grass and lawn areas. Make it look completely photorealistic and natural. Do not enhance or change anything except the grass.`;
+    })(),
     "Object Removal": `Remove any unwanted objects, clutter, vehicles, people, or distracting elements from this real estate photo. Fill the removed areas naturally and seamlessly with the surrounding background. Keep all important architectural and design elements intact. Make it look clean and professional.`,
 
     "Sky Replacement": `Replace the sky in this real estate photo with a beautiful ${selectedFeature || "Clear Sky"} sky. Apply ${selectedStyle || "vibrant"} edit style. Keep all buildings, trees, landscape and ground elements exactly the same. Only change the sky portion. Make it look photorealistic.`,
