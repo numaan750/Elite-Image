@@ -110,8 +110,14 @@ const Step5 = ({ formData, setFormData, back }) => {
           processedUrl = originalImage;
         }
 
+        const previousProcessedImage =
+          Array.isArray(formData.beforeAfterData) &&
+          formData.beforeAfterData[i]?.processedImage
+            ? formData.beforeAfterData[i].processedImage
+            : originalImage;
+
         allProcessedData.push({
-          originalImage: originalImage,
+          originalImage: previousProcessedImage,
           processedImage: processedUrl,
           editPrompt: editDescription,
           editedAt: new Date().toISOString(),
