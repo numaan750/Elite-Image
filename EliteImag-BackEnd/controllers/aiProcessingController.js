@@ -264,53 +264,32 @@ const buildPrompt = (
       All objects remain exactly the same — only straightened.`,
 
     // ==================== WATERMARK REMOVE ====================
-    "Watermark Remove": `You are a professional image restoration expert.
-
-      7. Do NOT alter any pixels outside the watermark area.PRIMARY TASK:
-      7. Do NOT alter any pixels outside the watermark area.Remove ONLY visible watermarks, logos, copyright text, or overlay marks that are placed ON TOP of the image.
-      7. Do NOT alter any pixels outside the watermark area.
-      7. Do NOT alter any pixels outside the watermark area.IMPORTANT:
-      7. Do NOT alter any pixels outside the watermark area.The watermark is an overlay element. It is NOT part of the actual scene.
-      7. Do NOT alter any pixels outside the watermark area.
-      7. Do NOT alter any pixels outside the watermark area.REMOVE ONLY:
-      7. Do NOT alter any pixels outside the watermark area.- Text watermarks
-      7. Do NOT alter any pixels outside the watermark area.- Logo watermarks
-      7. Do NOT alter any pixels outside the watermark area.- Copyright symbols (©)
-      7. Do NOT alter any pixels outside the watermark area.- Semi-transparent overlay text
-      7. Do NOT alter any pixels outside the watermark area.- Repeated watermark patterns
-      7. Do NOT alter any pixels outside the watermark area.- Diagonal watermark text
-      7. Do NOT alter any pixels outside the watermark area.
-      7. Do NOT alter any pixels outside the watermark area.RECONSTRUCTION INSTRUCTIONS:
-      7. Do NOT alter any pixels outside the watermark area.After removing the watermark:
-      7. Do NOT alter any pixels outside the watermark area.1. Restore ONLY the exact pixels hidden behind the watermark.
-      7. Do NOT alter any pixels outside the watermark area.2. Match the surrounding texture precisely.
-      7. Do NOT alter any pixels outside the watermark area.3. Match the surrounding color exactly.
-      7. Do NOT alter any pixels outside the watermark area.4. Match the surrounding lighting exactly.
-      7. Do NOT alter any pixels outside the watermark area.5. Match the surrounding sharpness exactly.
-      7. Do NOT alter any pixels outside the watermark area.6. Blend seamlessly so no removal trace is visible.
-      7. Do NOT alter any pixels outside the watermark area.
-      STRICT PROTECTION RULES:
-      - DO NOT modify any object in the image.
-      - DO NOT change any person.
-      - DO NOT change walls, furniture, sky, grass, buildings, or background.
-      - DO NOT enhance image.
-      - DO NOT change brightness.
-      - DO NOT change contrast.
-      - DO NOT change saturation.
-      - DO NOT crop.
-      - DO NOT rotate.
-      - DO NOT apply filters.
-      - DO NOT improve quality.
-      - DO NOT alter composition.
-      - DO NOT add or remove any real object.
+    "Watermark Remove": `You are an expert photo retoucher specializing in watermark and overlay removal.
       
-      CRITICAL:
-      Only remove the watermark overlay layer.
-      Everything else must remain pixel-identical to the original image.
+      REMOVAL TASK: Remove all watermarks, text overlays, and logos from this image.
 
-      FINAL RESULT:
-      Image must look 100% identical to original,
-      with the only difference being that the watermark is completely removed.`,
+      WHAT TO REMOVE:
+      - Text watermarks (any text overlay on the image)
+      - Logo watermarks (brand logos, company mark      s)
+      - Copyright notices (© symbols, copyright text)
+      - Semi-transparent overlays (any translucent text/pattern)
+      - Diagonal text patterns
+      - Repeated watermark patterns across image
+
+      RECONSTRUCTION METHOD:
+      After removing each watermark:
+      1. Analyze the background texture behind the watermark
+      2. Reconstruct background seamlessly - match exact texture, color, pattern, and lighting
+      3. If watermark is over grass: replace with matching grass texture
+      4. If watermark is over sky: replace with matching sky gradient
+      5. If watermark is over wall: replace with matching wall texture
+      6. Reconstruction must be completely invisible
+
+      STRICT RULES:
+      1. Do NOT change, alter, or affect ANY non-watermark content
+      2. Keep all architectural elements, furniture, landscaping exactly identical
+      3. Do NOT change brightness, colors, contrast of non-watermark areas
+      4. Maintain original image quality and resolution`,
   };
 
   let prompt =
