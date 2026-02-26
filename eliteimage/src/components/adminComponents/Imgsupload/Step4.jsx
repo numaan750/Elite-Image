@@ -382,14 +382,6 @@ const downloadImage = async (imageUrl, filename) => {
 };
 
 const Step4 = ({ formData, setFormData, next, back }) => {
-  // const { token, saveGeneratedImage, getProjectById } = useContext(AppContext);
-  // const searchParams = useSearchParams(); // ✅ ADD
-  // const [sliderPositions, setSliderPositions] = useState({});
-  // const [isDragging, setIsDragging] = useState(null);
-  // const [isSaving, setIsSaving] = useState(false);
-  // const [isEditMode, setIsEditMode] = useState(false); // ✅ ADD
-  // const [projectId, setProjectId] = useState(null); // ✅ ADD
-  // const [isViewMode, setIsViewMode] = useState(false); // ✅ ADD
   const { token, saveGeneratedImage } = useContext(AppContext);
   const [sliderPositions, setSliderPositions] = useState({});
   const [isDragging, setIsDragging] = useState(null);
@@ -495,153 +487,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
     removeDraftFromList();
   }, []);
-
-  // ✅ ADD THIS COMPLETE useEffect
-  // useEffect(() => {
-  //   const loadProjectData = async () => {
-  //     const mode = searchParams.get("mode");
-  //     const pid = searchParams.get("projectId");
-
-  //     if (mode === "view" && pid) {
-  //       setIsViewMode(true);
-  //       setProjectId(pid);
-  //       try {
-  //         const project = await getProjectById(pid);
-
-  //         // Pre-fill formData with existing project data
-  //         setFormData({
-  //           ...formData,
-  //           uploadedImages: project.uploadedImages || [],
-  //           featureType: project.featureType || "",
-  //           selectedFeature: project.selectedFeature?.[0] || "",
-  //           selectedStyle: project.selectedStyle?.[0] || "",
-  //           beforeAfterData: project.beforeAfterData || [],
-  //           finalNotes: project.finalNotes || "",
-  //           userId: project.userid || user?._id,
-  //         });
-
-  //         toast.success("Project loaded successfully!");
-  //       } catch (error) {
-  //         toast.error("Failed to load project");
-  //         console.error(error);
-  //       }
-  //     } else if (mode === "edit" && pid) {
-  //       setIsEditMode(true);
-  //       setProjectId(pid);
-  //     }
-  //   };
-
-  //   if (searchParams.get("projectId")) {
-  //     loadProjectData();
-  //   }
-  // }, [searchParams]);
-
-  // const handleGenerate = async () => {
-  //   if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
-  //     toast.error("Please upload at least one image first!");
-  //     return;
-  //   }
-
-  //   if (!token) {
-  //     toast.error("Please login to save images");
-  //     return;
-  //   }
-
-  //   setIsSaving(true);
-  //   toast.loading(`Processing ${formData.uploadedImages.length} image(s)...`, {
-  //     id: "processing",
-  //   });
-
-  //   try {
-  //     const allProcessedData = [];
-  //     const allBackendPayloads = [];
-
-  //     for (let i = 0; i < formData.uploadedImages.length; i++) {
-  //       const uploadedImage = formData.uploadedImages[i];
-
-  //       console.log(`📤 [${i + 1}] Uploading original image...`);
-  //       const originalCloudinaryUrl = await uploadToCloudinary(uploadedImage);
-
-  //       console.log(`🎨 [${i + 1}] Processing image...`);
-  //       const processedImageUrl = await processImage(originalCloudinaryUrl, {
-  //         userId: formData.userId,
-  //         featureType: formData.featureType,
-  //         selectedFeature: formData.selectedFeature,
-  //         selectedStyle: formData.selectedStyle,
-  //       });
-
-  //       console.log(`📤 [${i + 1}] Uploading processed image...`);
-  //       const processedCloudinaryUrl = await uploadToCloudinary(
-  //         processedImageUrl
-  //       );
-
-  //       const processedData = {
-  //         originalImage: originalCloudinaryUrl,
-  //         processedImage: processedCloudinaryUrl,
-  //         processedAt: new Date().toISOString(),
-  //         status: "completed",
-  //         userId: formData.userId,
-  //         featureType: formData.featureType,
-  //         selectedOptions: {
-  //           feature: formData.selectedFeature,
-  //           style: formData.selectedStyle,
-  //         },
-  //       };
-  //       allProcessedData.push(processedData);
-
-  //       const backendPayload = {
-  //         userid: formData.userId,
-  //         title: `${formData.featureType} - Image ${
-  //           i + 1
-  //         } - ${new Date().toLocaleDateString()}`,
-  //         description: formData.finalNotes || `Generated image ${i + 1}`,
-  //         featureType: formData.featureType,
-  //         uploadedImages: [originalCloudinaryUrl],
-  //         selectedFeature: formData.selectedFeature
-  //           ? [formData.selectedFeature]
-  //           : [],
-  //         selectedStyle: formData.selectedStyle ? [formData.selectedStyle] : [],
-  //         beforeAfterData: [processedData],
-  //         finalNotes: formData.finalNotes || "",
-  //         image: processedCloudinaryUrl,
-  //       };
-  //       allBackendPayloads.push(backendPayload);
-  //     }
-
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       beforeAfterData: allProcessedData,
-  //     }));
-
-  //     // ✅ CHANGE: Check if update or save
-  //     if (isEditMode && projectId) {
-  //       // Update existing project
-  //       await saveGeneratedImage(allBackendPayloads[0], token, true, projectId);
-  //       toast.success("Project updated successfully!", { id: "processing" });
-  //     } else {
-  //       // Save new projects
-  //       await saveGeneratedImage(allBackendPayloads, token);
-  //       toast.success(
-  //         `${formData.uploadedImages.length} image(s) processed and saved!`,
-  //         { id: "processing" }
-  //       );
-  //     }
-
-  //     // for (let i = 0; i < allProcessedData.length; i++) {
-  //     //   await downloadImage(
-  //     //     allProcessedData[i].processedImage,
-  //     //     `elite-image-ai-${i + 1}.jpg`
-  //     //   );
-  //     // }
-
-  //     next();
-  //   } catch (error) {
-  //     console.error("❌ Error:", error);
-  //     toast.error(`Error: ${error.message}`, { id: "processing" });
-  //   } finally {
-  //     setIsSaving(false);
-  //   }
-  // };
   const handleDownload = () => {
     const processedData = formData.beforeAfterData;
 
@@ -670,16 +515,11 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       formData.beforeAfterData?.[0]?.processedImage ||
       formData.uploadedImages?.[0] ||
       "";
-
-    // ✅ pehle define karo
     const processedData =
       formData.beforeAfterData && formData.beforeAfterData.length > 0
         ? formData.beforeAfterData
         : formData.uploadedImages.map((img) => ({ processedImage: img }));
-
-    // Single image
     if (processedData.length <= 1) {
-      // ✅ ab theek hai
       if (navigator.share) {
         try {
           await navigator.share({
@@ -696,8 +536,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
       }
       return;
     }
-
-    // Multiple images
     try {
       toast.loading("Preparing images...", { id: "share" });
 
@@ -739,21 +577,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
     <div className="w-full min-h-screen bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
       <div className="w-full flex justify-start">
         <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
-          {/* <div className="flex items-center gap-2">
-            <button
-              onClick={back}
-              className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button
-              onClick={next}
-              className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div> */}
-
           <span className="font-medium text-black text-[16px] sm:text-[18px] mb-6 sm:mb-8">
             Elite Image Ai
           </span>
@@ -872,8 +695,8 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                     >
                       <div
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-      w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
-      cursor-ew-resize border-2 border-[#034F75]"
+                         w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
+                         cursor-ew-resize border-2 border-[#034F75]"
                         onMouseDown={() => setIsDragging(index)}
                         onTouchStart={() => setIsDragging(index)}
                       >
@@ -912,37 +735,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
             <IoShareSocial size={17} className="sm:w-[18px] sm:h-[18px]" />
             Share Link
           </button>
-
-          {/* Back Button
-          <button
-            onClick={back} // ya router.back() agar browser history chahiye
-            className="flex items-center justify-center gap-2 border border-gray-400 text-[12px] sm:text-[16px] px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-gray-200 transition-colors flex-1 sm:flex-initial min-w-[120px]"
-          >
-           Back
-          </button> */}
         </div>
-
-        {/* Generate Button - ADD THIS IF NOT EXISTS */}
-        {/* <button
-          onClick={handleGenerate}
-          disabled={formData.uploadedImages.length === 0 || isSaving}
-          className={`w-full sm:w-[280px] flex items-center justify-center gap-2 text-[12px] sm:text-[16px] py-2.5 sm:py-3 rounded-lg transition-colors
-    ${
-      formData.uploadedImages.length > 0 && !isSaving
-        ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
-        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-    }`}
-        >
-          <span>
-            {isSaving
-              ? isEditMode
-                ? "Updating..."
-                : "Saving..."
-              : isEditMode
-              ? "Update Project"
-              : "Generate Image"}
-          </span>
-        </button> */}
 
         <button
           onClick={() => downloadImagesAsZip(formData)}

@@ -128,7 +128,7 @@ const Step5 = ({ formData, setFormData, back }) => {
         ...prev,
         beforeAfterData: allProcessedData,
         finalNotes: editDescription,
-        uploadedImages: allProcessedData.map((item) => item.processedImage),
+        // uploadedImages: allProcessedData.map((item) => item.processedImage),
       }));
       const backendPayload = {
         userid: formData.userId,

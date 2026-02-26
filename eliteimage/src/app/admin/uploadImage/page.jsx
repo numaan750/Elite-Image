@@ -129,7 +129,7 @@ const UploadImageTabs = () => {
     userId: null,
     featureType: featureType || null,
     uploadedImages: [],
-    localFiles: [], // ✅ ADD THIS - Store actual File objects
+    localFiles: [],
     selectedFeature: "",
     selectedFurniture: "",
     selectedStyle: "",
@@ -138,10 +138,6 @@ const UploadImageTabs = () => {
     totalSteps: currentConfig.totalSteps,
     projectId: null,
   });
-
-  // Load draft on mount
-  // Load draft on mount
-  // Load draft on mount
   useEffect(() => {
     const mode = searchParams.get("mode");
     const draftId = searchParams.get("draftId");
@@ -152,15 +148,11 @@ const UploadImageTabs = () => {
       if (currentDraft) {
         try {
           const draft = JSON.parse(currentDraft);
-
-          // ✅ FIX: Verify draft ID matches
           if (draft.id === draftId || draft.draftId === draftId) {
             setFormData({
               ...draft,
               draftId: draftId,
             });
-
-            // Set active step from draft
             const stepMap = {
               step1: 1,
               step2: 2,
@@ -182,7 +174,7 @@ const UploadImageTabs = () => {
         }
       }
     }
-  }, [searchParams]); // ✅ No saveDraft here
+  }, [searchParams]);
 
   useEffect(() => {
     let id = localStorage.getItem("userId");
@@ -203,7 +195,6 @@ const UploadImageTabs = () => {
   }, [userId]);
 
   useEffect(() => {
-    // ✅ Jab featureType change ho, tab form update karo
     if (featureType) {
       setFormData((prev) => ({
         ...prev,
@@ -223,8 +214,6 @@ const UploadImageTabs = () => {
 
   const currentStepConfig = stepsConfig[activeStep - 1];
   const CurrentStepComponent = currentStepConfig?.component;
-
-  // ✅ Agar feature select nahi hai, to AllFeatures page show karo
   if (showAllFeatures) {
     return (
       <AuthGuard>
@@ -253,19 +242,6 @@ const UploadImageTabs = () => {
             </div>
           )}
         </div>
-
-        {/* <div className="mt-4 flex justify-between text-sm text-gray-600">
-          <div>
-            {activeStep > 1 && (
-              <span>← Previous: {stepsConfig[activeStep - 2]?.name}</span>
-            )}
-          </div>
-          <div>
-            {activeStep < maxSteps && (
-              <span>Next: {stepsConfig[activeStep]?.name} →</span>
-            )}
-          </div>
-        </div> */}
       </div>
     </AuthGuard>
   );

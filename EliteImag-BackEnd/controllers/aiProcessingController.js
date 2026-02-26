@@ -109,7 +109,6 @@ const buildPrompt = (
       5. DO NOT remove or change ANYTHING outside the described regions
       6. DO NOT alter colors, brightness, or quality of non-selected areas
       7. Result must look like the removed objects were NEVER THERE`
-      
           : feature && feature.includes("Selection")
             ? `${feature}
       
@@ -129,23 +128,24 @@ const buildPrompt = (
       STYLE DETAILS: ${styleDetail}
 
       WHAT TO DO based on sky type "${feature}":
-      - If "Clear Sky": Replace with beautiful clear blue sky, no clouds, clean and bright
-      - If "Partly Cloudy Sky": Replace with natural partly cloudy sky, white fluffy clouds on blue background
-      - If "Overcast Sky": Replace with soft overcast white/gray sky, even diffused lighting
-      - If "Sunset Sky": Replace with dramatic warm orange-pink-purple sunset sky
-      - If "Twilight / Dusk Sky": Replace with twilight sky - deep blue-purple gradient, horizon glow
-      - If "Dramatic Sky": Replace with moody dramatic sky - dark clouds, volumetric light rays, epic atmosphere
-      - If "Rainy Sky": Replace with overcast dark gray rainy sky, storm clouds
+      - If "Clear Sky": Replace with a vibrant, clear blue sky, perfectly even tone, no clouds, bright and realistic lighting.
+      - If "Partly Cloudy Sky": Replace with a natural, photorealistic partly cloudy sky; white fluffy clouds with realistic shapes, soft shadows, and natural depth; clouds should vary in size and density for realism.
+      - If "Overcast Sky": Replace with a soft, diffuse overcast sky; even gray-white tones, subtle light variations, realistic cloud textures.
+      - If "Sunset Sky": Replace with a dramatic, photorealistic warm sunset sky (orange, pink, purple); include natural light gradients and subtle cloud highlights reflecting sunset colors.
+      - If "Twilight / Dusk Sky": Replace with deep blue to purple gradient twilight sky; include soft horizon glow, natural dim light effect on clouds if present.
+      - If "Dramatic Sky": Replace with epic moody sky; volumetric light rays, dark clouds, high contrast, dramatic atmosphere, realistic cloud formations.
+      - If "Rainy Sky": Replace with stormy gray sky; textured clouds, slight rain haze, subtle lighting to reflect storm conditions.
 
       STYLE APPLICATION: ${styleDetail}
 
       STRICT RULES:
-      1. Replace ONLY the sky - identify sky region precisely
-      2. Create perfectly seamless edges at: rooftops, trees, chimneys, antennas, poles
-      3. Match color temperature of new sky with ground/building lighting for realism
-      4. If sunset/dusk sky: adjust building color temperature slightly to match warm light
-      5. Keep COMPLETELY IDENTICAL: buildings, roof, trees, lawn, driveway, cars, people - everything non-sky
-      6. Maintain original image sharpness and resolution`,
+      1. Replace ONLY the sky - identify sky region precisely.
+      2. Create perfectly seamless edges at rooftops, trees, chimneys, antennas, and poles.
+      3. Match the color temperature of the new sky with ground/building lighting for realism.
+      4. If sunset/dusk sky: slightly adjust building and ground colors to reflect warm light.
+      5. Keep COMPLETELY IDENTICAL: buildings, roofs, trees, lawns, driveways, cars, people — everything non-sky.
+      6. Maintain original image sharpness, resolution, and perspective.
+      7. Clouds must be realistic in shape, density, and lighting; avoid flat or artificial cloud textures.`,
 
     // ==================== VIRTUAL STAGING ====================
     "Virtual Staging": `You are a world-class professional virtual staging artist for real estate.
@@ -220,52 +220,97 @@ const buildPrompt = (
       3. Result must look like a real professional twilight photography shot`,
 
     // ==================== STRAIGHTEN ====================
-    Straighten: `You are a professional architectural photographer specializing in perspective correction.
+    Straighten: `You are a professional architectural correction expert.
 
-      CORRECTION TASK: Fix all perspective and lens distortion issues in this real estate photo.
+      PRIMARY TASK:
+      Correct all tilted, rotated, leaning, curved, or distorted objects and lines in this image.
 
-      CORRECTIONS TO APPLY:
-      1. Barrel/Pincushion Distortion: Fix lens distortion - straight lines must be straight
-      2. Vertical Lines: Make ALL vertical elements perfectly vertical - walls, door frames, window frames, columns
-      3. Horizontal Lines: Make ALL horizontal elements perfectly horizontal - floors, countertops, window sills, roof lines
-      4. Camera Tilt: Correct any camera rotation - straighten the horizon line
-      5. Keystone/Converging Verticals: Fix perspective distortion where walls appear to lean inward or outward
-      6. Crop if needed: After correction, crop to remove any empty corner areas, maintain best composition
+      OBJECT STRAIGHTENING RULES:
+      1. Make all vertical elements perfectly vertical:
+         - Walls
+         - Door frames
+         - Window frames
+         - Columns
+         - Cabinets
+         - Poles
+         - Buildings
 
-      WHAT NOT TO DO:
-      1. Do NOT add any new content
-      2. Do NOT remove any existing objects
-      3. Do NOT change any colors, brightness, or contrast
-      4. Do NOT alter any textures or details
-      5. ONLY fix geometry - all visual content stays identical, just straightened`,
+      2. Make all horizontal elements perfectly horizontal:
+         - Floors
+         - Ceilings
+         - Countertops
+         - Roof lines
+         - Tables
+         - Shelves
+
+      3. Fix camera tilt or rotation so the entire scene looks properly aligned.
+      4. Correct lens distortion (barrel or pincushion distortion).
+      5. Fix converging verticals (keystone distortion).
+      6. If objects appear slightly rotated, straighten them naturally.
+      7. Crop minimally if required after correction.
+
+      STRICT LIMITS:
+      - DO NOT change colors
+      - DO NOT change brightness
+      - DO NOT enhance anything
+      - DO NOT add or remove objects
+      - DO NOT change background
+      - DO NOT modify textures
+      - DO NOT blur or sharpen
+      - ONLY fix geometry and alignment
+
+      FINAL RESULT:
+      Image must look identical to original but properly straight, aligned, and geometrically corrected.
+      All objects remain exactly the same — only straightened.`,
 
     // ==================== WATERMARK REMOVE ====================
-    "Watermark Remove": `You are an expert photo retoucher specializing in watermark and overlay removal.
+    "Watermark Remove": `You are a professional image restoration expert.
+
+      7. Do NOT alter any pixels outside the watermark area.PRIMARY TASK:
+      7. Do NOT alter any pixels outside the watermark area.Remove ONLY visible watermarks, logos, copyright text, or overlay marks that are placed ON TOP of the image.
+      7. Do NOT alter any pixels outside the watermark area.
+      7. Do NOT alter any pixels outside the watermark area.IMPORTANT:
+      7. Do NOT alter any pixels outside the watermark area.The watermark is an overlay element. It is NOT part of the actual scene.
+      7. Do NOT alter any pixels outside the watermark area.
+      7. Do NOT alter any pixels outside the watermark area.REMOVE ONLY:
+      7. Do NOT alter any pixels outside the watermark area.- Text watermarks
+      7. Do NOT alter any pixels outside the watermark area.- Logo watermarks
+      7. Do NOT alter any pixels outside the watermark area.- Copyright symbols (©)
+      7. Do NOT alter any pixels outside the watermark area.- Semi-transparent overlay text
+      7. Do NOT alter any pixels outside the watermark area.- Repeated watermark patterns
+      7. Do NOT alter any pixels outside the watermark area.- Diagonal watermark text
+      7. Do NOT alter any pixels outside the watermark area.
+      7. Do NOT alter any pixels outside the watermark area.RECONSTRUCTION INSTRUCTIONS:
+      7. Do NOT alter any pixels outside the watermark area.After removing the watermark:
+      7. Do NOT alter any pixels outside the watermark area.1. Restore ONLY the exact pixels hidden behind the watermark.
+      7. Do NOT alter any pixels outside the watermark area.2. Match the surrounding texture precisely.
+      7. Do NOT alter any pixels outside the watermark area.3. Match the surrounding color exactly.
+      7. Do NOT alter any pixels outside the watermark area.4. Match the surrounding lighting exactly.
+      7. Do NOT alter any pixels outside the watermark area.5. Match the surrounding sharpness exactly.
+      7. Do NOT alter any pixels outside the watermark area.6. Blend seamlessly so no removal trace is visible.
+      7. Do NOT alter any pixels outside the watermark area.
+      STRICT PROTECTION RULES:
+      - DO NOT modify any object in the image.
+      - DO NOT change any person.
+      - DO NOT change walls, furniture, sky, grass, buildings, or background.
+      - DO NOT enhance image.
+      - DO NOT change brightness.
+      - DO NOT change contrast.
+      - DO NOT change saturation.
+      - DO NOT crop.
+      - DO NOT rotate.
+      - DO NOT apply filters.
+      - DO NOT improve quality.
+      - DO NOT alter composition.
+      - DO NOT add or remove any real object.
       
-      REMOVAL TASK: Remove all watermarks, text overlays, and logos from this image.
+      CRITICAL:
+      Only remove the watermark overlay layer.
+      Everything else must remain pixel-identical to the original image.
 
-      WHAT TO REMOVE:
-      - Text watermarks (any text overlay on the image)
-      - Logo watermarks (brand logos, company marks)
-      - Copyright notices (© symbols, copyright text)
-      - Semi-transparent overlays (any translucent text/pattern)
-      - Diagonal text patterns
-      - Repeated watermark patterns across image
-
-      RECONSTRUCTION METHOD:
-      After removing each watermark:
-      1. Analyze the background texture behind the watermark
-      2. Reconstruct background seamlessly - match exact texture, color, pattern, and lighting
-      3. If watermark is over grass: replace with matching grass texture
-      4. If watermark is over sky: replace with matching sky gradient
-      5. If watermark is over wall: replace with matching wall texture
-      6. Reconstruction must be completely invisible
-
-      STRICT RULES:
-      1. Do NOT change, alter, or affect ANY non-watermark content
-      2. Keep all architectural elements, furniture, landscaping exactly identical
-      3. Do NOT change brightness, colors, contrast of non-watermark areas
-      4. Maintain original image quality and resolution`,
+      FINAL RESULT:
+      Image must look 100% identical to original,
+      with the only difference being that the watermark is completely removed.`,
   };
 
   let prompt =
