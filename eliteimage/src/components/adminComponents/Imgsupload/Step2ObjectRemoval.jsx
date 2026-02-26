@@ -205,19 +205,19 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Coordinates: starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
         });
 
-        return `PRECISE OBJECT REMOVAL - ${areas.length} region(s) selected by user:
+        return `Selection-PRECISE OBJECT REMOVAL - ${areas.length} REGION(s) to remove:
 
-              ${areaDescriptions.join("\n\n")}
-
-              CRITICAL EXECUTION RULES:
-              1. Remove ONLY the content inside each described REGION above - nothing else
-              2. There are exactly ${areas.length} region(s) to remove - remove ALL of them
-              3. Fill each removed region with seamless background matching surrounding area exactly
-              4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
-              5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
-              6. DO NOT alter brightness, colors, or quality of any area outside the regions
-              7. Final result must look completely natural as if those objects were never there
-              8. This is SURGICAL removal - only the selected regions, nothing more`;
+         ${areaDescriptions.join("\n\n")}
+         
+         CRITICAL EXECUTION RULES:
+         1. Remove ONLY the content inside each described REGION above - nothing else
+         2. There are exactly ${areas.length} REGION(s) to remove - remove ALL of them, every single one
+         3. Fill each removed region with seamless background matching surrounding area exactly
+         4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
+         5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
+         6. DO NOT alter brightness, colors, or quality of any area outside the regions
+         7. Final result must look completely natural as if those objects were never there
+         8. This is SURGICAL removal - only the selected regions, nothing more`;
       };
       const uploadPromises = formData.uploadedImages.map(async (img, i) => {
         const originalUrl = await uploadToCloudinary(img);

@@ -88,25 +88,36 @@ const buildPrompt = (
       7. Do NOT add any decorative elements not in original`,
 
     // ==================== OBJECT REMOVAL ====================
-    "Object Removal": `You are an expert professional photo retoucher specializing in precise object removal.
+    "Object Removal": `You are an expert professional photo retoucher. Your task is SURGICAL OBJECT REMOVAL.
 
       ${
-        feature && feature.includes("Selection")
-          ? `PRECISE REMOVAL TASK:
+        feature && feature.includes("REGION")
+          ? `USER HAS SELECTED SPECIFIC REGIONS TO REMOVE:
+      
       ${feature}
 
+      EXECUTION RULES - FOLLOW EXACTLY:
+      1. Find and remove ONLY the objects inside each REGION described above
+      2. Count the regions - remove ALL of them, not just one
+      3. For each removed region, fill with seamless background:
+         - If region is over grass/lawn: reconstruct with matching grass
+         - If region is over wall: reconstruct with matching wall texture
+         - If region is over floor: reconstruct with matching floor
+         - If region is over sky: reconstruct with matching sky
+         - If region is over driveway: reconstruct with matching driveway
+      4. Blending must be PERFECT - no visible edges, no blur artifacts
+      5. DO NOT remove or change ANYTHING outside the described regions
+      6. DO NOT alter colors, brightness, or quality of non-selected areas
+      7. Result must look like the removed objects were NEVER THERE`
+          : feature && feature.includes("Selection")
+            ? `${feature}
+      
       EXECUTION RULES:
-      1. Remove ONLY the content inside each described region - be extremely precise
-      2. Fill each removed region with seamless realistic background:
-         - Match exact texture of surrounding area (grass, wall, floor, sky, etc.)
-         - Match exact color tone and lighting
-         - Match perspective and depth
-      3. Reconstruction must be completely invisible - no blurring, no smearing, no artifacts
-      4. DO NOT touch even 1 pixel outside the specified regions
-      5. DO NOT change brightness, colors, contrast, or quality anywhere else
-      6. DO NOT remove objects that are NOT in the specified regions
-      7. Final result must look completely natural as if objects were never there`
-          : `Remove unwanted objects and clutter. Fill removed areas with seamless realistic background matching surroundings. Keep all architectural elements.`
+      1. Remove ONLY the content inside each described region
+      2. Fill with seamless realistic background matching surroundings
+      3. DO NOT touch anything outside specified regions
+      4. Result must look completely natural`
+            : `Remove all unwanted objects, clutter, and distracting elements visible in the photo. Fill removed areas with seamless realistic background. Keep all architectural and structural elements intact.`
       }`,
 
     // ==================== SKY REPLACEMENT ====================
