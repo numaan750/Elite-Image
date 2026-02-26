@@ -10,55 +10,123 @@ const buildPrompt = (
   finalNotes,
 ) => {
   const prompts = {
-    Enhance: `Enhance this real estate photo professionally. Apply ${selectedStyle || "vibrant"} editing style. Focus on ${selectedFeature || "overall quality"}. Improve lighting, contrast, colors and sharpness. Make it look magazine-quality and photorealistic. Keep all architectural elements exactly the same.`,
+    Enhance: `You are a professional real estate photo editor. Enhance this real estate photograph:
+       - Enhancement focus: ${selectedFeature || "Overall Quality"}
+       - Editing style: ${selectedStyle || "Vibrant"}
+       - Apply ${selectedStyle === "Vibrant Edit" ? "rich saturated colors with high clarity" : "soft natural tones with gentle contrast"}
+       - Focus on: ${selectedFeature || "overall image quality"}
+       - CRITICAL: Do NOT add, remove, or move any objects, furniture, or architectural elements
+       - CRITICAL: Keep ALL original content exactly as-is, only improve photo quality`,
 
-    HDR: `Apply ${selectedStyle || "vibrant"} HDR processing to this real estate photo. HDR technique: ${selectedFeature || "Tone Mapping"}. Enhance dynamic range, improve shadow and highlight details, boost colors naturally. Make it look like a professional HDR real estate photograph.`,
+    HDR: `You are a professional HDR photographer. Apply HDR processing:
+       - HDR technique: ${selectedFeature || "Tone Mapping"}
+       - Style: ${selectedStyle || "Vibrant"}
+       - Apply ${selectedFeature || "tone mapping"} technique specifically
+       - ${selectedStyle === "Vibrant Edit" ? "Use rich bold HDR tones with vivid colors" : "Use natural balanced HDR with subtle tonal enhancement"}
+       - CRITICAL: Do NOT add, remove, or move any objects or structural elements
+       - Only change tonal processing, keep all original content identical`,
 
     "Grass Replacement": (() => {
-      const grassPrompts = {
-        "Lawn Renovation": `completely replace and renovate the entire lawn area with fresh, lush, perfectly manicured green grass. Remove all dead patches, brown spots, and worn areas. Make it look like a brand new professional lawn`,
-        "Overgrown Removal": `remove all overgrown, wild, and untamed grass and vegetation. Replace with neat, trimmed, evenly cut short green lawn grass. Make it look clean and well-maintained`,
-        "Driveway Cleanup": `clean up and remove any grass or weeds growing on or around the driveway edges and pathways. Keep the driveway clean and replace surrounding lawn with neat green grass`,
-        "Texture Matching": `replace the grass with perfectly uniform, consistent texture green lawn that matches the surrounding landscape style. Make all grass areas look seamlessly consistent`,
-        "Season Change": `transform the grass to look like a beautiful lush summer green lawn. Replace any dry, dead, or winter-looking grass with vibrant healthy green grass`,
-        "Weed Reduction": `remove all visible weeds, dandelions, and unwanted plants from the lawn. Replace with clean, uniform, weed-free green grass throughout all lawn areas`,
+      const grassActions = {
+        "Lawn Renovation":
+          "Replace ALL grass areas with fresh perfectly manicured lush green grass. Remove all dead patches and bare spots.",
+        "Overgrown Removal":
+          "Replace ALL overgrown wild grass with neatly trimmed uniform short green lawn.",
+        "Driveway Cleanup":
+          "Clean all grass and weeds along driveway edges only. Replace surrounding lawn with neat green grass.",
+        "Texture Matching":
+          "Replace grass with perfectly uniform consistent-texture green lawn matching the property style.",
+        "Season Change":
+          "Transform ALL grass to vibrant lush summer green. Replace any dry dead brown grass.",
+        "Weed Reduction":
+          "Remove ALL visible weeds and invasive plants. Replace with clean uniform weed-free green grass.",
       };
-
-      const styleEffects = {
+      const styleDetails = {
         "Vibrant Edit":
-          "with highly saturated, vivid green colors and sharp crisp details",
+          "Use rich saturated deep green tones with crisp sharp texture.",
         "Soft Edit":
-          "with natural soft tones, gentle green colors and smooth realistic texture",
+          "Use natural slightly muted green tones with smooth realistic texture.",
       };
-
-      const grassAction =
-        grassPrompts[selectedFeature] || grassPrompts["Lawn Renovation"];
-      const styleEffect =
-        styleEffects[selectedStyle] || styleEffects["Vibrant Edit"];
-
-      return `In this real estate photo, ${grassAction} ${styleEffect}. Keep ALL structures, buildings, pathways, driveways, fences, trees, and non-grass elements EXACTLY unchanged. Only modify the grass and lawn areas. Make it look completely photorealistic and natural. Do not enhance or change anything except the grass.`;
+      const action =
+        grassActions[selectedFeature] || grassActions["Lawn Renovation"];
+      const styleDetail =
+        styleDetails[selectedStyle] || styleDetails["Vibrant Edit"];
+      return `You are a professional real estate photo retoucher specializing in grass replacement.
+       TASK: ${action}
+       STYLE: ${styleDetail}
+       STRICT RULES:
+       1. ONLY modify pixels that are grass or lawn - nothing else
+       2. Keep COMPLETELY UNCHANGED: buildings, roof, windows, doors, driveway, pathways, fences, trees, shrubs, sky, cars - every non-grass element
+       3. New grass edges must blend seamlessly with driveways and structures
+       4. Match original photo lighting direction and shadows
+       5. Result must look completely photorealistic
+       6. Do NOT enhance or change any colors outside grass areas
+       7. Do NOT add any new objects not in the original photo`;
     })(),
-    "Object Removal":
-      selectedFeature && selectedFeature.includes("Selection")
-        ? `You are given a real estate photo. Your task is to remove specific objects from selected regions only.\n\n${selectedFeature}\n\nIMPORTANT RULES:\n1. Only remove content inside the described regions\n2. Fill each removed region with realistic background (wall, floor, sky, grass)\n3. Make the removal seamless and invisible\n4. Do NOT change anything outside the selected regions\n5. Final image must look like a professional real estate photo`
-        : `Remove any unwanted objects, clutter, vehicles, people, or distracting elements from this real estate photo. Fill the removed areas naturally with the surrounding background. Keep all architectural elements intact. Make it look clean and professional.`,
-    "Sky Replacement": `Replace the sky in this real estate photo with a beautiful ${selectedFeature || "Clear Sky"} sky. Apply ${selectedStyle || "vibrant"} edit style. Keep all buildings, trees, landscape and ground elements exactly the same. Only change the sky portion. Make it look photorealistic.`,
 
-    "Virtual Staging": `Virtually stage this empty ${selectedFeature || "Living Room"} with ${selectedStyle || "Modern Furniture"} style furniture. Add realistic furniture, decorations and accessories appropriate for the space. Keep walls, floors, windows, doors and architectural elements exactly unchanged. Make it look like a professional real estate photo.`,
+    "Object Removal": (() => {
+      if (selectedFeature && selectedFeature.includes("Selection")) {
+        return `You are an expert professional photo retoucher.
+       ${selectedFeature}
+       MANDATORY RULES:
+       1. Remove ONLY the exact content inside each described region
+       2. Fill each removed region with seamless background matching surrounding context
+       3. Reconstruction must be invisible - matching exact texture color and lighting
+       4. DO NOT touch anything outside the specified regions - not even 1 pixel
+       5. DO NOT change brightness colors or quality of any other area
+       6. Final result must look completely natural`;
+      }
+      return `Remove all unwanted objects clutter and distracting elements. Fill removed areas with realistic seamless background. Preserve all architectural elements.`;
+    })(),
 
-    "Day to Dusk": `Transform this daytime real estate exterior photo into a beautiful ${selectedStyle || "vibrant"} dusk/twilight shot. Dusk technique: ${selectedFeature || "Warm Tone"}. Add warm sunset orange and purple sky lighting, turn on all interior lights visible through windows creating warm glow, add outdoor landscape lighting. Keep all architectural elements exactly the same. Make it look photorealistic.`,
+    "Sky Replacement": `You are a professional real estate photographer.
+       TASK: Replace sky with: ${selectedFeature || "Clear Blue Sky"}
+       STYLE: ${selectedStyle || "Vibrant"}
+       - Replace ONLY the sky portion with beautiful high-resolution ${selectedFeature || "clear blue sky"}
+       - ${selectedStyle === "Vibrant Edit" ? "Use rich deep saturated sky colors" : "Use natural soft sky tones"}
+       - Create perfectly seamless edges at rooftops trees and horizon
+       - Match color temperature of new sky with ground lighting
+       CRITICAL DO NOT CHANGE: Buildings roof trees lawn driveway - ALL IDENTICAL. Maintain original sharpness.`,
 
-    Straighten: `Straighten and correct the perspective of this real estate photo. Fix any lens distortion, make vertical lines perfectly vertical, horizontal lines perfectly horizontal. Remove any tilt or angle issues. Maintain the original composition and content. Make it look professionally shot.`,
+    "Virtual Staging": `You are a professional virtual staging artist.
+       TASK: Stage this empty ${selectedFeature || "Living Room"}
+       FURNITURE STYLE: ${selectedStyle || "Modern Furniture"}
+       - Add ${selectedStyle || "Modern"} style furniture appropriate for ${selectedFeature || "living room"}
+       - Include sofa tables lamps rug wall art plants and accessories in ${selectedStyle || "modern"} style
+       - Position furniture with correct perspective matching room vanishing points
+       - Apply realistic shadows from existing room lighting
+       CRITICAL: Do NOT alter walls floors ceilings windows doors or any fixed architectural feature. Keep original room exactly as-is.`,
 
-    "Watermark Remove": `Remove any watermarks, text overlays, logos, or copyright marks from this real estate photo. Fill the removed areas naturally and seamlessly with the surrounding content. Keep the photo otherwise completely unchanged and make it look clean.`,
+    "Day to Dusk": `You are a professional real estate twilight photographer.
+       TECHNIQUE: ${selectedFeature || "Warm Tone"}
+       STYLE: ${selectedStyle || "Vibrant"}
+       - Replace sky with ${selectedFeature === "Warm Tone" ? "warm orange pink purple sunset" : selectedFeature === "Cool Tone" ? "cool blue-purple twilight" : selectedFeature === "Golden Hour" ? "rich golden amber sky" : "dramatic dusk sky"}
+       - Turn ON all interior lights visible through windows with warm amber glow
+       - Add exterior pathway lights and landscape lighting effects
+       - ${selectedStyle === "Vibrant Edit" ? "Use rich saturated twilight colors" : "Use natural balanced dusk tones"}
+       CRITICAL KEEP IDENTICAL: All architecture landscaping lawn driveway - UNCHANGED. Only sky and lighting change.`,
+
+    Straighten: `You are a professional architectural photographer.
+       CORRECTIONS:
+       1. Fix all lens barrel and pincushion distortion
+       2. Make ALL vertical lines perfectly vertical
+       3. Make ALL horizontal lines perfectly horizontal
+       4. Correct camera tilt and straighten horizon
+       5. Fix converging verticals keystoning effect
+       CRITICAL: Do NOT add remove or change any content objects or colors. Only correct geometry - all visual content stays identical.`,
+
+    "Watermark Remove": `You are an expert photo retoucher specializing in watermark removal.
+      REMOVE ALL: text watermarks logos copyright notices semi-transparent overlays diagonal text patterns
+      RECONSTRUCTION: After removing each watermark reconstruct background seamlessly matching exact texture color and lighting of surrounding area.
+      CRITICAL: Do NOT change alter or affect ANY non-watermark content. Keep all architectural elements furniture landscaping exactly identical. Maintain original image quality and resolution.`,
   };
 
   let prompt =
     prompts[featureType] ||
-    `Enhance this real estate photo professionally with ${selectedStyle || "high quality"} processing.`;
+    `Enhance this real estate photo professionally. Style: ${selectedStyle || "high quality"}. Focus: ${selectedFeature || "overall enhancement"}. Keep all original content intact.`;
 
   if (finalNotes && finalNotes.trim()) {
-    prompt += ` Additional instructions: ${finalNotes}`;
+    prompt += `\n\nADDITIONAL INSTRUCTIONS: ${finalNotes}`;
   }
 
   return prompt;

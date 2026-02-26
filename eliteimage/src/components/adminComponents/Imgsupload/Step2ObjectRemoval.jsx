@@ -185,9 +185,8 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
       const buildSelectionPrompt = (areas) => {
         if (!areas || areas.length === 0) {
-          return "Remove any unwanted objects, clutter, or distracting elements from this photo.";
+          return "Remove any unwanted objects or distracting elements from this photo.";
         }
-
         const containerEl = document.querySelector(".cursor-crosshair");
         const displayWidth = containerEl?.offsetWidth || 800;
         const displayHeight = containerEl?.offsetHeight || 600;
@@ -197,14 +196,25 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           const yPct = Math.round((area.y / displayHeight) * 100);
           const wPct = Math.round((area.width / displayWidth) * 100);
           const hPct = Math.round((area.height / displayHeight) * 100);
-
+          const centerXPct = Math.round(xPct + wPct / 2);
+          const centerYPct = Math.round(yPct + hPct / 2);
           const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
           const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
 
-          return `Selection ${idx + 1}: in the ${vertPos}-${horizPos} portion of the image, starting at ${xPct}% from left and ${yPct}% from top, spanning ${wPct}% of image width and ${hPct}% of image height`;
+          return `Selection ${idx + 1}: Remove the object located in the ${vertPos}-${horizPos} area. Region starts at ${xPct}% from left and ${yPct}% from top, spans ${wPct}% width and ${hPct}% height. Center point: ${centerXPct}% from left, ${centerYPct}% from top.`;
         });
 
-        return `There ${areas.length === 1 ? "is" : "are"} ${areas.length} selected region${areas.length > 1 ? "s" : ""} that must be removed:\n${areaDescriptions.join("\n")}\n\nFor each selected region: identify the object or content inside that exact region, completely erase it, and fill the area naturally with the surrounding background (wall, floor, sky, grass, etc.) as if the object was never there. Do NOT remove anything outside these selected regions. Keep everything else in the photo completely unchanged.`;
+        return `OBJECT REMOVAL TASK - ${areas.length} region${areas.length > 1 ? "s" : ""} selected:
+
+        ${areaDescriptions.join("\n\n")}
+
+        STRICT INSTRUCTIONS:
+        1. Remove ONLY the content inside each described region - erase completely
+        2. Fill each region with realistic seamless background matching surrounding area
+        3. Reconstruction must be invisible - match exact texture color lighting and perspective
+        4. DO NOT remove alter or modify ANYTHING outside the specified regions
+        5. DO NOT change brightness colors or quality anywhere else
+        6. Final result must look completely natural`;
       };
       const uploadPromises = formData.uploadedImages.map(async (img, i) => {
         const originalUrl = await uploadToCloudinary(img);
