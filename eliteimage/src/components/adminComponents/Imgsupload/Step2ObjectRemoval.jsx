@@ -208,17 +208,47 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
         const uploadPromises = formData.uploadedImages.map(async (img, i) => {
           const originalUrl = await uploadToCloudinary(img);
-
-          // ✅ Real AI Object Removal
           let processedUrl;
           try {
             toast.loading(`Removing objects from image ${i + 1}...`, {
               id: `ai-obj-${i}`,
             });
+            const areas = selectedAreas[i] || [];
+            const imageElement = document.querySelector(
+              'img[alt="Select object to remove"]',
+            );
+            const imgWidth =
+              imageElement?.naturalWidth || imageElement?.width || 800;
+            const imgHeight =
+              imageElement?.naturalHeight || imageElement?.height || 600;
+
+            const areaDescriptions = areas.map((area, areaIndex) => {
+              const xPercent = Math.round((area.x / imgWidth) * 100);
+              const yPercent = Math.round((area.y / imgHeight) * 100);
+              const wPercent = Math.round((area.width / imgWidth) * 100);
+              const hPercent = Math.round((area.height / imgHeight) * 100);
+              let position = "";
+              if (yPercent < 33) position = "top";
+              else if (yPercent > 66) position = "bottom";
+              else position = "middle";
+
+              let side = "";
+              if (xPercent < 33) side = "left";
+              else if (xPercent > 66) side = "right";
+              else side = "center";
+
+              return `object ${areaIndex + 1} located at ${position} ${side} area of the image (approximately ${xPercent}% from left, ${yPercent}% from top, covering ${wPercent}% width and ${hPercent}% height)`;
+            });
+
+            const selectionDescription =
+              areaDescriptions.length > 0
+                ? `Remove the following selected objects: ${areaDescriptions.join(". Also remove ")}.`
+                : "Remove any unwanted objects from this photo.";
+
             processedUrl = await processImageWithAI(
               originalUrl,
               "Object Removal",
-              null,
+              selectionDescription,
               null,
               null,
             );
@@ -295,20 +325,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   return (
     <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
       <div className="flex items-center gap-3 text-gray-700">
-        {/* <div className="flex items-center gap-2">
-          <button
-            onClick={back}
-            className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            onClick={handleContinue}
-            className="h-7 w-7 rounded border flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div> */}
         <span className="font-medium text-black text-[18px] sm:text-[20px] mb-6 sm:mb-8">
           Elite Image AI
         </span>
