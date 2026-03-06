@@ -574,7 +574,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-10 sm:mt-3 lg:mt-3">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-10 sm:mt-8 lg:mt-3">
 
       <div className="w-full mb-4 sm:mb-5 lg:mb-6">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">

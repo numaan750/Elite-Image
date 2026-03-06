@@ -4,9 +4,9 @@ import React from "react";
 const Pricing = () => {
   return (
     <>
-      <div className="mt-10 sm:mt-3 lg:mt-3">
+      <div className="mt-10 sm:mt-8 lg:mt-3">
         <div>
-          <h2 className="text-[20px] sm:text-[20px] lg:text-[28px] font-semibold mb-2 sm:mb-4 lg:mb-6 mt-8">
+          <h2 className="text-[20px] sm:text-[20px] lg:text-[28px] font-semibold mb-2 sm:mb-4 lg:mb-6">
             Pricing
           </h2>
 

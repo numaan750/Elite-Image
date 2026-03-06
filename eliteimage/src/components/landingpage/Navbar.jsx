@@ -127,7 +127,7 @@ const Navbar = memo(() => {
 
               <Link
                 href="/login"
-                className="mt-2 sm:mt-3 bg-[#034F75] text-white py-2.5 sm:py-3 px-4 text-center rounded-lg hover:bg-[#023a57] transition-colors"
+                className="mt-2 sm:mt-8 bg-[#034F75] text-white py-2.5 sm:py-3 px-4 text-center rounded-lg hover:bg-[#023a57] transition-colors"
               >
                 Log in
               </Link>

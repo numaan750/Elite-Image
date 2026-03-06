@@ -142,7 +142,7 @@ const Projects = () => {
   }
   return (
     <>
-      <div className="mt-10 sm:mt-3 lg:mt-3">
+      <div className="mt-10 sm:mt-8 lg:mt-3">
         <div className=" w-full">
           <div className="mb-2 sm:mb-4 lg:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <h2 className="text-[20px] sm:text-[32px] lg:text-[28px] font-semibold text-black">

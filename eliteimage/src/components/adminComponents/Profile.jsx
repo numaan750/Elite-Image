@@ -91,7 +91,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-white mt-10 sm:mt-3 lg:mt-3">
+    <div className="min-h-screen bg-white mt-10 sm:mt-8 lg:mt-3">
       <Toaster position="top-right" />
       <h2 className="text-[20px] sm:text-[28px] font-semibold mb-2 sm:mb-4 lg:mb-6">
         Account Settings

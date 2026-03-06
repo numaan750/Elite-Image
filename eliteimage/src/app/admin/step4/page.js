@@ -227,7 +227,7 @@ const Step4Page = () => {
     }
   };
   return (
-    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-10 sm:mt-3 lg:mt-3">
+    <div className="w-full min-h-screen bg-white flex flex-col items-center mt-10 sm:mt-8 lg:mt-3">
 
       <div className="w-full ">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-semibold text-black ">

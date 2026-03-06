@@ -58,10 +58,10 @@ const AIEnhancement = () => {
 
   return (
     <div className="w-auto">
-      <main className="bg-white mt-10 sm:mt-3 lg:mt-3">
+      <main className="bg-white mt-10 sm:mt-8 lg:mt-3">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
           <div className="w-full lg:w-auto">
-            <h2 className="mt-4 sm:mt-6 lg:mt-10 text-[22px] sm:text-[24px] lg:text-[28px] font-semibold text-black leading-tight">
+            <h2 className="text-[22px] sm:text-[24px] lg:text-[28px] font-semibold text-black leading-tight">
               Welcome Back, Google User
             </h2>
 
@@ -72,7 +72,7 @@ const AIEnhancement = () => {
 
           <Link
             href="/admin/pricing"
-            className="flex items-center gap-2 rounded-lg bg-[#034F75] px-3 py-2 text-white w-full sm:w-auto lg:mt-16 hover:bg-[#023d5c] transition-colors justify-center sm:justify-start"
+            className="flex items-center gap-2 rounded-lg bg-[#034F75] px-3 py-2 text-white w-full sm:w-auto  hover:bg-[#023d5c] transition-colors justify-center sm:justify-start"
           >
             <span className="text-base mb-1">💳</span>
             <span className="text-[16px] font-medium">
@@ -81,7 +81,7 @@ const AIEnhancement = () => {
           </Link>
         </div>
 
-        <section className="mt-6 sm:mt-8 lg:mt-10 mb-6">
+        <section className="mt-6 sm:mt-8 lg:mt-8 mb-6">
           <h3 className="text-[20px] sm:text-[28px] font-semibold text-black">
             AI Enhancement Features
           </h3>

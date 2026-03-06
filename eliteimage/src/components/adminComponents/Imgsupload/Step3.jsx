@@ -201,7 +201,7 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white mt-10 sm:mt-3 lg:mt-3">
+    <div className="w-full min-h-screen bg-white mt-10 sm:mt-8 lg:mt-3">
 
       <h2 className=" mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
         Edit Styles - {featureType}
