@@ -176,7 +176,7 @@ const Hero = memo(() => {
           </div>
 
           {/* After Image (Left side - clipped) */}
-          <div
+          {/* <div
             className="absolute inset-0"
             style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
           >
@@ -192,7 +192,7 @@ const Hero = memo(() => {
             <span className="absolute top-[12px] sm:top-[16px] lg:top-[20px] left-[12px] sm:left-[16px] lg:left-[20px] bg-[#034F75] text-white text-[12px] sm:text-[14px] lg:text-[16px] px-[10px] sm:px-[12px] lg:px-[16px] py-[4px] sm:py-[5px] lg:py-[6px] rounded-[6px] lg:rounded-[8px] font-medium z-10">
               After
             </span>
-          </div>
+          </div> */}
 
           {/* Divider Line */}
           <div

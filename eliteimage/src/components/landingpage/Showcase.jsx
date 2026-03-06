@@ -294,19 +294,20 @@ import React, { useState, useRef } from "react";
 import Image from "next/image";
 
 const ImageComparisonSlider = ({ beforeImage, afterImage, alt }) => {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
+  // const [sliderPosition, setSliderPosition] = useState(50);
+  const sliderPosition = 50;
+  // const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
-  const handleMove = (clientX) => {
-    if (!containerRef.current) return;
+  // const handleMove = (clientX) => {
+  //   if (!containerRef.current) return;
 
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const percentage = (x / rect.width) * 100;
+  //   const rect = containerRef.current.getBoundingClientRect();
+  //   const x = clientX - rect.left;
+  //   const percentage = (x / rect.width) * 100;
 
-    setSliderPosition(Math.min(Math.max(percentage, 0), 100));
-  };
+  //   setSliderPosition(Math.min(Math.max(percentage, 0), 100));
+  // };
 
   const handleMouseDown = () => setIsDragging(true);
 
@@ -325,19 +326,14 @@ const ImageComparisonSlider = ({ beforeImage, afterImage, alt }) => {
     <div
       ref={containerRef}
       className="relative w-full h-[280px] md:h-[320px] rounded-2xl overflow-hidden cursor-ew-resize select-none"
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseUp}
-      onTouchMove={handleTouchMove}
+      // onMouseDown={handleMouseDown}
+      // onMouseUp={handleMouseUp}
+      // onMouseMove={handleMouseMove}
+      // onMouseLeave={handleMouseUp}
+      // onTouchMove={handleTouchMove}
     >
-      <Image
-        src={afterImage}
-        alt={`${alt} - After`}
-        fill
-        className="object-cover"
-      />
-      <div
+      <Image src={afterImage} alt={alt} fill className="object-cover" />
+      {/* <div
         className="absolute top-0 left-0 h-full overflow-hidden"
         style={{ width: `${sliderPosition}%` }}
       >
@@ -352,7 +348,7 @@ const ImageComparisonSlider = ({ beforeImage, afterImage, alt }) => {
             height: "100%",
           }}
         />
-      </div>
+      </div> */}
       <div
         className="absolute top-0 h-full w-[3px] bg-white/80 z-20"
         style={{ left: `${sliderPosition}%` }}
