@@ -242,48 +242,48 @@ A highly realistic real estate interior photo with staged furniture that looks i
       3. Result must look like a real professional twilight photography shot`,
 
     // ==================== STRAIGHTEN ====================
-    Straighten: `You are a professional architectural correction expert.
+    Straighten: `You are a professional architectural photo correction expert.
 
-      PRIMARY TASK:
-      Correct all tilted, rotated, leaning, curved, or distorted objects and lines in this image.
+IMPORTANT:
+Edit the provided image. Do NOT generate a new image.
 
-      OBJECT STRAIGHTENING RULES:
-      1. Make all vertical elements perfectly vertical:
-         - Walls
-         - Door frames
-         - Window frames
-         - Columns
-         - Cabinets
-         - Poles
-         - Buildings
+PRIMARY TASK:
+Correct camera tilt, perspective distortion, and misaligned objects.
 
-      2. Make all horizontal elements perfectly horizontal:
-         - Floors
-         - Ceilings
-         - Countertops
-         - Roof lines
-         - Tables
-         - Shelves
+OBJECT STRAIGHTENING RULES:
 
-      3. Fix camera tilt or rotation so the entire scene looks properly aligned.
-      4. Correct lens distortion (barrel or pincushion distortion).
-      5. Fix converging verticals (keystone distortion).
-      6. If objects appear slightly rotated, straighten them naturally.
-      7. Crop minimally if required after correction.
+1. Make all vertical elements perfectly vertical:
+- walls
+- door frames
+- window frames
+- columns
+- cabinets
+- poles
+- buildings
 
-      STRICT LIMITS:
-      - DO NOT change colors
-      - DO NOT change brightness
-      - DO NOT enhance anything
-      - DO NOT add or remove objects
-      - DO NOT change background
-      - DO NOT modify textures
-      - DO NOT blur or sharpen
-      - ONLY fix geometry and alignment
+2. Make all horizontal elements perfectly horizontal:
+- floors
+- ceilings
+- countertops
+- roof lines
+- tables
+- shelves
 
-      FINAL RESULT:
-      Image must look identical to original but properly straight, aligned, and geometrically corrected.
-      All objects remain exactly the same — only straightened.`,
+3. Fix camera tilt or rotation so the scene is properly aligned.
+4. Correct lens distortion and keystone distortion.
+5. Straighten objects that appear slightly rotated.
+6. Apply minimal crop if needed after correction.
+
+STRICT LIMITS:
+- Do NOT change colors
+- Do NOT change lighting
+- Do NOT enhance the image
+- Do NOT add or remove objects
+- Do NOT modify textures
+- Do NOT change the background
+
+FINAL RESULT:
+The output must remain a realistic photograph identical to the original image, only geometrically corrected and properly aligned.`,
 
     // ==================== WATERMARK REMOVE ====================
     "Watermark Remove": `You are an expert photo retoucher specializing in watermark and overlay removal.
