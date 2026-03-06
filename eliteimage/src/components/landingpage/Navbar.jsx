@@ -73,12 +73,20 @@ const Navbar = memo(() => {
               About Us
             </a>
           </nav>
-          <Link
-            href="/login"
-            className="hidden md:block bg-[#034F75] text-white py-2 sm:py-2.5 lg:py-3 px-4 sm:px-5 lg:px-[20px] rounded-lg hover:bg-[#023a57] transition-colors text-sm lg:text-base"
-          >
-            Log in
-          </Link>
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/login"
+              className="border-2 border-[#034F75] text-[#034F75] py-2 sm:py-2.5 lg:py-3 px-4 sm:px-5 lg:px-[20px] rounded-lg hover:bg-[#034F75] hover:text-white transition-colors text-sm lg:text-base font-medium"
+            >
+              Log in
+            </Link>
+            <Link
+              href="/login?mode=signup"
+              className="bg-[#034F75] text-white py-2 sm:py-2.5 lg:py-3 px-4 sm:px-5 lg:px-[20px] rounded-lg hover:bg-[#023a57] transition-colors text-sm lg:text-base font-medium"
+            >
+              Sign Up
+            </Link>
+          </div>
 
           <button
             className="md:hidden p-1"
@@ -125,12 +133,20 @@ const Navbar = memo(() => {
                 About Us
               </a>
 
-              <Link
-                href="/login"
-                className="mt-2 sm:mt-8 bg-[#034F75] text-white py-2.5 sm:py-3 px-4 text-center rounded-lg hover:bg-[#023a57] transition-colors"
-              >
-                Log in
-              </Link>
+              <div className="mt-2 sm:mt-4 flex flex-col gap-3">
+                <Link
+                  href="/login"
+                  className="border-2 border-[#034F75] text-[#034F75] py-2.5 sm:py-3 px-4 text-center rounded-lg hover:bg-[#034F75] hover:text-white transition-colors font-medium"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/login?mode=signup"
+                  className="bg-[#034F75] text-white py-2.5 sm:py-3 px-4 text-center rounded-lg hover:bg-[#023a57] transition-colors font-medium"
+                >
+                  Sign Up
+                </Link>
+              </div>
             </nav>
           </div>
         )}
