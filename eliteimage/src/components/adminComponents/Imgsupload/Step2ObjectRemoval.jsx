@@ -340,7 +340,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           </div>
 
           <div
-            className="relative w-full h-full bg-white rounded-[40px] overflow-hidden cursor-crosshair"
+            className="relative w-full bg-white rounded-[40px] overflow-hidden cursor-crosshair"
             onMouseDown={isProcessing ? undefined : handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -359,7 +359,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               width={800}
               height={600}
               sizes="(max-width: 768px) 100vw, 800px"
-              className="w-full h-full select-none"
+              className="w-full h-auto select-none"
               draggable={false}
               priority
             />
