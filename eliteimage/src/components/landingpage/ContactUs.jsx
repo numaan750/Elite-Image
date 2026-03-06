@@ -250,7 +250,7 @@ export default function ContactSection() {
               <div>
                 <label
                   htmlFor="message"
-                  className="text-[16px] text-[#605F5F] block"
+                  className="text-[16px] text-black block"
                 >
                   Message
                 </label>

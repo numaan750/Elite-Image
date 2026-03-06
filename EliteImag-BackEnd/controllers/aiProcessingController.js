@@ -148,47 +148,69 @@ const buildPrompt = (
       7. Clouds must be realistic in shape, density, and lighting; avoid flat or artificial cloud textures.`,
 
     // ==================== VIRTUAL STAGING ====================
-    "Virtual Staging": `You are a world-class professional virtual staging artist for real estate.
+    "Virtual Staging": `You are a world-class professional real estate virtual staging expert who produces ultra photorealistic interior photography results.
 
       ROOM TYPE: "${feature}"
       FURNITURE STYLE: "${style}"
-
-      STAGING TASK: Add ${style} style furniture and decor to this empty ${feature}.
+STAGING TASK:
+Add ${style} style furniture and decor to this empty ${feature} while preserving the original architecture exactly.
 
       FURNITURE TO ADD for "${feature}":
-      - Living Room: sofa/sectional, coffee table, side tables, floor lamp, TV unit, area rug, wall art, decorative plants, throw pillows, curtains
-      - Bedroom: bed with headboard, bedside tables, lamps, dresser, mirror, artwork, bedding, curtains, plants
-      - Kitchen: bar stools, kitchen accessories on counter, hanging pendant lights, decorative items, small plants
-      - Dining Room: dining table, dining chairs, pendant light above table, sideboard, artwork, table centerpiece
-      - Bathroom: towels, bath mat, vanity accessories, mirror, small plant, decorative items
-      - Home Office: desk, office chair, bookshelf, desk lamp, computer/monitor, books, small plants
-      - Kids Room: bed, study desk, chair, bookshelf, toys, colorful rugs, wall art
-      - Study Room: large desk, bookshelf filled with books, reading chair, floor lamp, framed certificates
+- Living Room: sofa/sectional, coffee table, side tables, floor lamp, TV unit, area rug, wall art, decorative plants, throw pillows, curtains
+- Bedroom: bed with headboard, bedside tables, lamps, dresser, mirror, artwork, bedding, curtains, plants
+- Kitchen: bar stools, kitchen accessories on counter, hanging pendant lights, decorative items, small plants
+- Dining Room: dining table, dining chairs, pendant light above table, sideboard, artwork, table centerpiece
+- Bathroom: towels, bath mat, vanity accessories, mirror, small plant, decorative items
+- Home Office: desk, office chair, bookshelf, desk lamp, computer/monitor, books, small plants
+- Kids Room: bed, study desk, chair, bookshelf, toys, colorful rugs, wall art
+- Study Room: large desk, bookshelf filled with books, reading chair, floor lamp, framed certificates
 
       STYLE "${style}" DETAILS:
-      - Modern Furniture: clean lines, neutral colors (white/gray/black), minimalist, metal accents
-      - Contemporary: current trends, mixed materials, bold but clean
-      - Minimalist: very minimal pieces, lots of white space, simple colors
-      - Scandinavian: light wood, white walls, cozy textures, simple functional design
-      - Mid-Century: retro 1950-60s style, tapered legs, warm wood tones, geometric patterns
-      - Industrial: raw materials, metal + wood combination, exposed brick look, dark tones
-      - Traditional: classic ornate furniture, rich wood tones, formal arrangement
-      - Transitional: mix of traditional and modern, neutral palette, elegant
-      - Rustic: natural wood, warm earth tones, cozy farmhouse feel
-      - Bohemian: eclectic mix, colorful patterns, plants everywhere, layered textures
-      - Farmhouse: shiplap, white with wood accents, vintage items, cozy feel
-      - Luxury / Glam: gold accents, velvet upholstery, marble surfaces, crystal/glass elements
-      - Japandi: Japanese + Scandinavian mix, natural materials, zen minimalism, beige/green tones
-      - Vintage: antique furniture, aged finishes, retro accessories, warm patina
-      - Art Deco: geometric patterns, gold and black, luxurious materials, bold symmetry
+- Modern: clean lines, neutral colors (white, gray, black), minimalist furniture, metal accents
+- Contemporary: modern trends, mixed materials, elegant clean look
+- Minimalist: very few furniture pieces, simple neutral palette, lots of open space
+- Scandinavian: light wood furniture, white walls, cozy textures, soft natural lighting
+- Mid-Century Modern: retro furniture with tapered legs, warm wood tones, geometric accents
+- Industrial: metal and wood combination, raw textures, dark tones
+- Traditional: classic furniture, rich wood tones, elegant layout
+- Transitional: blend of traditional and modern elements
+- Rustic: natural wood furniture, warm earthy tones, cozy feel
+- Bohemian: colorful patterns, layered fabrics, indoor plants
+- Farmhouse: white and wood tones, vintage accents, cozy decor
+- Luxury / Glam: velvet fabrics, marble surfaces, gold accents, elegant decor
+- Japandi: Japanese + Scandinavian minimal design, natural materials, calm neutral tones
+- Vintage: antique furniture, retro accessories
+- Art Deco: bold geometry, black and gold accents, luxurious materials
 
-      STRICT RULES:
-      1. Do NOT alter walls, floors, ceilings, windows, doors, or any fixed architectural feature
-      2. Keep original room structure 100% identical
-      3. Place furniture with correct perspective matching room's vanishing points
-      4. Apply realistic shadows from existing room lighting
-      5. All furniture must be properly scaled to room size
-      6. Result must look like a professional real estate staging photo`,
+      REALISM REQUIREMENTS:
+- Ultra photorealistic interior photography
+- Professional real estate listing photo quality
+- Natural lighting from windows
+- Accurate shadows and reflections
+- High dynamic range lighting
+- Correct depth and perspective
+- DSLR camera look, 24mm wide-angle interior photography
+- 8K ultra detailed textures
+- realistic materials (wood, fabric, glass, metal)
+
+STRICT RULES:
+1. Do NOT change walls, floors, ceilings, windows, doors, or architectural elements
+2. Keep original room structure exactly the same
+3. Furniture must match room perspective and scale perfectly
+4. Lighting must match the original room lighting
+5. Result must look like a professional real estate photograph
+
+NEGATIVE STYLE:
+- no cartoon
+- no illustration
+- no painting
+- no CGI look
+- no 3D render style
+- no animated style
+- no unrealistic textures
+
+OUTPUT:
+A highly realistic real estate interior photo with staged furniture that looks indistinguishable from a real photograph.`,
 
     // ==================== DAY TO DUSK ====================
     "Day to Dusk": `You are a professional real estate twilight/dusk photographer.
@@ -220,48 +242,66 @@ const buildPrompt = (
       3. Result must look like a real professional twilight photography shot`,
 
     // ==================== STRAIGHTEN ====================
-    Straighten: `You are a professional architectural correction expert.
+    Straighten: `You are a professional architectural and perspective correction expert.
 
-      PRIMARY TASK:
-      Correct all tilted, rotated, leaning, curved, or distorted objects and lines in this image.
+PRIMARY OBJECTIVE:
+Correct all tilted, rotated, leaning, or distorted geometry in the image while keeping the scene visually identical to the original.
 
-      OBJECT STRAIGHTENING RULES:
-      1. Make all vertical elements perfectly vertical:
-         - Walls
-         - Door frames
-         - Window frames
-         - Columns
-         - Cabinets
-         - Poles
-         - Buildings
+GEOMETRY CORRECTION TASKS:
 
-      2. Make all horizontal elements perfectly horizontal:
-         - Floors
-         - Ceilings
-         - Countertops
-         - Roof lines
-         - Tables
-         - Shelves
+1. Vertical Alignment
+Make all vertical structures perfectly vertical:
+- Walls
+- Door frames
+- Window frames
+- Columns
+- Cabinets
+- Poles
+- Buildings
+- Structural edges
 
-      3. Fix camera tilt or rotation so the entire scene looks properly aligned.
-      4. Correct lens distortion (barrel or pincushion distortion).
-      5. Fix converging verticals (keystone distortion).
-      6. If objects appear slightly rotated, straighten them naturally.
-      7. Crop minimally if required after correction.
+2. Horizontal Alignment
+Make all horizontal structures perfectly level:
+- Floors
+- Ceilings
+- Countertops
+- Roof lines
+- Tables
+- Shelves
+- Architectural ledges
 
-      STRICT LIMITS:
-      - DO NOT change colors
-      - DO NOT change brightness
-      - DO NOT enhance anything
-      - DO NOT add or remove objects
-      - DO NOT change background
-      - DO NOT modify textures
-      - DO NOT blur or sharpen
-      - ONLY fix geometry and alignment
+3. Camera Correction
+- Fix camera tilt or rotation
+- Ensure the horizon and structural lines are properly aligned
+- Remove any unintended rotation
 
-      FINAL RESULT:
-      Image must look identical to original but properly straight, aligned, and geometrically corrected.
-      All objects remain exactly the same — only straightened.`,
+4. Lens Distortion Correction
+- Correct barrel distortion
+- Correct pincushion distortion
+- Restore natural straight lines
+
+5. Perspective Correction
+- Fix keystone distortion
+- Ensure vertical lines remain parallel
+- Correct converging architectural lines
+
+6. Natural Alignment
+- Straighten slightly rotated objects
+- Maintain realistic perspective
+- Apply minimal cropping only if required after correction
+
+STRICT LIMITATIONS:
+- Do NOT change colors
+- Do NOT change brightness or exposure
+- Do NOT enhance image quality
+- Do NOT add or remove objects
+- Do NOT modify textures or materials
+- Do NOT blur, sharpen, or stylize the image
+- Do NOT alter the environment or background
+
+FINAL RESULT:
+The output must look identical to the original image, but perfectly straight, balanced, and geometrically corrected. 
+Only alignment, perspective, and distortion should be fixed while everything else remains unchanged.`,
 
     // ==================== WATERMARK REMOVE ====================
     "Watermark Remove": `You are an expert photo retoucher specializing in watermark and overlay removal.
