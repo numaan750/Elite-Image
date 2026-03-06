@@ -388,15 +388,15 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
   const { saveDraft } = useContext(AppContext);
   const searchParams = useSearchParams();
- useEffect(() => {
-  const timer = setTimeout(() => {
-    if (!formData.featureType) {
-      toast.error("Please select a feature first");
-      router.push("/admin/dashboard");
-    }
-  }, 300); // 300ms wait karo
-  return () => clearTimeout(timer);
-}, [formData.featureType, router]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!formData.featureType) {
+        toast.error("Please select a feature first");
+        router.push("/admin/dashboard");
+      }
+    }, 300); // 300ms wait karo
+    return () => clearTimeout(timer);
+  }, [formData.featureType, router]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && formData.beforeAfterData) {
@@ -578,7 +578,6 @@ const Step4 = ({ formData, setFormData, next, back }) => {
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center mt-10 sm:mt-8 lg:mt-3">
-
       <div className="w-full mb-4 sm:mb-5 lg:mb-6">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
           Processing Complete
@@ -674,7 +673,12 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                         if (!img) return null;
                         return (
                           <Image
-                            src={img}
+                            src={
+                              (Array.isArray(formData.beforeAfterData)
+                                ? formData.beforeAfterData[index]?.originalImage
+                                : formData.beforeAfterData?.originalImage) ||
+                              img
+                            }
                             alt={`Before ${index + 1}`}
                             fill
                             sizes="(max-width: 768px) 100vw, 800px"
