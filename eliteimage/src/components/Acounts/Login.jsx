@@ -4,12 +4,16 @@ import { AppContext } from "@/context/AppContext";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 
 // import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSignup, setIsSignup] = useState(false);
+  const searchParams = useSearchParams();
+  const [isSignup, setIsSignup] = useState(
+    searchParams.get("mode") === "signup",
+  );
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
