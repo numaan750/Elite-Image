@@ -202,89 +202,104 @@ const Projects = () => {
           </button> */}
           </div>
 
-          <div className="space-y-4 sm:space-y-5 ">
-            {images.map((project) => (
-              <div
-                key={project._id}
-                className="relative flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
-              >
-                {isSelectionMode && (
-                  <div className="absolute top-2 left-2 z-10">
-                    <input
-                      type="checkbox"
-                      checked={selectedProjects.includes(project._id)}
-                      onChange={() => toggleProjectSelection(project._id)}
-                      className="w-5 h-5 cursor-pointer accent-[#034F75]"
-                    />
-                  </div>
-                )}
-                <Image
-                  src={
-                    project.image ||
-                    project.uploadedImages?.[0] ||
-                    "/placeholder.png"
-                  }
-                  alt="project"
-                  width={112}
-                  height={112}
-                  className="h-30 w-30 sm:h-35 sm:w-35 rounded-lg object-cover flex-shrink-0"
-                />
+          {images.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 sm:py-16 px-4">
+              <div className="bg-[#D3E7F0] rounded-full p-6 mb-4">
+                <Pencil size={48} className="text-[#034F75]" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
+                No Projects Yet
+              </h3>
+              <p className="text-sm sm:text-base text-gray-600 text-center max-w-md">
+                Your completed projects will appear here. Start a new project to
+                see it here.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 sm:space-y-5 ">
+              {images.map((project) => (
+                <div
+                  key={project._id}
+                  className="relative flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
+                >
+                  {isSelectionMode && (
+                    <div className="absolute top-2 left-2 z-10">
+                      <input
+                        type="checkbox"
+                        checked={selectedProjects.includes(project._id)}
+                        onChange={() => toggleProjectSelection(project._id)}
+                        className="w-5 h-5 cursor-pointer accent-[#034F75]"
+                      />
+                    </div>
+                  )}
+                  <Image
+                    src={
+                      project.image ||
+                      project.uploadedImages?.[0] ||
+                      "/placeholder.png"
+                    }
+                    alt="project"
+                    width={112}
+                    height={112}
+                    className="h-30 w-30 sm:h-35 sm:w-35 rounded-lg object-cover flex-shrink-0"
+                  />
 
-                <div className="flex flex-1 flex-col justify-between gap-1.5">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-[16px] sm:text-[24px] font-medium text-black">
-                      {project.featureType || "Unknown Feature"}
+                  <div className="flex flex-1 flex-col justify-between gap-1.5">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-[16px] sm:text-[24px] font-medium text-black">
+                        {project.featureType || "Unknown Feature"}
+                      </p>
+                      <span className="text-sm sm:text-base text-gray-600 whitespace-nowrap">
+                        {new Date(project.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-[16px] sm:text-[18px] text-gray-600 mb-4">
+                      Images ({project.uploadedImages?.length || 1})
                     </p>
-                    <span className="text-sm sm:text-base text-gray-600 whitespace-nowrap">
-                      {new Date(project.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="text-[16px] sm:text-[18px] text-gray-600 mb-4">
-                    Images ({project.uploadedImages?.length || 1})
-                  </p>
 
-                  <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
-                    <Link
-                      href={`/admin/step4?mode=view&projectId=${project._id}`}
-                      className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
-                    >
-                      <Eye size={16} className="flex-shrink-0" />
-                      <span className="whitespace-nowrap">View Results</span>
-                    </Link>
+                    <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
+                      <Link
+                        href={`/admin/step4?mode=view&projectId=${project._id}`}
+                        className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
+                      >
+                        <Eye size={16} className="flex-shrink-0" />
+                        <span className="whitespace-nowrap">View Results</span>
+                      </Link>
 
-                    <Link
-                      href={`/admin/edit-project?mode=edit&projectId=${
-                        project._id
-                      }&featureType=${encodeURIComponent(project.featureType)}`}
-                      className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
-                    >
-                      <Pencil size={16} className="flex-shrink-0" />
-                      <span className="whitespace-nowrap">Re-Edit</span>
-                    </Link>
+                      <Link
+                        href={`/admin/edit-project?mode=edit&projectId=${
+                          project._id
+                        }&featureType=${encodeURIComponent(project.featureType)}`}
+                        className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
+                      >
+                        <Pencil size={16} className="flex-shrink-0" />
+                        <span className="whitespace-nowrap">Re-Edit</span>
+                      </Link>
 
-                    <button
-                      onClick={() => {
-                        setProjectToDelete(project._id);
-                        setShowDeleteModal(true);
-                      }}
-                      disabled={deleteLoading === project._id}
-                      className="flex items-center cursor-pointer gap-2 rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {deleteLoading === project._id ? (
-                        <Loader2
-                          size={16}
-                          className="animate-spin flex-shrink-0"
-                        />
-                      ) : (
-                        <Trash2 size={16} className="flex-shrink-0" />
-                      )}
-                      <span className="whitespace-nowrap">Delete</span>
-                    </button>
+                      <button
+                        onClick={() => {
+                          setProjectToDelete(project._id);
+                          setShowDeleteModal(true);
+                        }}
+                        disabled={deleteLoading === project._id}
+                        className="flex items-center cursor-pointer gap-2 rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {deleteLoading === project._id ? (
+                          <Loader2
+                            size={16}
+                            className="animate-spin flex-shrink-0"
+                          />
+                        ) : (
+                          <Trash2 size={16} className="flex-shrink-0" />
+                        )}
+                        <span className="whitespace-nowrap">Delete</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {selectedProject && (
