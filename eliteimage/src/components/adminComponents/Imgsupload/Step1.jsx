@@ -375,12 +375,12 @@ const Step1 = ({ formData, setFormData, next }) => {
   );
 
   return (
-    <div className="bg-white mt-14 sm:mt-16 lg:mt-15">
-      <div className="flex items-center text-gray-700">
+    <div className="bg-white mt-4">
+      {/* <div className="flex items-center text-gray-700">
         <span className="font-medium text-black text-[16px] sm:text-[20px] mb-6 sm:mb-8 ">
           Elite Image Ai
         </span>
-      </div>
+      </div> */}
 
       <h2 className="mb-2 sm:mb-4 lg:mb-6 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-black">
         Upload Images
@@ -423,16 +423,16 @@ const Step1 = ({ formData, setFormData, next }) => {
                 size={32}
                 className="text-[#034F75] sm:w-10 sm:h-10 lg:w-[50px] lg:h-[50px]"
               />
-              <p className="mt-3 sm:mt-4 text-[12px] sm:text-[20px] lg:text-[20px] font-medium text-[#034F75] px-2">
+              <p className="mt-3 sm:mt-4 text-[12px] sm:text-[14px] lg:text-[16px] font-medium text-[#034F75] px-2">
                 Drag and drop your images here
               </p>
-              <span className="my-2 sm:my-3 text-[12px] sm:text-[16px] lg:text-[20px] text-[#034F75]">
+              <span className="my-2 sm:my-3 text-[12px] sm:text-[16px] lg:text-[16px] text-[#034F75]">
                 Or
               </span>
               <label className="rounded-lg bg-[#034F75] px-4 sm:px-5 lg:px-6 py-2 text-white text-[16px] sm:text-[18px] cursor-pointer hover:bg-[#023d5c] transition-colors">
                 {uploadingImage ? "Uploading..." : "Browse File"}
               </label>
-              <p className="mt-3 sm:mt-4 text-[12px] sm:text-[20px] text-[#034F75] px-2">
+              <p className="mt-3 sm:mt-4 text-[12px] sm:text-[16px] text-[#034F75] px-2">
                 Supports: JPG, PNG, HEIC • Max 5MB per file
               </p>
             </>
