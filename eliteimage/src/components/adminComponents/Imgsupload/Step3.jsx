@@ -272,11 +272,18 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         <button
           onClick={handleGenerate}
           disabled={!selected || isSaving}
-          className={`flex items-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg hover:bg-[#023d5c] transition-colors ${
+          className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg hover:bg-[#023d5c] transition-colors min-w-[160px] ${
             !selected || isSaving ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
-          {isSaving ? "Processing..." : "Generate Now"}
+          {isSaving ? (
+            <>
+              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Generate Now"
+          )}
         </button>
       </div>
     </div>

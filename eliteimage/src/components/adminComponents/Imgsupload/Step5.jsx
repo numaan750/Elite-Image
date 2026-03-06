@@ -332,7 +332,7 @@ const Step5 = ({ formData, setFormData, back }) => {
           <button
             onClick={handleGenerate}
             disabled={isSaving || isGenerating}
-            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg transition-colors
+            className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg transition-colors min-w-[160px]
                ${
                  isSaving || isGenerating
                    ? "opacity-50 cursor-not-allowed"
@@ -340,14 +340,22 @@ const Step5 = ({ formData, setFormData, back }) => {
                }
              `}
           >
-            <FaMagic size={15} />
-            <span>
-              {isGenerating
-                ? "AI Processing.."
-                : isSaving
-                  ? "Saving..."
-                  : "Generate"}
-            </span>
+            {isGenerating ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                AI Processing..
+              </>
+            ) : isSaving ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <FaMagic size={15} />
+                Generate
+              </>
+            )}
           </button>
         </div>
       </div>

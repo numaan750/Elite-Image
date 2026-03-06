@@ -168,7 +168,7 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
           onClick={handleContinue}
           disabled={!selectedFurniture || isSaving}
           className={`
-           w-full sm:w-auto
+           w-full sm:w-auto sm:min-w-[160px]
            flex items-center justify-center gap-2
            bg-[#034F75]
            text-white

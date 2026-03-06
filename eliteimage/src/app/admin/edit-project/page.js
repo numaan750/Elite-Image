@@ -419,7 +419,7 @@ const EditProjectPage = () => {
             onClick={handleGenerate}
             disabled={isSaving || isGenerating}
             className={`
-              w-full sm:w-auto            
+              w-full sm:w-auto sm:min-w-[160px]
               flex items-center justify-center gap-2
               bg-[#034F75] text-white
               text-[16px] sm:text-[16px] lg:text-[18px]
@@ -430,14 +430,22 @@ const EditProjectPage = () => {
               ${isSaving || isGenerating ? "opacity-50 cursor-not-allowed" : "hover:bg-[#023d5c]"}
             `}
           >
-            <FaMagic size={16} />
-            <span>
-              {isGenerating
-                ? "AI Processing..."
-                : isSaving
-                  ? "Saving..."
-                  : "Generate"}
-            </span>
+            {isGenerating ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                AI Processing...
+              </>
+            ) : isSaving ? (
+              <>
+                <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <FaMagic size={16} />
+                Generate
+              </>
+            )}
           </button>
         </div>
       </div>

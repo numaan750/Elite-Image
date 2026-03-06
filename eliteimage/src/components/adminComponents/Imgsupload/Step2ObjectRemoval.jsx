@@ -433,12 +433,13 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               }}
               disabled={isProcessing}
               className={`
-               w-full sm:w-auto
+               w-full sm:w-auto sm:min-w-[180px]
                px-3 sm:px-3 py-2
                text-[14px] sm:text-[16px] lg:text-[18px]
                border-2 border-[#034F75] 
                rounded-lg 
                transition-colors
+               justify-center
                ${isProcessing ? "opacity-50 cursor-not-allowed text-gray-400 border-gray-300" : "text-[#034F75] hover:bg-[#034F75] hover:text-white"}
              `}
             >
@@ -450,7 +451,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             onClick={handleRemoveObject}
             disabled={!allImagesHaveSelection || isProcessing}
             className={`
-             w-full sm:w-auto
+             w-full sm:w-auto sm:min-w-[180px]
              flex items-center justify-center gap-2
              px-5 sm:px-7 py-2 
              text-[14px] sm:text-[16px] lg:text-[18px]
