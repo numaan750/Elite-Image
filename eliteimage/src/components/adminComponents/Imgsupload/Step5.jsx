@@ -87,8 +87,10 @@ const Step5 = ({ formData, setFormData, back }) => {
       const allProcessedData = [];
 
       for (let i = 0; i < formData.uploadedImages.length; i++) {
-        const originalImage = formData.uploadedImages[i];
-
+const originalImage = Array.isArray(formData.beforeAfterData) && 
+  formData.beforeAfterData[i]?.processedImage 
+    ? formData.beforeAfterData[i].processedImage 
+    : formData.uploadedImages[i];
         toast.loading(
           `AI processing image ${i + 1} of ${formData.uploadedImages.length}...`,
           { id: `gen-${i}` },
@@ -97,12 +99,12 @@ const Step5 = ({ formData, setFormData, back }) => {
         let processedUrl;
         try {
           processedUrl = await processImageWithAI(
-            originalImage,
-            formData.featureType,
-            formData.selectedFeature || null,
-            formData.selectedStyle || null,
-            editDescription,
-          );
+  originalImage,
+  "DirectEdit",           // special featureType
+  editDescription,        // selectedFeature mein user instruction
+  formData.selectedStyle || null,
+  editDescription,
+);
           toast.success(`Image ${i + 1} ready!`, { id: `gen-${i}` });
         } catch (aiError) {
           console.error(`AI failed for image ${i + 1}:`, aiError);

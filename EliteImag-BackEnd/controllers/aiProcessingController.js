@@ -330,6 +330,17 @@ Only alignment, perspective, and distortion should be fixed while everything els
       2. Keep all architectural elements, furniture, landscaping exactly identical
       3. Do NOT change brightness, colors, contrast of non-watermark areas
       4. Maintain original image quality and resolution`,
+
+    // ==================== DIRECT EDIT ====================
+    DirectEdit: `You are a professional photo editor. The user wants specific changes made to this image.
+
+USER INSTRUCTION: "${feature}"
+
+TASK: Apply exactly what the user has described above to this image.
+- Make only the changes the user specified
+- Keep everything else identical to the original
+- Result must be photorealistic and professional
+- Preserve original image quality and resolution`,
   };
 
   let prompt =
