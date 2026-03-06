@@ -185,14 +185,7 @@ const Step5 = ({ formData, setFormData, back }) => {
   };
 
   return (
-    <div className="w-full bg-white flex flex-col items-center mt-14 sm:mt-16 lg:mt-15">
-      <div className="w-full flex justify-start">
-        <div className="flex items-center gap-3 sm:gap-4 lg:gap-7 text-gray-700">
-          <span className="font-medium text-black text-[16px] sm:text-[20px] mb-6 sm:mb-8">
-            Elite Image Ai
-          </span>
-        </div>
-      </div>
+    <div className="w-full bg-white flex flex-col items-center mt-10 sm:mt-3 lg:mt-3">
 
       <div className="w-full mb-2 sm:mb-4 lg:mb-6 ">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">

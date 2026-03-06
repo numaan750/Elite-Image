@@ -1,208 +1,206 @@
-"use client";
-import React, { useState, useContext } from "react";
-import { Eye, Pencil, Trash2, Loader2 } from "lucide-react";
-import Link from "next/link";
-import toast from "react-hot-toast";
+// "use client";
+// import React, { useState, useContext } from "react";
+// import { Eye, Pencil, Trash2, Loader2 } from "lucide-react";
+// import Link from "next/link";
+// import toast from "react-hot-toast";
 
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { AppContext } from "@/context/AppContext";
+// import { useRouter } from "next/navigation";
+// import Image from "next/image";
+// import { AppContext } from "@/context/AppContext";
 
-const History = () => {
-  const router = useRouter();
-  const { images, loading, error, getAiImages, deleteImages } =
-    useContext(AppContext);
-  const [deleteLoading, setDeleteLoading] = useState(null);
+// const History = () => {
+//   const router = useRouter();
+//   const { images, loading, error, getAiImages, deleteImages } =
+//     useContext(AppContext);
+//   const [deleteLoading, setDeleteLoading] = useState(null);
 
-  const handleDelete = (id) => {
-    toast.custom((t) => (
-      <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col gap-3 w-[300px]">
-        <p className="text-sm font-medium text-gray-800">
-          Are you sure you want to delete this image?
-        </p>
+//   const handleDelete = (id) => {
+//     toast.custom((t) => (
+//       <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col gap-3 w-[300px]">
+//         <p className="text-sm font-medium text-gray-800">
+//           Are you sure you want to delete this image?
+//         </p>
 
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className="px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300"
-          >
-            No
-          </button>
+//         <div className="flex justify-end gap-2">
+//           <button
+//             onClick={() => toast.dismiss(t.id)}
+//             className="px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300"
+//           >
+//             No
+//           </button>
 
-          <button
-            onClick={async () => {
-              toast.dismiss(t.id);
+//           <button
+//             onClick={async () => {
+//               toast.dismiss(t.id);
 
-              const toastId = toast.loading("Deleting image...");
-              setDeleteLoading(id);
+//               const toastId = toast.loading("Deleting image...");
+//               setDeleteLoading(id);
 
-              try {
-                await deleteImages(id);
-                toast.success("Image deleted successfully ✅", {
-                  id: toastId,
-                });
-              } catch (err) {
-                console.error(err);
-                toast.error("Failed to delete image ❌", {
-                  id: toastId,
-                });
-              } finally {
-                setDeleteLoading(null);
-              }
-            }}
-            className="px-3 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
-          >
-            Yes, Delete
-          </button>
-        </div>
-      </div>
-    ));
-  };
-  const handleViewResults = (item) => {
-    const queryParams = new URLSearchParams({
-      projectId: item._id,
-      featureType: item.featureType,
-      mode: "view",
-    }).toString();
+//               try {
+//                 await deleteImages(id);
+//                 toast.success("Image deleted successfully ✅", {
+//                   id: toastId,
+//                 });
+//               } catch (err) {
+//                 console.error(err);
+//                 toast.error("Failed to delete image ❌", {
+//                   id: toastId,
+//                 });
+//               } finally {
+//                 setDeleteLoading(null);
+//               }
+//             }}
+//             className="px-3 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700"
+//           >
+//             Yes, Delete
+//           </button>
+//         </div>
+//       </div>
+//     ));
+//   };
+//   const handleViewResults = (item) => {
+//     const queryParams = new URLSearchParams({
+//       projectId: item._id,
+//       featureType: item.featureType,
+//       mode: "view",
+//     }).toString();
 
-    router.push(`/admin/step4?${queryParams}`);
-  };
+//     router.push(`/admin/step4?${queryParams}`);
+//   };
 
-  const handleReEdit = (item) => {
-    const queryParams = new URLSearchParams({
-      type: item.featureType,
-      editMode: "true",
-      projectId: item._id,
-    }).toString();
+//   const handleReEdit = (item) => {
+//     const queryParams = new URLSearchParams({
+//       type: item.featureType,
+//       editMode: "true",
+//       projectId: item._id,
+//     }).toString();
 
-    router.push(`/admin/uploadImageTabs?${queryParams}`);
-  };
+//     router.push(`/admin/uploadImageTabs?${queryParams}`);
+//   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-10 h-10 text-[#034F75]" />
-      </div>
-    );
-  }
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center">
+//         <Loader2 className="animate-spin w-10 h-10 text-[#034F75]" />
+//       </div>
+//     );
+//   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="bg-red-50 border border-red-300 rounded-lg p-6 max-w-md">
-          <p className="text-red-600 text-center">{error}</p>
-        </div>
-      </div>
-    );
-  }
+//   if (error) {
+//     return (
+//       <div className="min-h-screen bg-white flex items-center justify-center p-4">
+//         <div className="bg-red-50 border border-red-300 rounded-lg p-6 max-w-md">
+//           <p className="text-red-600 text-center">{error}</p>
+//         </div>
+//       </div>
+//     );
+//   }
 
-  return (
-    <>
-      <h2 className="text-base sm:text-[26px] font-bold text-black px-4 sm:px-6 lg:px-9 py-3 sm:py-4">
-        Eliteimage Ai
-      </h2>
+//   return (
+//     <>
+    
 
-      <div className="py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <h2 className="text-[20px] sm:text-[28px] lg:text-[35px] font-semibold text-black">
-            Generation History
-          </h2>
+//       <div className="py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
+//         <div className="mb-6 sm:mb-8 lg:mb-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+//           <h2 className="text-[20px] sm:text-[28px] lg:text-[35px] font-semibold text-black">
+//             Generation History
+//           </h2>
 
-          <button
-            onClick={getAiImages}
-            className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[20px] text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
-          >
-            Refresh
-          </button>
-        </div>
+//           <button
+//             onClick={getAiImages}
+//             className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[20px] text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
+//           >
+//             Refresh
+//           </button>
+//         </div>
 
-        {!images || images.length === 0 ? (
-          <div className="text-center py-12 sm:py-16 bg-[#D3E7F0] rounded-lg">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-              <span className="text-3xl sm:text-4xl">🖼️</span>
-            </div>
-            <h3 className="text-xl sm:text-2xl font-semibold text-gray-600 mb-2">
-              No Images Yet
-            </h3>
-            <p className="text-sm sm:text-base text-gray-500">
-              Start generating images to see them here
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4 sm:space-y-5">
-            {images.map((item) => (
-              <div
-                key={item._id}
-                className="flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
-              >
-                <Image
-                  src={
-                    item.image ||
-                    item.uploadedImages?.[0] ||
-                    "/placeholder.png"
-                  }
-                  alt={item.title}
-                  width={112}
-                  height={112}
-                  className="h-24 w-24 sm:h-35 sm:w-35 rounded-lg object-cover flex-shrink-0"
-                />
+//         {!images || images.length === 0 ? (
+//           <div className="text-center py-12 sm:py-16 bg-[#D3E7F0] rounded-lg">
+//             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+//               <span className="text-3xl sm:text-4xl">🖼️</span>
+//             </div>
+//             <h3 className="text-xl sm:text-2xl font-semibold text-gray-600 mb-2">
+//               No Images Yet
+//             </h3>
+//             <p className="text-sm sm:text-base text-gray-500">
+//               Start generating images to see them here
+//             </p>
+//           </div>
+//         ) : (
+//           <div className="space-y-4 sm:space-y-5">
+//             {images.map((item) => (
+//               <div
+//                 key={item._id}
+//                 className="flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
+//               >
+//                 <Image
+//                   src={
+//                     item.image ||
+//                     item.uploadedImages?.[0] ||
+//                     "/placeholder.png"
+//                   }
+//                   alt={item.title}
+//                   width={112}
+//                   height={112}
+//                   className="h-24 w-24 sm:h-35 sm:w-35 rounded-lg object-cover flex-shrink-0"
+//                 />
 
-                <div className="flex flex-1 flex-col justify-between gap-3">
-                  <div>
-                    <p className="text-[16px] sm:text-[20px] font-medium text-black">
-                      {item.title}
-                    </p>
-                    <p className="text-[16px] sm:text-[20px] text-gray-600">
-                      {item.featureType}
-                    </p>
-                    <p className="text-[14px] text-gray-500">
-                      {new Date(item.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
+//                 <div className="flex flex-1 flex-col justify-between gap-3">
+//                   <div>
+//                     <p className="text-[16px] sm:text-[20px] font-medium text-black">
+//                       {item.title}
+//                     </p>
+//                     <p className="text-[16px] sm:text-[20px] text-gray-600">
+//                       {item.featureType}
+//                     </p>
+//                     <p className="text-[14px] text-gray-500">
+//                       {new Date(item.createdAt).toLocaleDateString()}
+//                     </p>
+//                   </div>
 
-                  <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
-                    <button
-                      onClick={() => handleViewResults(item)}
-                      className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
-                    >
-                      <Eye size={16} className="flex-shrink-0" />
-                      <span className="whitespace-nowrap">View Results</span>
-                    </button>
+//                   <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
+//                     <button
+//                       onClick={() => handleViewResults(item)}
+//                       className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
+//                     >
+//                       <Eye size={16} className="flex-shrink-0" />
+//                       <span className="whitespace-nowrap">View Results</span>
+//                     </button>
 
-                    <Link
-                      href={`/admin/step4?mode=edit&projectId=${
-                        item._id
-                      }&featureType=${encodeURIComponent(item.featureType)}`}
-                      className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
-                    >
-                      <Pencil size={16} className="flex-shrink-0" />
-                      <span className="whitespace-nowrap">Re-Edit</span>
-                    </Link>
+//                     <Link
+//                       href={`/admin/step4?mode=edit&projectId=${
+//                         item._id
+//                       }&featureType=${encodeURIComponent(item.featureType)}`}
+//                       className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-sm sm:text-base text-white hover:bg-[#023d5c] transition-colors"
+//                     >
+//                       <Pencil size={16} className="flex-shrink-0" />
+//                       <span className="whitespace-nowrap">Re-Edit</span>
+//                     </Link>
 
-                    <button
-                      onClick={() => handleDelete(item._id)}
-                      disabled={deleteLoading === item._id}
-                      className="flex items-center cursor-pointer gap-2 rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {deleteLoading === item._id ? (
-                        <Loader2
-                          size={16}
-                          className="animate-spin flex-shrink-0"
-                        />
-                      ) : (
-                        <Trash2 size={16} className="flex-shrink-0" />
-                      )}
-                      <span className="whitespace-nowrap">Delete</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
-  );
-};
+//                     <button
+//                       onClick={() => handleDelete(item._id)}
+//                       disabled={deleteLoading === item._id}
+//                       className="flex items-center cursor-pointer gap-2 rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-sm sm:text-base text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+//                     >
+//                       {deleteLoading === item._id ? (
+//                         <Loader2
+//                           size={16}
+//                           className="animate-spin flex-shrink-0"
+//                         />
+//                       ) : (
+//                         <Trash2 size={16} className="flex-shrink-0" />
+//                       )}
+//                       <span className="whitespace-nowrap">Delete</span>
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     </>
+//   );
+// };
 
-export default History;
+// export default History;

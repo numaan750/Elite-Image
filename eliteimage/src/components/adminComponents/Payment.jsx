@@ -124,11 +124,8 @@ export default function Payment() {
   };
 
   return (
-    <div className="flex items-start justify-start bg-white pt-10 sm:pt-10 lg:pt-10">
+    <div className="flex items-start justify-start bg-white mt-10 sm:mt-3 lg:mt-3">
       <div className="w-full max-w-xl">
-        <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium mb-6 sm:mb-6">
-          Eliteimage Ai
-        </h3>
         <h2 className="text-[18px] sm:text-[20px] lg:text-[28px] font-semibold mb-6 sm:mb-10 lg:mb-12">
           Final step, complete your payment
         </h2>

@@ -29,10 +29,7 @@ export default function Support() {
   const [open, setOpen] = useState(0);
 
   return (
-    <div className="min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
-      <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium mb-6 sm:mb-8">
-        Eliteimage Ai
-      </h3>
+    <div className="min-h-screen bg-white mt-10 sm:mt-3 lg:mt-3">
       <h2 className="text-[20px] sm:text-[28px] font-semibold mb-2 sm:mb-4 lg:mb-6">
         How Can We Help?
       </h2>

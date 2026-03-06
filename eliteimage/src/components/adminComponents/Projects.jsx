@@ -142,304 +142,304 @@ const Projects = () => {
   }
   return (
     <>
-      <h2 className="text-base sm:text-[20px] font-medium text-black mt-14 sm:mt-16 lg:mt-15">
-        Eliteimage Ai
-      </h2>
+      <div className="mt-10 sm:mt-3 lg:mt-3">
+        <div className=" w-full">
+          <div className="mb-2 sm:mb-4 lg:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <h2 className="text-[20px] sm:text-[32px] lg:text-[28px] font-semibold text-black">
+              My Projects
+            </h2>
 
-      <div className="py-4 sm:py-6 lg:py-8 w-full">
-        <div className="mb-2 sm:mb-4 lg:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <h2 className="text-[20px] sm:text-[32px] lg:text-[28px] font-semibold text-black">
-            My Projects
-          </h2>
-
-          {images.length > 0 && (
-            <div className="flex gap-2 sm:gap-3">
-              {!isSelectionMode ? (
-                <button
-                  onClick={() => setIsSelectionMode(true)}
-                  className="px-3 py-2 rounded-md cursor-pointer bg-[#034F75] text-white hover:bg-[#023d5c] transition-colors text-[14px] sm:text-[16px]"
-                >
-                  Select Multiple
-                </button>
-              ) : (
-                <>
+            {images.length > 0 && (
+              <div className="flex gap-2 sm:gap-3">
+                {!isSelectionMode ? (
                   <button
-                    onClick={handleSelectAll}
-                    className="px-3 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-[14px] sm:text-[16px]"
+                    onClick={() => setIsSelectionMode(true)}
+                    className="px-3 py-2 rounded-md cursor-pointer bg-[#034F75] text-white hover:bg-[#023d5c] transition-colors text-[14px] sm:text-[16px]"
                   >
-                    Select All
+                    Select Multiple
                   </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleSelectAll}
+                      className="px-3 py-2 rounded-md cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-[14px] sm:text-[16px]"
+                    >
+                      Select All
+                    </button>
 
-                  <button
-                    onClick={() => {
-                      setIsSelectionMode(false);
-                      setSelectedProjects([]);
-                    }}
-                    className="px-3 py-2 cursor-pointer rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-[14px] sm:text-[16px]"
-                  >
-                    Cancel
-                  </button>
-
-                  {selectedProjects.length > 0 && (
                     <button
                       onClick={() => {
-                        setProjectToDelete("bulk");
-                        setShowDeleteModal(true);
+                        setIsSelectionMode(false);
+                        setSelectedProjects([]);
                       }}
-                      className="px-3 py-2 rounded-md cursor-pointer bg-red-600 hover:bg-red-700 text-white transition-colors text-[14px] sm:text-[16px] flex items-center gap-2"
+                      className="px-3 py-2 cursor-pointer rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors text-[14px] sm:text-[16px]"
                     >
-                      <Trash2 size={16} />
-                      Delete ({selectedProjects.length})
+                      Cancel
                     </button>
-                  )}
-                </>
-              )}
-            </div>
-          )}
 
-          {/* <button
+                    {selectedProjects.length > 0 && (
+                      <button
+                        onClick={() => {
+                          setProjectToDelete("bulk");
+                          setShowDeleteModal(true);
+                        }}
+                        className="px-3 py-2 rounded-md cursor-pointer bg-red-600 hover:bg-red-700 text-white transition-colors text-[14px] sm:text-[16px] flex items-center gap-2"
+                      >
+                        <Trash2 size={16} />
+                        Delete ({selectedProjects.length})
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* <button
             onClick={getAiImages}
             className="rounded-md cursor-pointer bg-[#0B5C7A] px-4 py-1.5 text-[16px] sm:text-[18px] text-white hover:bg-[#034F75] transition-colors w-full sm:w-auto"
           >
             Reload
           </button> */}
-        </div>
+          </div>
 
-        <div className="space-y-4 sm:space-y-5 ">
-          {images.map((project) => (
-            <div
-              key={project._id}
-              className="relative flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
-            >
-              {isSelectionMode && (
-                <div className="absolute top-2 left-2 z-10">
-                  <input
-                    type="checkbox"
-                    checked={selectedProjects.includes(project._id)}
-                    onChange={() => toggleProjectSelection(project._id)}
-                    className="w-5 h-5 cursor-pointer accent-[#034F75]"
-                  />
-                </div>
-              )}
-              <Image
-                src={
-                  project.image ||
-                  project.uploadedImages?.[0] ||
-                  "/placeholder.png"
-                }
-                alt="project"
-                width={112}
-                height={112}
-                className="h-30 w-30 sm:h-35 sm:w-35 rounded-lg object-cover flex-shrink-0"
-              />
-
-              <div className="flex flex-1 flex-col justify-between gap-1.5">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[16px] sm:text-[24px] font-medium text-black">
-                    {project.featureType || "Unknown Feature"}
-                  </p>
-                  <span className="text-sm sm:text-base text-gray-600 whitespace-nowrap">
-                    {new Date(project.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <p className="text-[16px] sm:text-[18px] text-gray-600 mb-4">
-                  Images ({project.uploadedImages?.length || 1})
-                </p>
-
-                <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
-                  <Link
-                    href={`/admin/step4?mode=view&projectId=${project._id}`}
-                    className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
-                  >
-                    <Eye size={16} className="flex-shrink-0" />
-                    <span className="whitespace-nowrap">View Results</span>
-                  </Link>
-
-                  <Link
-                    href={`/admin/edit-project?mode=edit&projectId=${
-                      project._id
-                    }&featureType=${encodeURIComponent(project.featureType)}`}
-                    className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
-                  >
-                    <Pencil size={16} className="flex-shrink-0" />
-                    <span className="whitespace-nowrap">Re-Edit</span>
-                  </Link>
-
-                  <button
-                    onClick={() => {
-                      setProjectToDelete(project._id);
-                      setShowDeleteModal(true);
-                    }}
-                    disabled={deleteLoading === project._id}
-                    className="flex items-center cursor-pointer gap-2 rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {deleteLoading === project._id ? (
-                      <Loader2
-                        size={16}
-                        className="animate-spin flex-shrink-0"
-                      />
-                    ) : (
-                      <Trash2 size={16} className="flex-shrink-0" />
-                    )}
-                    <span className="whitespace-nowrap">Delete</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {selectedProject && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 sm:p-4"
-          onClick={() => setSelectedProject(null)}
-        >
-          <div
-            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="sticky top-0 bg-[#034F75] text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-lg z-10">
-              <h2 className="text-lg sm:text-xl font-semibold">
-                Project Details
-              </h2>
-              <button
-                onClick={() => setSelectedProject(null)}
-                className="hover:bg-[#023d5c] p-2 rounded-md transition cursor-pointer text-lg sm:text-xl font-bold"
-                aria-label="Close Project Details"
+          <div className="space-y-4 sm:space-y-5 ">
+            {images.map((project) => (
+              <div
+                key={project._id}
+                className="relative flex flex-col sm:flex-row gap-4 sm:gap-5 rounded-xl border border-[#034F75] bg-[#D3E7F0] p-3 sm:p-4"
               >
-                ✕
-              </button>
-            </div>
+                {isSelectionMode && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <input
+                      type="checkbox"
+                      checked={selectedProjects.includes(project._id)}
+                      onChange={() => toggleProjectSelection(project._id)}
+                      className="w-5 h-5 cursor-pointer accent-[#034F75]"
+                    />
+                  </div>
+                )}
+                <Image
+                  src={
+                    project.image ||
+                    project.uploadedImages?.[0] ||
+                    "/placeholder.png"
+                  }
+                  alt="project"
+                  width={112}
+                  height={112}
+                  className="h-30 w-30 sm:h-35 sm:w-35 rounded-lg object-cover flex-shrink-0"
+                />
 
-            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 bg-gray-100 rounded-lg p-3 sm:p-4">
-                {selectedProject.uploadedImages?.map((img, idx) => (
-                  <Image
-                    key={idx}
-                    src={img}
-                    alt={`Image ${idx + 1}`}
-                    width={200}
-                    height={200}
-                    className="w-full h-32 sm:h-40 object-cover rounded-lg"
-                  />
-                ))}
-              </div>
-
-              <div className="space-y-3 sm:space-y-4">
-                <div className="bg-[#D3E7F0] rounded-lg p-3 sm:p-4">
-                  <label className="block text-xs sm:text-sm font-semibold mb-2">
-                    Title
-                  </label>
-                  <p className="text-sm sm:text-base text-gray-800 break-words">
-                    {selectedProject.title}
-                  </p>
-                </div>
-
-                <div className="bg-[#D3E7F0] rounded-lg p-3 sm:p-4">
-                  <label className="block text-xs sm:text-sm font-semibold mb-2">
-                    Description
-                  </label>
-                  <p className="text-sm sm:text-base text-gray-800 break-words">
-                    {selectedProject.description}
-                  </p>
-                </div>
-
-                {selectedProject.featureType && (
-                  <div className="bg-[#D3E7F0] rounded-lg p-3 sm:p-4">
-                    <label className="block text-xs sm:text-sm font-semibold mb-2">
-                      Feature Type
-                    </label>
-                    <span className="inline-block bg-[#034F75] text-white text-xs sm:text-sm px-3 py-1 rounded-full">
-                      {selectedProject.featureType}
+                <div className="flex flex-1 flex-col justify-between gap-1.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[16px] sm:text-[24px] font-medium text-black">
+                      {project.featureType || "Unknown Feature"}
+                    </p>
+                    <span className="text-sm sm:text-base text-gray-600 whitespace-nowrap">
+                      {new Date(project.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                )}
+                  <p className="text-[16px] sm:text-[18px] text-gray-600 mb-4">
+                    Images ({project.uploadedImages?.length || 1})
+                  </p>
 
-                {selectedProject.selectedStyle?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 sm:gap-3 lg:gap-5">
+                    <Link
+                      href={`/admin/step4?mode=view&projectId=${project._id}`}
+                      className="flex items-center cursor-pointer gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
+                    >
+                      <Eye size={16} className="flex-shrink-0" />
+                      <span className="whitespace-nowrap">View Results</span>
+                    </Link>
+
+                    <Link
+                      href={`/admin/edit-project?mode=edit&projectId=${
+                        project._id
+                      }&featureType=${encodeURIComponent(project.featureType)}`}
+                      className="flex items-center gap-2 rounded-md bg-[#034F75] px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-white hover:bg-[#023d5c] transition-colors"
+                    >
+                      <Pencil size={16} className="flex-shrink-0" />
+                      <span className="whitespace-nowrap">Re-Edit</span>
+                    </Link>
+
+                    <button
+                      onClick={() => {
+                        setProjectToDelete(project._id);
+                        setShowDeleteModal(true);
+                      }}
+                      disabled={deleteLoading === project._id}
+                      className="flex items-center cursor-pointer gap-2 rounded-md shadow-md bg-white px-3 sm:px-4 py-2 text-[16px] sm:text-[18px] text-[#FF1C20] hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {deleteLoading === project._id ? (
+                        <Loader2
+                          size={16}
+                          className="animate-spin flex-shrink-0"
+                        />
+                      ) : (
+                        <Trash2 size={16} className="flex-shrink-0" />
+                      )}
+                      <span className="whitespace-nowrap">Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {selectedProject && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-3 sm:p-4"
+            onClick={() => setSelectedProject(null)}
+          >
+            <div
+              className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-[#034F75] text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between rounded-t-lg z-10">
+                <h2 className="text-lg sm:text-xl font-semibold">
+                  Project Details
+                </h2>
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  className="hover:bg-[#023d5c] p-2 rounded-md transition cursor-pointer text-lg sm:text-xl font-bold"
+                  aria-label="Close Project Details"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 bg-gray-100 rounded-lg p-3 sm:p-4">
+                  {selectedProject.uploadedImages?.map((img, idx) => (
+                    <Image
+                      key={idx}
+                      src={img}
+                      alt={`Image ${idx + 1}`}
+                      width={200}
+                      height={200}
+                      className="w-full h-32 sm:h-40 object-cover rounded-lg"
+                    />
+                  ))}
+                </div>
+
+                <div className="space-y-3 sm:space-y-4">
                   <div className="bg-[#D3E7F0] rounded-lg p-3 sm:p-4">
                     <label className="block text-xs sm:text-sm font-semibold mb-2">
-                      Styles
+                      Title
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProject.selectedStyle.map((style, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-block bg-[#034F75] text-white text-xs sm:text-sm px-3 py-1 rounded-full"
-                        >
-                          {style}
-                        </span>
-                      ))}
-                    </div>
+                    <p className="text-sm sm:text-base text-gray-800 break-words">
+                      {selectedProject.title}
+                    </p>
                   </div>
-                )}
 
-                {selectedProject.selectedFeature?.length > 0 && (
                   <div className="bg-[#D3E7F0] rounded-lg p-3 sm:p-4">
                     <label className="block text-xs sm:text-sm font-semibold mb-2">
-                      Selected Features
+                      Description
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProject.selectedFeature.map((feature, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-block bg-[#0B5C7A] text-white text-xs sm:text-sm px-3 py-1 rounded-full"
-                        >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
+                    <p className="text-sm sm:text-base text-gray-800 break-words">
+                      {selectedProject.description}
+                    </p>
                   </div>
-                )}
+
+                  {selectedProject.featureType && (
+                    <div className="bg-[#D3E7F0] rounded-lg p-3 sm:p-4">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2">
+                        Feature Type
+                      </label>
+                      <span className="inline-block bg-[#034F75] text-white text-xs sm:text-sm px-3 py-1 rounded-full">
+                        {selectedProject.featureType}
+                      </span>
+                    </div>
+                  )}
+
+                  {selectedProject.selectedStyle?.length > 0 && (
+                    <div className="bg-[#D3E7F0] rounded-lg p-3 sm:p-4">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2">
+                        Styles
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.selectedStyle.map((style, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-block bg-[#034F75] text-white text-xs sm:text-sm px-3 py-1 rounded-full"
+                          >
+                            {style}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedProject.selectedFeature?.length > 0 && (
+                    <div className="bg-[#D3E7F0] rounded-lg p-3 sm:p-4">
+                      <label className="block text-xs sm:text-sm font-semibold mb-2">
+                        Selected Features
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.selectedFeature.map((feature, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-block bg-[#0B5C7A] text-white text-xs sm:text-sm px-3 py-1 rounded-full"
+                          >
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {showDeleteModal && (
-        <div
-          className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowDeleteModal(false)}
-        >
+        {showDeleteModal && (
           <div
-            className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowDeleteModal(false)}
           >
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              Delete Project
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this project? This action cannot
-              be undone.
-            </p>
+            <div
+              className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Delete Project
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete this project? This action cannot
+                be undone.
+              </p>
 
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors"
-              >
-                Cancel
-              </button>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 transition-colors"
+                >
+                  Cancel
+                </button>
 
-              <button
-                onClick={() =>
-                  projectToDelete === "bulk"
-                    ? handleBulkDelete()
-                    : (() => {
-                        setShowDeleteModal(false);
-                        handleDelete(projectToDelete);
-                      })()
-                }
-                disabled={deleteLoading === projectToDelete}
-                className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
-              >
-                {deleteLoading === projectToDelete ? "Deleting..." : " Delete"}
-              </button>
+                <button
+                  onClick={() =>
+                    projectToDelete === "bulk"
+                      ? handleBulkDelete()
+                      : (() => {
+                          setShowDeleteModal(false);
+                          handleDelete(projectToDelete);
+                        })()
+                  }
+                  disabled={deleteLoading === projectToDelete}
+                  className="px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+                >
+                  {deleteLoading === projectToDelete
+                    ? "Deleting..."
+                    : " Delete"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };

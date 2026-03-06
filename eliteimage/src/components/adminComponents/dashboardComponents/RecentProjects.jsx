@@ -42,7 +42,7 @@ const RecentProjects = () => {
     );
   }
   return (
-    <div className="mt-10 sm:mt-12 lg:mt-14 ">
+    <div className="mt-10 mt-10 sm:mt-3 lg:mt-3">
       <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <h2 className="text-[20px] sm:text-[28px] lg:text-[28px] font-semibold text-black">
           Recent Projects

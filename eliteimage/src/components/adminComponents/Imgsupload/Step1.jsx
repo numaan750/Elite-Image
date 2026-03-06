@@ -375,13 +375,7 @@ const Step1 = ({ formData, setFormData, next }) => {
   );
 
   return (
-    <div className="bg-white mt-4">
-      {/* <div className="flex items-center text-gray-700">
-        <span className="font-medium text-black text-[16px] sm:text-[20px] mb-6 sm:mb-8 ">
-          Elite Image Ai
-        </span>
-      </div> */}
-
+    <div className="bg-white mt-10 sm:mt-3 lg:mt-3">
       <h2 className="mb-2 sm:mb-4 lg:mb-6 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-black">
         Upload Images
         {formData.featureType && (

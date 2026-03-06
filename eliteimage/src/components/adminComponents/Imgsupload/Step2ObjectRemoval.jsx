@@ -297,13 +297,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
-      <div className="flex items-center gap-3 text-gray-700">
-        <span className="font-medium text-black text-[18px] sm:text-[20px] mb-6 sm:mb-8">
-          Elite Image AI
-        </span>
-      </div>
-
+    <div className="w-full min-h-screen bg-white mt-10 sm:mt-3 lg:mt-3">
       <h2 className="mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[28px] lg:text-[28px] font-semibold text-gray-900">
         Object Removal Options
       </h2>

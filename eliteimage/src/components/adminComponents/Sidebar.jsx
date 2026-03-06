@@ -66,7 +66,7 @@ export default function Sidebar() {
     lg:translate-x-0 lg:static
   `}
       >
-        <div className="flex items-center justify-between mb-12">
+        <div className="flex items-center justify-between mb-5">
           <h2 className="text-[24px] font-semibold">Eliteimage</h2>
           <button className="lg:hidden" onClick={() => setOpen(false)}>
             <X />

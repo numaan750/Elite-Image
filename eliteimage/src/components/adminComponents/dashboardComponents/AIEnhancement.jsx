@@ -58,13 +58,9 @@ const AIEnhancement = () => {
 
   return (
     <div className="w-auto">
-      <main className="bg-white mt-14 sm:mt-16 lg:mt-15">
+      <main className="bg-white mt-10 sm:mt-3 lg:mt-3">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6">
           <div className="w-full lg:w-auto">
-            <h1 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium text-black">
-              Eliteimage Ai
-            </h1>
-
             <h2 className="mt-4 sm:mt-6 lg:mt-10 text-[22px] sm:text-[24px] lg:text-[28px] font-semibold text-black leading-tight">
               Welcome Back, Google User
             </h2>

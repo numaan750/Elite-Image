@@ -4,14 +4,7 @@ import React from "react";
 const Pricing = () => {
   return (
     <>
-      <h2 className="text-[18px] sm:text-[20px] font-medium text-black mt-14 sm:mt-16 lg:mt-15">
-        Eliteimage Ai
-      </h2>
-
-      <div
-        id="pricing"
-        className=""
-      >
+      <div className="mt-10 sm:mt-3 lg:mt-3">
         <div>
           <h2 className="text-[20px] sm:text-[20px] lg:text-[28px] font-semibold mb-2 sm:mb-4 lg:mb-6 mt-8">
             Pricing
@@ -118,7 +111,7 @@ const Pricing = () => {
               </ul>
 
               <Link
-href="/admin/pricing/payment?plan=Basic&amount=22"
+                href="/admin/pricing/payment?plan=Basic&amount=22"
                 className="inline-flex w-full items-center justify-center bg-[#034F75] text-[#D3E7F0] font-semibold text-[14px] sm:text-[17.18px] py-3 sm:py-4 rounded-xl cursor-pointer hover:bg-[#023d5c] transition-colors mt-5 sm:mt-7"
               >
                 Choose Plan
@@ -273,7 +266,7 @@ href="/admin/pricing/payment?plan=Basic&amount=22"
               </ul>
 
               <Link
-href="/admin/pricing/payment?plan=Pro&amount=49.99"
+                href="/admin/pricing/payment?plan=Pro&amount=49.99"
                 className="inline-flex w-full items-center justify-center bg-white text-[#034F75] font-semibold text-[16px] sm:text-[17.18px] py-3 sm:py-4 rounded-xl border border-[#034F75] hover:bg-gray-50 transition cursor-pointer"
               >
                 Choose Plan
@@ -380,7 +373,7 @@ href="/admin/pricing/payment?plan=Pro&amount=49.99"
               </ul>
 
               <Link
-href="/admin/pricing/payment?plan=Agency&amount=99.99"
+                href="/admin/pricing/payment?plan=Agency&amount=99.99"
                 className="inline-flex w-full items-center justify-center bg-[#034F75] text-[#D3E7F0] font-semibold text-[14px] sm:text-[17.18px] py-3 sm:py-4 rounded-xl cursor-pointer hover:bg-[#023d5c] transition-colors mt-6 sm:mt-10"
               >
                 Choose Plan

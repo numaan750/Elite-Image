@@ -57,12 +57,7 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white mt-14 sm:mt-16 lg:mt-15">
-      <div className="flex items-center text-gray-700">
-        <span className="font-medium text-black text-[16px] sm:text-[18px] mb-6 sm:mb-8">
-          Elite Image AI
-        </span>
-      </div>
+    <div className="w-full min-h-screen bg-white mt-10 sm:mt-3 lg:mt-3">
 
       <h2 className="mb-2 sm:mb-4 lg:mb-6 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-gray-900">
         {featureData.title}
