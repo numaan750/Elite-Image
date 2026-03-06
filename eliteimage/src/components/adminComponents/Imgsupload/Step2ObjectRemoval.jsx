@@ -332,7 +332,9 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
               <img
                 key={index}
                 src={typeof img === "string" ? img : URL.createObjectURL(img)}
-                onClick={() => setActiveImageIndex(index)}
+                onClick={() => {
+                  if (!isProcessing) setActiveImageIndex(index);
+                }}
                 className={`h-20 w-28 object-cover rounded cursor-pointer border-2
                 ${
                   activeImageIndex === index
@@ -345,7 +347,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
           <div
             className="relative w-full bg-white rounded-[40px] overflow-hidden cursor-crosshair"
-            onMouseDown={handleMouseDown}
+            onMouseDown={isProcessing ? undefined : handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
@@ -405,38 +407,40 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
       >
         <button
           onClick={back}
-          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
+          disabled={isProcessing}
+          className={`flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 transition-colors ${isProcessing ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
         >
           <ChevronRight size={17} className="rotate-180" />
           Back
         </button>
-
         <div className="flex flex-col sm:flex-row gap-3">
           {selectedAreas[activeImageIndex]?.length > 0 && (
             <button
               onClick={() => {
-                setSelectedAreas((prev) => ({
-                  ...prev,
-                  [activeImageIndex]: [],
-                }));
-                setFormData((prev) => ({
-                  ...prev,
-                  selectedObjectAreas: {
-                    ...(prev.selectedObjectAreas || {}),
+                if (!isProcessing) {
+                  setSelectedAreas((prev) => ({
+                    ...prev,
                     [activeImageIndex]: [],
-                  },
-                }));
+                  }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    selectedObjectAreas: {
+                      ...(prev.selectedObjectAreas || {}),
+                      [activeImageIndex]: [],
+                    },
+                  }));
+                }
               }}
-              className="
+              disabled={isProcessing}
+              className={`
                w-full sm:w-auto
                px-3 sm:px-3 py-2
                text-[14px] sm:text-[16px] lg:text-[18px]
                border-2 border-[#034F75] 
-               text-[#034F75] 
                rounded-lg 
-               hover:bg-[#034F75] hover:text-white
-                      transition-colors
-             "
+               transition-colors
+               ${isProcessing ? "opacity-50 cursor-not-allowed text-gray-400 border-gray-300" : "text-[#034F75] hover:bg-[#034F75] hover:text-white"}
+             `}
             >
               Clear All Selections
             </button>

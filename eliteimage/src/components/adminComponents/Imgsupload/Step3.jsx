@@ -221,8 +221,15 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
         {styles.map((item, index) => (
           <div
             key={`${item.name}-${index}`}
-            onClick={() => setSelected(item.name)}
-            className={`w-full rounded-xl sm:rounded-2xl cursor-pointer border-2 overflow-hidden transition-all hover:shadow-lg
+            onClick={() => {
+              if (!isSaving) setSelected(item.name);
+            }}
+            className={`w-full rounded-xl sm:rounded-2xl border-2 overflow-hidden transition-all
+             ${
+               isSaving
+                 ? "cursor-not-allowed opacity-60"
+                 : "cursor-pointer hover:shadow-lg"
+             }
              ${
                selected === item.name
                  ? "border-[#034F75] shadow-md"
@@ -255,7 +262,8 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
       <div className=" flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
         <button
           onClick={back}
-          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
+          disabled={isSaving}
+          className={`flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors${isSaving ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
         >
           <ChevronRight size={17} className="rotate-180" />
           Back

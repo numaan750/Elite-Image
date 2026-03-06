@@ -512,7 +512,8 @@ const Step1 = ({ formData, setFormData, next }) => {
       <div className="flex justify-between items-center gap-3">
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
+          disabled={isSaving}
+          className={`flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 transition-colors ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
         >
           <ChevronRight size={17} className="rotate-180" />
           Back
@@ -541,7 +542,7 @@ const Step1 = ({ formData, setFormData, next }) => {
             {isSaving ? (
               <>
                 <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Saving...
+                Generating...
               </>
             ) : isAnyImageUploading || loadingCount > 0 ? (
               <>

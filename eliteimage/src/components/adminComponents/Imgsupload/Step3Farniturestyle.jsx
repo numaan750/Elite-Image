@@ -40,6 +40,7 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
   const [selectedFurniture, setSelectedFurniture] = useState(
     formData.selectedFurniture || FURNITURE_TYPES[0].name,
   );
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const { saveDraft } = useContext(AppContext);
 
@@ -75,6 +76,7 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
   }, [formData.featureType, router]);
 
   const handleContinue = () => {
+    setIsSaving(true);
     setFormData((prev) => ({
       ...prev,
       selectedFurniture: selectedFurniture,
@@ -103,8 +105,16 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
         {FURNITURE_TYPES.map((item) => (
           <div
             key={item.name}
-            onClick={() => setSelectedFurniture(item.name)}
-            className={`rounded-xl cursor-pointer border-2 overflow-hidden transition-all hover:shadow-lg ${
+            onClick={() => {
+              if (!isSaving) setSelectedFurniture(item.name);
+            }}
+            className={`rounded-xl border-2 overflow-hidden transition-all
+            ${
+              isSaving
+                ? "cursor-not-allowed opacity-60"
+                : "cursor-pointer hover:shadow-lg"
+            }
+            ${
               selectedFurniture === item.name
                 ? "border-[#034F75] shadow-md"
                 : "border-gray-200"
@@ -147,7 +157,8 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
       >
         <button
           onClick={back}
-          className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 hover:bg-gray-100 transition-colors"
+          disabled={isSaving}
+          className={`flex items-center gap-2 rounded-lg border border-gray-300 px-4 sm:px-6 py-2 text-[14px] sm:text-[18px] text-gray-700 transition-colors ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
         >
           <ChevronRight size={17} className="rotate-180" />
           Back
@@ -155,19 +166,20 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
 
         <button
           onClick={handleContinue}
+          disabled={!selectedFurniture || isSaving}
           className={`
            w-full sm:w-auto
            flex items-center justify-center gap-2
-           bg-[#034F75] hover:bg-[#023a5c]
+           bg-[#034F75]
            text-white
            text-[14px] sm:text-[16px] lg:text-[18px]
            px-5 sm:px-6 py-2
            rounded-lg
            transition-colors
-           ${!selectedFurniture ? "opacity-50" : ""}
+           ${!selectedFurniture || isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-[#023a5c]"}
          `}
         >
-          Continue
+          {isSaving ? "Loading..." : "Continue"}
           <ChevronRight size={18} />
         </button>
       </div>

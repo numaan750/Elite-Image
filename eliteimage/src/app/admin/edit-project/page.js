@@ -126,10 +126,11 @@ const EditProjectPage = () => {
       const allProcessedData = [];
 
       for (let i = 0; i < formData.uploadedImages.length; i++) {
-const originalImage = Array.isArray(formData.beforeAfterData) && 
-  formData.beforeAfterData[i]?.processedImage 
-    ? formData.beforeAfterData[i].processedImage 
-    : formData.uploadedImages[i];
+        const originalImage =
+          Array.isArray(formData.beforeAfterData) &&
+          formData.beforeAfterData[i]?.processedImage
+            ? formData.beforeAfterData[i].processedImage
+            : formData.uploadedImages[i];
         toast.loading(
           `AI processing image ${i + 1} of ${formData.uploadedImages.length}...`,
           { id: `gen-${i}` },
@@ -137,13 +138,13 @@ const originalImage = Array.isArray(formData.beforeAfterData) &&
 
         let processedUrl;
         try {
-         processedUrl = await processImageWithAI(
-  originalImage,
-  "DirectEdit",
-  editDescription,
-  formData.selectedStyle || null,
-  editDescription,
-);
+          processedUrl = await processImageWithAI(
+            originalImage,
+            "DirectEdit",
+            editDescription,
+            formData.selectedStyle || null,
+            editDescription,
+          );
           toast.success(`Image ${i + 1} ready!`, { id: `gen-${i}` });
         } catch (aiError) {
           console.error(`AI failed for image ${i + 1}:`, aiError);
@@ -368,17 +369,21 @@ const originalImage = Array.isArray(formData.beforeAfterData) &&
           <textarea
             value={editDescription}
             onChange={(e) => {
-              setEditDescription(e.target.value);
-              setIsTyping(true);
-              if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
-              typingTimerRef.current = setTimeout(() => {
-                setIsTyping(false);
-              }, 1000);
+              if (!isGenerating) {
+                setEditDescription(e.target.value);
+                setIsTyping(true);
+                if (typingTimerRef.current)
+                  clearTimeout(typingTimerRef.current);
+                typingTimerRef.current = setTimeout(() => {
+                  setIsTyping(false);
+                }, 1000);
+              }
             }}
+            disabled={isGenerating}
             placeholder="Enter Here"
-            className="w-full h-20 sm:h-24 lg:h-28 resize-none rounded border-none bg-transparent 
+            className={`w-full h-20 sm:h-24 lg:h-28 resize-none rounded border-none bg-transparent 
               text-[14px] sm:text-[20px] text-gray-800 placeholder:text-gray-400
-              focus:outline-none"
+              focus:outline-none ${isGenerating ? "opacity-60 cursor-not-allowed" : ""}`}
           />
         </div>
 
@@ -394,7 +399,8 @@ const originalImage = Array.isArray(formData.beforeAfterData) &&
         >
           <button
             onClick={() => router.back()}
-            className="
+            disabled={isGenerating}
+            className={`
         w-full sm:w-auto
         flex items-center justify-center gap-2
         bg-gray-300 text-black
@@ -404,7 +410,7 @@ const originalImage = Array.isArray(formData.beforeAfterData) &&
         rounded-lg
         hover:bg-gray-400
         transition-colors
-      "
+      ${isGenerating ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
           >
             Cancel
           </button>
