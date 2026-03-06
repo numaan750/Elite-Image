@@ -141,7 +141,7 @@ const Step1 = ({ formData, setFormData, next }) => {
       setFormData((prev) => ({
         ...prev,
         beforeAfterData: allProcessedData,
-        uploadedImages: allProcessedImages,
+        // uploadedImages: allProcessedImages,
       }));
 
       const singlePayload = {
