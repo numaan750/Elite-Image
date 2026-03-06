@@ -1,11 +1,11 @@
 import Login from '@/components/Acounts/Login'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const Page = () => {
   return (
-    <div>
+     <Suspense fallback={<div>Loading...</div>}>
         <Login />
-    </div>
+     </Suspense>
   )
 }
 
