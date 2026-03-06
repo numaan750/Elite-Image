@@ -5,11 +5,11 @@ import Link from "next/link";
 
 const FaPlay = dynamic(
   () => import("react-icons/fa").then((mod) => mod.FaPlay),
-  { ssr: false, loading: () => null }
+  { ssr: false, loading: () => null },
 );
 const PiUpload = dynamic(
   () => import("react-icons/pi").then((mod) => mod.PiUpload),
-  { ssr: false, loading: () => null }
+  { ssr: false, loading: () => null },
 );
 
 const Hero = memo(() => {
@@ -161,6 +161,9 @@ const Hero = memo(() => {
         >
           {/* Before Image (Right side - full width) */}
           <div className="absolute inset-0">
+            <span className="absolute top-[12px] sm:top-[16px] lg:top-[20px] left-[12px] sm:left-[16px] lg:left-[20px] bg-[#034F75] text-white text-[12px] sm:text-[14px] lg:text-[16px] px-[10px] sm:px-[12px] lg:px-[16px] py-[4px] sm:py-[5px] lg:py-[6px] rounded-[6px] lg:rounded-[8px] font-medium z-10">
+              After
+            </span>
             <Image
               src="/LandingPage/heroimg1.webp"
               alt="Before"
@@ -190,8 +193,8 @@ const Hero = memo(() => {
               quality={60}
             />
             <span className="absolute top-[12px] sm:top-[16px] lg:top-[20px] left-[12px] sm:left-[16px] lg:left-[20px] bg-[#034F75] text-white text-[12px] sm:text-[14px] lg:text-[16px] px-[10px] sm:px-[12px] lg:px-[16px] py-[4px] sm:py-[5px] lg:py-[6px] rounded-[6px] lg:rounded-[8px] font-medium z-10">
-              After
-            </span>
+             After
+             </span>
           </div> */}
 
           {/* Divider Line */}
