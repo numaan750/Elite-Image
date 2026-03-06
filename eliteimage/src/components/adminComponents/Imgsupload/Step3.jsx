@@ -8,7 +8,14 @@ import { AppContext } from "@/context/AppContext";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-const Step3 = ({ formData, setFormData, next, back, featureType }) => {
+const Step3 = ({
+  formData,
+  setFormData,
+  next,
+  back,
+  featureType,
+  currentProgressStep,
+}) => {
   const {
     token,
     saveGeneratedImage,
@@ -202,13 +209,15 @@ const Step3 = ({ formData, setFormData, next, back, featureType }) => {
 
   return (
     <div className="w-full min-h-screen bg-white mt-10 sm:mt-8 lg:mt-3">
-
       <h2 className=" mb-4 sm:mb-5 lg:mb-6 text-[20px] sm:text-[24px] lg:text-[28px] font-semibold text-black">
         Edit Styles - {featureType}
       </h2>
       {formData.totalSteps > 0 && (
         <div className="mb-2 sm:mb-4 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-          <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
+          <ProgressBar
+            currentStep={currentProgressStep}
+            totalSteps={formData.totalSteps}
+          />
         </div>
       )}
 

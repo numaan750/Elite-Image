@@ -214,6 +214,7 @@ const UploadImageTabs = () => {
 
   const currentStepConfig = stepsConfig[activeStep - 1];
   const CurrentStepComponent = currentStepConfig?.component;
+  const currentProgressStep = currentStepConfig?.progressStep ?? activeStep;
   if (showAllFeatures) {
     return (
       <AuthGuard>
@@ -235,6 +236,7 @@ const UploadImageTabs = () => {
               next={goNext}
               back={goBack}
               featureType={featureType}
+              currentProgressStep={currentProgressStep}
             />
           ) : (
             <div className="text-center py-12">

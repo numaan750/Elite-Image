@@ -36,7 +36,13 @@ const FURNITURE_TYPES = [
   },
 ];
 
-const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
+const Step3Farniturestyle = ({
+  formData,
+  setFormData,
+  next,
+  back,
+  currentProgressStep,
+}) => {
   const [selectedFurniture, setSelectedFurniture] = useState(
     formData.selectedFurniture || FURNITURE_TYPES[0].name,
   );
@@ -92,7 +98,10 @@ const Step3Farniturestyle = ({ formData, setFormData, next, back }) => {
       </h2>
       {formData.totalSteps > 0 && (
         <div className="mb-4 sm:mb-5 lg:mb-6 flex items-center justify-center gap-2 sm:gap-3 lg:gap-4">
-          <ProgressBar currentStep={3} totalSteps={formData.totalSteps} />
+          <ProgressBar
+            currentStep={currentProgressStep}
+            totalSteps={formData.totalSteps}
+          />
         </div>
       )}
 
