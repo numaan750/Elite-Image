@@ -3,27 +3,26 @@ import Image from "next/image";
 import React, { useState, memo } from "react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Navbar = memo(() => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const handleScroll = (e, targetId) => {
     e.preventDefault();
-
-    const element = document.getElementById(targetId);
-
-    if (element) {
-      const navbarHeight = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition =
-        elementPosition + window.pageYOffset - navbarHeight;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-
-      setOpen(false);
+    if (window.location.pathname === "/") {
+      const element = document.getElementById(targetId);
+      if (element) {
+        const navbarHeight = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition =
+          elementPosition + window.pageYOffset - navbarHeight;
+        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        setOpen(false);
+      }
+    } else {
+      router.push(`/#${targetId}`);
     }
   };
 

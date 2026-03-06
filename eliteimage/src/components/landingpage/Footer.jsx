@@ -1,23 +1,24 @@
 "use client";
 import React, { memo } from "react";
 import { Facebook, Linkedin, Instagram, Twitter, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Footer = memo(() => {
+  const router = useRouter();
   const handleScroll = (e, targetId) => {
     e.preventDefault();
 
-    const element = document.getElementById(targetId);
-
-    if (element) {
-      const navbarHeight = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition =
-        elementPosition + window.pageYOffset - navbarHeight;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
+    if (window.location.pathname === "/") {
+      const element = document.getElementById(targetId);
+      if (element) {
+        const navbarHeight = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition =
+          elementPosition + window.pageYOffset - navbarHeight;
+        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+      }
+    } else {
+      router.push(`/#${targetId}`);
     }
   };
 
