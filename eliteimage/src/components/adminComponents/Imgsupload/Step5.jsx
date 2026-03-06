@@ -27,12 +27,14 @@ const Step5 = ({ formData, setFormData, back }) => {
   const typingTimerRef = React.useRef(null);
 
   useEffect(() => {
+  const timer = setTimeout(() => {
     if (!formData.featureType) {
       toast.error("Please select a feature first");
       router.push("/admin/dashboard");
     }
-  }, [formData.featureType, router]);
-
+  }, 300);
+  return () => clearTimeout(timer);
+}, [formData.featureType, router]);
   useEffect(() => {
     const initialPositions = {};
     formData.uploadedImages.forEach((_, index) => {

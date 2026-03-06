@@ -388,12 +388,15 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   const router = useRouter();
   const { saveDraft } = useContext(AppContext);
   const searchParams = useSearchParams();
-  useEffect(() => {
+ useEffect(() => {
+  const timer = setTimeout(() => {
     if (!formData.featureType) {
       toast.error("Please select a feature first");
       router.push("/admin/dashboard");
     }
-  }, [formData.featureType, router]);
+  }, 300); // 300ms wait karo
+  return () => clearTimeout(timer);
+}, [formData.featureType, router]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && formData.beforeAfterData) {
