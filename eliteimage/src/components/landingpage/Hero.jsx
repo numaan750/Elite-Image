@@ -13,8 +13,7 @@ const PiUpload = dynamic(
 );
 
 const Hero = memo(() => {
-  // const [sliderPosition, setSliderPosition] = useState(50);
-  
+  const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
 
