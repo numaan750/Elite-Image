@@ -126,94 +126,35 @@ OUTPUT: A dramatically improved, magazine-quality real estate photograph that lo
       7. Do NOT add any decorative elements not in original`,
 
     // ==================== OBJECT REMOVAL ====================
-    "Object Removal": (() => {
-      const hasRegions = feature && feature.includes("REGION");
-      const hasSelection = feature && feature.includes("Selection");
+    "Object Removal": `You are an expert professional photo retoucher. Your task is SURGICAL OBJECT REMOVAL.
 
-      const regionInstructions = `
-USER SELECTED SPECIFIC REGIONS FOR REMOVAL:
-${feature}
+      ${
+        feature && feature.includes("REGION")
+          ? `USER HAS SELECTED SPECIFIC REGIONS TO REMOVE:
+      
+      ${feature}
 
-SURGICAL REMOVAL PROTOCOL — EXECUTE WITH PRECISION:
-
-STEP 1 — BACKGROUND ANALYSIS (before removing anything):
-For each selected region, analyze what background surface lies BEHIND/UNDER the object:
-- Detect the floor material directly adjacent to the object (tile/hardwood/carpet/concrete)
-- Detect the wall surface around the object if wall-adjacent
-- Sample colors and textures from 360° surrounding pixels
-
-STEP 2 — OBJECT BOUNDARY MAPPING:
-- Precisely trace the exact silhouette of each object to be removed
-- Map the object's shadow and reflection separately
-- Identify ONLY the pixels belonging to the target object
-- Do NOT include any floor, wall, or ceiling pixels in the removal zone
-
-STEP 3 — INTELLIGENT BACKGROUND RECONSTRUCTION:
-After removing the object, fill ONLY the revealed area with:
-- Floor regions: Reconstruct using texture synthesis from surrounding floor — match grain direction, grout lines, pattern continuity, color variation
-- Wall regions: Reconstruct using surrounding wall texture — match paint texture, any pattern, lighting gradient
-- Grass/lawn: Reconstruct with natural grass variation matching surrounding blades
-- Sky regions: Seamless sky gradient matching surrounding sky
-- Driveway/pavement: Match surface texture, cracks, color from adjacent area
-
-STEP 4 — QUALITY VERIFICATION:
-- No visible seam or edge where object was removed
-- No blurring, smearing, or ghosting artifacts
-- Reconstructed texture must tile seamlessly with surrounding area
-- Lighting and shadow of reconstructed area must match surrounding area
-- The result must look like the object was NEVER IN THE PHOTO
-
-ABSOLUTE RESTRICTIONS:
-✗ Do NOT change floor color, material, or pattern anywhere else
-✗ Do NOT change wall color or texture anywhere else  
-✗ Do NOT alter brightness or contrast of surrounding areas
-✗ Do NOT remove or change ANYTHING outside the marked regions
-✗ Do NOT add any new objects or elements
-✗ Only the selected objects disappear — everything else stays identical`;
-
-      const selectionInstructions = `
-${feature}
-
-PRECISION REMOVAL RULES:
-1. Remove ONLY exact content inside each described region
-2. Analyze background texture surrounding each region before removal
-3. Fill with seamless photorealistic background reconstruction:
-   - Match texture, color, pattern, lighting of immediate surroundings
-   - Ensure continuity of floor lines, grout, grain, or surface patterns
-4. Touch NOTHING outside the specified regions
-5. No blur artifacts, no visible patch edges, no ghosting
-6. Result must look completely natural and untouched`;
-
-      const autoInstructions = `
-Remove all unwanted objects and clutter from this photo.
-
-REMOVAL APPROACH:
-1. Identify all movable objects that don't belong architecturally (furniture, cars, trash cans, personal items, signage, equipment, etc.)
-2. For each removed object, reconstruct the background surface perfectly:
-   - Analyze surrounding floor/wall/lawn texture pattern
-   - Fill with seamless texture synthesis — no visible patches
-3. Keep ALL architectural elements: walls, floors, ceilings, windows, doors, built-in features, landscaping structure
-4. Result must look like a clean, empty professional real estate photograph
-
-STRICT RULE: Floor and wall materials must remain 100% identical after removal.`;
-
-      return `You are a world-class professional photo retoucher specializing in surgical object removal for real estate photography.
-
-YOUR TASK: Remove specific objects WITHOUT disturbing any surrounding surfaces.
-
-THE GOLDEN RULE: The floor, walls, ceiling, and all surfaces outside the removed object must be PIXEL-PERFECT IDENTICAL to the original. The ONLY change in the image is where the removed object existed.
-
-${hasRegions ? regionInstructions : hasSelection ? selectionInstructions : autoInstructions}
-
-TECHNICAL APPROACH:
-- Use content-aware fill based on surrounding texture samples
-- Patch reconstruction using 360° neighborhood pixels
-- Seamless texture synthesis for floor/wall continuity
-- Correct perspective-aware fill for floors and walls
-- Shadow removal: remove cast shadows belonging to removed objects only
-
-OUTPUT: A perfectly clean photograph where the removed objects have vanished completely, the background surfaces are seamlessly reconstructed, and everything else in the image is 100% unchanged and undamaged.`;
-    })(),
+      EXECUTION RULES – FOLLOW STRICTLY:
+1. Detect ALL regions described above and process every region.
+2. Remove ONLY the objects located inside those regions.
+3. Do NOT modify, repaint, regenerate, or change the background in any way.
+4. Do NOT change floor, walls, roof, sky, grass, driveway, textures, colors, lighting, brightness, or shadows.
+5. Do NOT create new background elements.
+6. Do NOT blur, smooth, or alter surrounding areas.
+7. Do NOT remove or change anything outside the specified regions.
+8. Keep the entire image identical to the original except that the objects inside the regions are removed.
+9. Preserve the original image quality, colors, and details exactly as they are.
+10. The final result must look exactly like the original image with only the selected objects removed.`
+          : feature && feature.includes("Selection")
+            ? `${feature}
+      
+      EXECUTION RULES:
+      1. Remove ONLY the content inside each described region
+      2. Fill with seamless realistic background matching surroundings
+      3. DO NOT touch anything outside specified regions
+      4. Result must look completely natural`
+            : `Remove all unwanted objects, clutter, and distracting elements visible in the photo. Fill removed areas with seamless realistic background. Keep all architectural and structural elements intact.`
+      }`,
 
     // ==================== SKY REPLACEMENT ====================
     "Sky Replacement": `You are a professional real estate photographer specializing in sky replacement.
@@ -249,17 +190,17 @@ ROOM TYPE: "${feature}"
 FURNITURE STYLE: "${style}"
 
 YOUR MISSION:
-Add beautifully staged ${style} furniture into this EMPTY room. The room's architecture is SACRED — walls, floors, ceilings, windows, doors are LOCKED and must remain pixel-perfect identical.
+Add beautifully staged ${style} furniture into this EMPTY room.
 
 PHASE 1 — ARCHITECTURE LOCK (DO THIS FIRST):
 Before placing any furniture, mentally map and LOCK every architectural element:
-✓ Wall surfaces, colors, textures — UNCHANGED
-✓ Floor material, pattern, color — UNCHANGED  
-✓ Ceiling height, color, features — UNCHANGED
-✓ Windows: size, position, frame, glass reflections — UNCHANGED
-✓ Doors: position, style, hardware — UNCHANGED
-✓ Baseboards, crown molding, columns — UNCHANGED
-✓ Room dimensions and perspective — UNCHANGED
+✓ Do Not Change Wall surfaces, colors, textures
+✓ Do Not Change Floor material, pattern, color  
+✓ Do Not Change Ceiling height, color, features
+✓ Do Not Change Windows: size, position, frame, glass reflections
+✓ Do Not Change Doors: position, style, hardware
+✓ Do Not Change Baseboards, crown molding, columns
+✓ Do Not Change Room dimensions and perspective
 WARNING: Any alteration to the above = FAILED result
 
 PHASE 2 — FURNITURE PLACEMENT for "${feature}":
