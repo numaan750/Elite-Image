@@ -20,26 +20,64 @@ const buildPrompt = (
 
   const prompts = {
     // ==================== ENHANCE ====================
-    Enhance: `You are a professional real estate photo editor. Your ONLY job is to enhance the photo quality.
+    Enhance: `You are a senior professional real estate photographer and photo retoucher with 15+ years of experience. Your task is PHOTO QUALITY ENHANCEMENT ONLY.
 
-      ENHANCEMENT FOCUS: "${feature}"
-      EDITING STYLE: "${style}"
-      STYLE DETAILS: ${styleDetail}
+ENHANCEMENT FOCUS: "${feature}"
+EDITING STYLE: "${style}"
+STYLE DETAILS: ${styleDetail}
 
-      WHAT TO DO based on focus "${feature}":
-      - If "Window Glow": Brighten window areas, add warm natural glow to glass, balance interior/exterior exposure
-      - If "Color Grading": Apply professional color grading matching the style - ${styleDetail}
-      - If "Shadow Alignment": Fix shadows, make them consistent with natural light direction, remove harsh shadows
-      - If "Edge Handling": Sharpen edges of walls, furniture, architectural elements cleanly
+YOUR CORE MISSION:
+Dramatically improve the overall photo quality while keeping every single element in its exact position. This is NOT a subtle edit — make a visible, professional improvement.
 
-      STRICT RULES:
-      1. Do NOT add any new objects, furniture, or elements
-      2. Do NOT remove any existing objects
-      3. Do NOT move anything
-      4. Only improve: brightness, contrast, color, sharpness, lighting quality
-      5. Keep all architectural elements 100% identical
-      6. Result must look photorealis       tic and professional`,
+WHAT TO ENHANCE based on focus "${feature}":
 
+If "Window Glow":
+- Recover blown-out window areas using HDR exposure blending technique
+- Add soft warm natural light radiating from window frames (golden/white glow)
+- Balance interior darkness with exterior brightness (multi-zone exposure)
+- Enhance light rays or ambient glow without looking artificial
+- Deepen shadows around non-window areas for dramatic contrast
+
+If "Color Grading":
+- Apply cinematic color grading matching style: ${styleDetail}
+- Adjust white balance, lift, gamma, gain per color channel
+- Add color story: warm tones for cozy spaces, cool tones for modern/luxury
+- Enhance saturation selectively (wood tones, greenery, textiles)
+- Apply subtle vignette to draw focus to center
+
+If "Shadow Alignment":
+- Identify primary light source direction in the image
+- Reconstruct shadows to match ONE consistent light direction
+- Remove conflicting or harsh multiple shadow sources
+- Add soft depth shadows under furniture to ground objects
+- Improve shadow softness and falloff for photorealism
+
+If "Edge Handling":
+- Apply micro-contrast sharpening to all architectural edges
+- Sharpen wall-to-ceiling transitions, door frames, window frames
+- Crisp up furniture outlines and material textures
+- Improve overall image clarity and detail resolution
+- Apply local contrast enhancement (clarity/texture boost)
+
+GLOBAL ENHANCEMENT ALWAYS APPLY:
+- Boost overall depth: separate foreground, midground, background tones
+- Enhance material textures: wood grain, fabric weave, tile grout, metal sheen
+- Improve shadow depth for 3D dimensionality
+- Increase micro-detail sharpness (8K-level detail extraction)
+- Professional lens correction: fix barrel distortion, chromatic aberration
+- Correct vertical/horizontal architectural lines (perspective correction)
+- Dynamic range expansion: brighter highlights, deeper shadows with detail
+
+STRICT RULES:
+1. ZERO new objects added — not even reflections that weren't there
+2. ZERO objects removed
+3. ZERO position changes
+4. ONLY improve: luminosity, color, depth, sharpness, texture detail, lighting quality
+5. All walls, floors, ceilings, furniture stay 100% identical in shape and position
+6. Result must look like a professional $5000 real estate photoshoot
+7. Output must be photorealistic — no painterly, HDR-overdone, or artificial look
+
+OUTPUT: A dramatically improved, magazine-quality real estate photograph that looks like it was shot by a top architectural photographer.`,
     // ==================== HDR ====================
     HDR: `You are a professional HDR photographer. Apply HDR processing to this real estate photo.
 
@@ -88,37 +126,94 @@ const buildPrompt = (
       7. Do NOT add any decorative elements not in original`,
 
     // ==================== OBJECT REMOVAL ====================
-    "Object Removal": `You are an expert professional photo retoucher. Your task is SURGICAL OBJECT REMOVAL.
+    "Object Removal": (() => {
+      const hasRegions = feature && feature.includes("REGION");
+      const hasSelection = feature && feature.includes("Selection");
 
-      ${
-        feature && feature.includes("REGION")
-          ? `USER HAS SELECTED SPECIFIC REGIONS TO REMOVE:
-      
-      ${feature}
+      const regionInstructions = `
+USER SELECTED SPECIFIC REGIONS FOR REMOVAL:
+${feature}
 
-      EXECUTION RULES - FOLLOW EXACTLY:
-      1. Find and remove ONLY the objects inside each REGION described above
-      2. Count the regions - remove ALL of them, not just one
-      3. For each removed region, fill with seamless background:
-         - If region is over grass/lawn: reconstruct with matching grass
-         - If region is over wall: reconstruct with matching wall texture
-         - If region is over floor: reconstruct with matching floor
-         - If region is over sky: reconstruct with matching sky
-         - If region is over driveway: reconstruct with matching driveway
-      4. Blending must be PERFECT - no visible edges, no blur artifacts
-      5. DO NOT remove or change ANYTHING outside the described regions
-      6. DO NOT alter colors, brightness, or quality of non-selected areas
-      7. Result must look like the removed objects were NEVER THERE`
-          : feature && feature.includes("Selection")
-            ? `${feature}
-      
-      EXECUTION RULES:
-      1. Remove ONLY the content inside each described region
-      2. Fill with seamless realistic background matching surroundings
-      3. DO NOT touch anything outside specified regions
-      4. Result must look completely natural`
-            : `Remove all unwanted objects, clutter, and distracting elements visible in the photo. Fill removed areas with seamless realistic background. Keep all architectural and structural elements intact.`
-      }`,
+SURGICAL REMOVAL PROTOCOL — EXECUTE WITH PRECISION:
+
+STEP 1 — BACKGROUND ANALYSIS (before removing anything):
+For each selected region, analyze what background surface lies BEHIND/UNDER the object:
+- Detect the floor material directly adjacent to the object (tile/hardwood/carpet/concrete)
+- Detect the wall surface around the object if wall-adjacent
+- Sample colors and textures from 360° surrounding pixels
+
+STEP 2 — OBJECT BOUNDARY MAPPING:
+- Precisely trace the exact silhouette of each object to be removed
+- Map the object's shadow and reflection separately
+- Identify ONLY the pixels belonging to the target object
+- Do NOT include any floor, wall, or ceiling pixels in the removal zone
+
+STEP 3 — INTELLIGENT BACKGROUND RECONSTRUCTION:
+After removing the object, fill ONLY the revealed area with:
+- Floor regions: Reconstruct using texture synthesis from surrounding floor — match grain direction, grout lines, pattern continuity, color variation
+- Wall regions: Reconstruct using surrounding wall texture — match paint texture, any pattern, lighting gradient
+- Grass/lawn: Reconstruct with natural grass variation matching surrounding blades
+- Sky regions: Seamless sky gradient matching surrounding sky
+- Driveway/pavement: Match surface texture, cracks, color from adjacent area
+
+STEP 4 — QUALITY VERIFICATION:
+- No visible seam or edge where object was removed
+- No blurring, smearing, or ghosting artifacts
+- Reconstructed texture must tile seamlessly with surrounding area
+- Lighting and shadow of reconstructed area must match surrounding area
+- The result must look like the object was NEVER IN THE PHOTO
+
+ABSOLUTE RESTRICTIONS:
+✗ Do NOT change floor color, material, or pattern anywhere else
+✗ Do NOT change wall color or texture anywhere else  
+✗ Do NOT alter brightness or contrast of surrounding areas
+✗ Do NOT remove or change ANYTHING outside the marked regions
+✗ Do NOT add any new objects or elements
+✗ Only the selected objects disappear — everything else stays identical`;
+
+      const selectionInstructions = `
+${feature}
+
+PRECISION REMOVAL RULES:
+1. Remove ONLY exact content inside each described region
+2. Analyze background texture surrounding each region before removal
+3. Fill with seamless photorealistic background reconstruction:
+   - Match texture, color, pattern, lighting of immediate surroundings
+   - Ensure continuity of floor lines, grout, grain, or surface patterns
+4. Touch NOTHING outside the specified regions
+5. No blur artifacts, no visible patch edges, no ghosting
+6. Result must look completely natural and untouched`;
+
+      const autoInstructions = `
+Remove all unwanted objects and clutter from this photo.
+
+REMOVAL APPROACH:
+1. Identify all movable objects that don't belong architecturally (furniture, cars, trash cans, personal items, signage, equipment, etc.)
+2. For each removed object, reconstruct the background surface perfectly:
+   - Analyze surrounding floor/wall/lawn texture pattern
+   - Fill with seamless texture synthesis — no visible patches
+3. Keep ALL architectural elements: walls, floors, ceilings, windows, doors, built-in features, landscaping structure
+4. Result must look like a clean, empty professional real estate photograph
+
+STRICT RULE: Floor and wall materials must remain 100% identical after removal.`;
+
+      return `You are a world-class professional photo retoucher specializing in surgical object removal for real estate photography.
+
+YOUR TASK: Remove specific objects WITHOUT disturbing any surrounding surfaces.
+
+THE GOLDEN RULE: The floor, walls, ceiling, and all surfaces outside the removed object must be PIXEL-PERFECT IDENTICAL to the original. The ONLY change in the image is where the removed object existed.
+
+${hasRegions ? regionInstructions : hasSelection ? selectionInstructions : autoInstructions}
+
+TECHNICAL APPROACH:
+- Use content-aware fill based on surrounding texture samples
+- Patch reconstruction using 360° neighborhood pixels
+- Seamless texture synthesis for floor/wall continuity
+- Correct perspective-aware fill for floors and walls
+- Shadow removal: remove cast shadows belonging to removed objects only
+
+OUTPUT: A perfectly clean photograph where the removed objects have vanished completely, the background surfaces are seamlessly reconstructed, and everything else in the image is 100% unchanged and undamaged.`;
+    })(),
 
     // ==================== SKY REPLACEMENT ====================
     "Sky Replacement": `You are a professional real estate photographer specializing in sky replacement.
@@ -148,98 +243,158 @@ const buildPrompt = (
       7. Clouds must be realistic in shape, density, and lighting; avoid flat or artificial cloud textures.`,
 
     // ==================== VIRTUAL STAGING ====================
-    "Virtual Staging": `You are a world-class professional real estate virtual staging expert who produces ultra photorealistic interior photography results.
+    "Virtual Staging": `You are the world's most skilled virtual staging artist specializing in ultra-photorealistic real estate interior photography. You have staged thousands of luxury real estate listings.
 
-      ROOM TYPE: "${feature}"
-      FURNITURE STYLE: "${style}"
-STAGING TASK:
-Add ${style} style furniture and decor to this empty ${feature} while preserving the original architecture exactly.
+ROOM TYPE: "${feature}"
+FURNITURE STYLE: "${style}"
 
-      FURNITURE TO ADD for "${feature}":
-- Living Room: sofa/sectional, coffee table, side tables, floor lamp, TV unit, area rug, wall art, decorative plants, throw pillows, curtains
-- Bedroom: bed with headboard, bedside tables, lamps, dresser, mirror, artwork, bedding, curtains, plants
-- Kitchen: bar stools, kitchen accessories on counter, hanging pendant lights, decorative items, small plants
-- Dining Room: dining table, dining chairs, pendant light above table, sideboard, artwork, table centerpiece
-- Bathroom: towels, bath mat, vanity accessories, mirror, small plant, decorative items
-- Home Office: desk, office chair, bookshelf, desk lamp, computer/monitor, books, small plants
-- Kids Room: bed, study desk, chair, bookshelf, toys, colorful rugs, wall art
-- Study Room: large desk, bookshelf filled with books, reading chair, floor lamp, framed certificates
+YOUR MISSION:
+Add beautifully staged ${style} furniture into this EMPTY room. The room's architecture is SACRED — walls, floors, ceilings, windows, doors are LOCKED and must remain pixel-perfect identical.
 
-      STYLE "${style}" DETAILS:
-- Modern: clean lines, neutral colors (white, gray, black), minimalist furniture, metal accents
-- Contemporary: modern trends, mixed materials, elegant clean look
-- Minimalist: very few furniture pieces, simple neutral palette, lots of open space
-- Scandinavian: light wood furniture, white walls, cozy textures, soft natural lighting
-- Mid-Century Modern: retro furniture with tapered legs, warm wood tones, geometric accents
-- Industrial: metal and wood combination, raw textures, dark tones
-- Traditional: classic furniture, rich wood tones, elegant layout
-- Transitional: blend of traditional and modern elements
-- Rustic: natural wood furniture, warm earthy tones, cozy feel
-- Bohemian: colorful patterns, layered fabrics, indoor plants
-- Farmhouse: white and wood tones, vintage accents, cozy decor
-- Luxury / Glam: velvet fabrics, marble surfaces, gold accents, elegant decor
-- Japandi: Japanese + Scandinavian minimal design, natural materials, calm neutral tones
-- Vintage: antique furniture, retro accessories
-- Art Deco: bold geometry, black and gold accents, luxurious materials
+PHASE 1 — ARCHITECTURE LOCK (DO THIS FIRST):
+Before placing any furniture, mentally map and LOCK every architectural element:
+✓ Wall surfaces, colors, textures — UNCHANGED
+✓ Floor material, pattern, color — UNCHANGED  
+✓ Ceiling height, color, features — UNCHANGED
+✓ Windows: size, position, frame, glass reflections — UNCHANGED
+✓ Doors: position, style, hardware — UNCHANGED
+✓ Baseboards, crown molding, columns — UNCHANGED
+✓ Room dimensions and perspective — UNCHANGED
+WARNING: Any alteration to the above = FAILED result
 
-      REALISM REQUIREMENTS:
-- Ultra photorealistic interior photography
-- Professional real estate listing photo quality
-- Natural lighting from windows
-- Accurate shadows and reflections
-- High dynamic range lighting
-- Correct depth and perspective
-- DSLR camera look, 24mm wide-angle interior photography
-- 8K ultra detailed textures
-- realistic materials (wood, fabric, glass, metal)
+PHASE 2 — FURNITURE PLACEMENT for "${feature}":
 
-STRICT RULES:
-1. Do NOT change walls, floors, ceilings, windows, doors, or architectural elements
-2. Keep original room structure exactly the same
-3. Furniture must match room perspective and scale perfectly
-4. Lighting must match the original room lighting
-5. Result must look like a professional real estate photograph
+Living Room: large sofa/sectional, rectangular coffee table, 2 side tables with table lamps, floor lamp in corner, TV console unit, area rug under furniture, 2-3 framed wall artworks, indoor plant (fiddle leaf or palm), decorative throw pillows and blanket, sheer curtains on windows
 
-NEGATIVE STYLE:
-- no cartoon
-- no illustration
-- no painting
-- no CGI look
-- no 3D render style
-- no animated style
-- no unrealistic textures
+Bedroom: queen/king bed with upholstered headboard, 2 matching bedside tables, 2 bedside lamps, dresser with mirror, bench at foot of bed, window curtains, artwork above headboard, bedding with pillows and duvet, small indoor plant
 
-OUTPUT:
-A highly realistic real estate interior photo with staged furniture that looks indistinguishable from a real photograph.`,
+Kitchen: 2-4 bar stools at island/counter, pendant lights above counter, fruit bowl or decorative tray on counter, small herb plants on windowsill, cookbook display, coffee machine or kettle as accent
+
+Dining Room: rectangular dining table, 4-6 dining chairs, pendant chandelier centered above table, sideboard/buffet against wall, 2 framed artworks, table centerpiece (vase with flowers or candles), area rug under table
+
+Bathroom: fluffy folded towels on rack, bath mat on floor, vanity accessories (soap dispenser, tray, candle), large mirror above vanity, small plant (snake plant or succulent), artwork on wall
+
+Home Office: large L-shape or straight desk, ergonomic office chair, bookshelf with organized books, desk lamp, monitor/laptop, small plant, framed motivational art, desk organizer
+
+Kids Room: single/bunk bed with colorful bedding, study desk with chair, 3-tier bookshelf with toys and books, colorful area rug, wall decals or growth chart, small storage baskets, fun ceiling pendant light
+
+Study Room: large wooden desk, leather reading chair, wall-to-wall bookshelf filled with books, floor lamp next to chair, framed certificates on wall, globe or classic desk accessories, Persian area rug
+
+PHASE 3 — STYLE EXECUTION for "${style}":
+Modern: white/gray/black palette, chrome/matte black metal accents, handle-less cabinets, geometric forms, minimal decor
+Contemporary: mixed warm neutrals, curved sofa forms, mixed metal finishes, statement pendant lights
+Minimalist: 3-4 key furniture pieces only, white and warm beige palette, zero clutter, maximum open space
+Scandinavian: light birch/ash wood, white and soft gray, sheepskin throws, hygge cozy feel, simple clean forms
+Mid-Century Modern: walnut wood with tapered legs, mustard/teal/burnt orange accents, starburst clock, retro shapes
+Industrial: dark metal frames, reclaimed wood tops, exposed brick aesthetic, Edison bulb pendants, leather seating
+Traditional: mahogany/cherry wood, rolled-arm sofas, ornate patterns, classic table lamps with shades, rich jewel tones
+Transitional: neutral sofa with wood frame, mix of modern and classic accessories, layered neutrals
+Rustic: chunky natural wood, plaid/linen textiles, woven baskets, stone-effect accents, warm amber lighting
+Bohemian: rattan furniture, layered colorful rugs, macrame wall hanging, lots of plants, eclectic cushion mix
+Farmhouse: shiplap accent wall styling, distressed white wood, galvanized metal accents, linen fabrics, mason jar decor
+Luxury/Glam: velvet upholstery in jewel tones, marble side tables, gold/brass hardware, fur throws, crystal pendants
+Japandi: minimal natural wood, warm greige palette, wabi-sabi ceramics, linen fabrics, floor-level coffee table, bamboo
+Vintage: antique wood furniture, persian rug, brass accessories, velvet upholstery, gallery wall of vintage prints
+Art Deco: black and gold palette, geometric mirror, velvet seating, chevron patterns, bold angular forms
+
+PHASE 4 — PHOTOREALISM REQUIREMENTS:
+- Camera: DSLR Canon 5D Mark IV, 24mm wide-angle lens, f/8 aperture
+- Lighting: Match EXACTLY the natural light direction coming from windows in original photo
+- Shadows: Each furniture piece casts realistic soft shadow onto the floor
+- Reflections: Glossy floors/surfaces show subtle furniture reflections
+- Depth of field: Slight foreground softness, sharp midground focus
+- Materials: Wood grain visible, fabric texture visible, metal specularity correct
+- Scale: Every piece perfectly proportioned to room — no oversized/undersized items
+- Perspective: All furniture aligned to room's vanishing points
+- Resolution: 8K ultra-sharp interior photography quality
+
+NEGATIVE RULES — NEVER DO:
+✗ Do NOT change wall color or add wallpaper
+✗ Do NOT change floor material or color
+✗ Do NOT alter window size or position
+✗ Do NOT change ceiling or add features
+✗ Do NOT remove any original architectural elements
+✗ No cartoon, illustration, CGI, 3D render, or painting look
+✗ No floating furniture (all pieces must contact floor or wall)
+✗ No wrong-scale furniture (must match room proportions)
+
+FINAL OUTPUT: An absolutely photorealistic real estate listing photo with perfect ${style} staging that looks indistinguishable from a real professionally photographed and staged room. The architecture`,
 
     // ==================== DAY TO DUSK ====================
-    "Day to Dusk": `You are a professional real estate twilight/dusk photographer.
+    "Day to Dusk": `Day to Dusk: You are a world-class professional real estate twilight photographer and digital artist.
+DUSK TECHNIQUE: ${feature}
+SELECTED SKY STYLE: ${style}
+SKY DETAILS: ${styleDetail}
+MISSION:
+Transform this daytime photo into a stunning professional twilight real estate shot that looks like it was captured by a $500/hour architectural photographer at the perfect golden hour.
 
-      DUSK TECHNIQUE: "${feature}"
-      STYLE: "${style}"
-      STYLE DETAILS: ${styleDetail}
+SKY TRANSFORMATION — "${style}":
 
-      TRANSFORMATION TASK: Convert this daytime exterior photo to a beautiful twilight/dusk shot.
+If "Golden Sunset":
+Replace sky with rich golden-orange sunset — bright orange/amber at horizon fading to deep gold at mid-sky, soft peach/pink clouds, warm glow reflecting on building facade and landscape.
 
-      WHAT TO DO based on technique "${feature}":
-      - If "Brighten Shadows": During dusk conversion, lift shadow areas to show detail in dark zones
-      - If "Reduce Highlights": During dusk conversion, tone down bright highlights, prevent overexposure
-      - If "Natural Light Boost": Create natural-looking dusk light, not overdone, realistic twilight
-      - If "Warm Tone": Use warm orange-amber twilight palette, golden hour feel
-      - If "Smart Sharpening": Apply sharpening to keep architectural details crisp during dusk conversion
-      - If "Noise Reduction": Apply clean noise-free dusk effect
+If "Purple Twilight":
+Deep magenta-purple near horizon transitioning to indigo/violet mid-sky, scattered wispy clouds catching pink light, dramatic rich moody atmosphere, luxury feel.
 
-      DUSK CONVERSION STEPS:
-      1. Replace sky with beautiful ${styleDetail.includes("vibrant") ? "rich saturated" : "natural balanced"} twilight sky - orange/pink/purple gradient near horizon, deep blue above
-      2. Turn ON all visible interior lights through windows - warm amber/yellow glow
-      3. Add exterior lighting effects: pathway lights, landscape spotlights, porch lights
-      4. Darken overall ambient lighting to evening level
-      5. Add slight blue-purple cast to shadows (natural dusk effect)
+If "Blue Hour":
+Classic blue hour — 20 minutes after sunset — deep cobalt blue sky, slight teal gradient, no visible sun, cool professional twilight, extremely popular for luxury real estate.
 
-      STRICT RULES:
-      1. Keep ALL architecture, landscaping, lawn, driveway 100% identical
-      2. Only change: sky, lighting, overall color temperature
-      3. Result must look like a real professional twilight photography shot`,
+If "Dramatic Storm Dusk":
+Dark moody charcoal clouds with silver lining, deep orange glowing horizon behind clouds, dramatic ray of light breaking through, cinematic and powerful.
+
+If "Pastel Sunset":
+Soft watercolor-like sky — peach, blush pink, lavender gradient, light feathery clouds, gentle romantic feel, perfect for homes targeting family buyers.
+
+If "Starry Night Dusk":
+Deep navy/midnight blue sky with visible stars beginning to appear, crescent moon if space allows, serene and magical atmosphere, early evening feel.
+
+If "Fire Horizon":
+Intense burning orange-red at horizon, dramatic fire-like cloud texture, deep crimson mid-sky, most dramatic twilight option, grabs maximum attention.
+
+If "Overcast Dusk":
+Soft diffused light through grey-blue cloud layer, no harsh gradients, even moody lighting, contemporary minimalist twilight feel.
+
+If "Custom":
+Apply the exact sky description provided in SKY DETAILS.
+
+INTERIOR LIGHTS — MUST DO:
+Turn ON all interior room lights visible through windows:
+- Warm amber/golden light glowing from each window (2700K–3000K color temperature)
+- Light should spill slightly onto exterior walls around windows
+- Each window should glow uniquely (not identical flat brightness)
+- Rooms further back should glow slightly dimmer
+- If visible: kitchen pendant lights, chandeliers, table lamps all ON
+
+EXTERIOR LIGHTING EFFECTS:
+Add realistic exterior lighting:
+- Pathway lights along walkway
+- Landscape uplighting on trees and building corners
+- Porch/entry light glow
+- Garage lights if visible
+- Pool glow if water feature exists
+
+ATMOSPHERE ADJUSTMENT based on "${feature}":
+If "Brighten Shadows": lift shadow areas to reveal detail.
+If "Reduce Highlights": control window glow and bright areas.
+If "Natural Light Boost": keep lighting subtle and realistic.
+If "Warm Tone": emphasize warm amber color cast.
+If "Smart Sharpening": keep architectural edges crisp.
+If "Noise Reduction": smooth clean dusk sky without grain.
+
+ENVIRONMENTAL ADJUSTMENTS:
+- Reduce overall ambient brightness to evening levels
+- Slight blue-purple tint in shadows
+- Slightly darker grass and landscape
+- Warm ambient reflection on building facade
+- Driveway reflecting subtle sky color
+
+STRICT ARCHITECTURE RULES:
+Do NOT change building shape, roof, walls, doors, windows.
+Do NOT change driveway, paths, fences, trees or shrubs.
+ONLY change sky, lighting, color temperature and window illumination.
+
+OUTPUT:
+A breathtaking professional twilight real estate photo with a ${style} sky ready for MLS listing.`,
 
     // ==================== STRAIGHTEN ====================
     Straighten: `You are a professional architectural photo correction expert.
