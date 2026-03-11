@@ -131,6 +131,7 @@ const UploadImageTabs = () => {
     uploadedImages: [],
     localFiles: [],
     selectedFeature: "",
+    selectedFeatures: [],
     selectedFurniture: "",
     selectedStyle: "",
     beforeAfterData: {},
