@@ -48,17 +48,16 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
   }, [selected]);
 
   const handleContinue = () => {
-   setFormData((prev) => ({
-  ...prev,
-  selectedFeatures: selected,
-  selectedFeature: featureType === "Enhance" ? selected : selected[0] || "",
-}));
+    setFormData((prev) => ({
+      ...prev,
+      selectedFeatures: selected,
+      selectedFeature: featureType === "Enhance" ? selected : selected[0] || "",
+    }));
     next();
   };
 
   return (
     <div className="w-full min-h-screen bg-white mt-10 sm:mt-8 lg:mt-3">
-
       <h2 className="mb-2 sm:mb-4 lg:mb-6 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-gray-900">
         {featureData.title}
       </h2>
@@ -73,16 +72,16 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
           <div
             key={item.name}
             onClick={() => {
-  if (featureType === "Enhance") {
-    setSelected((prev) =>
-      prev.includes(item.name)
-        ? prev.filter((i) => i !== item.name)
-        : [...prev, item.name]
-    );
-  } else {
-    setSelected([item.name]);
-  }
-}}
+              if (featureType === "Enhance") {
+                setSelected((prev) =>
+                  prev.includes(item.name)
+                    ? prev.filter((i) => i !== item.name)
+                    : [...prev, item.name],
+                );
+              } else {
+                setSelected([item.name]);
+              }
+            }}
             className={`rounded-xl cursor-pointer border-2 overflow-hidden transition-all hover:shadow-lg ${
               selected.includes(item.name)
                 ? "border-[#034F75] shadow-md"

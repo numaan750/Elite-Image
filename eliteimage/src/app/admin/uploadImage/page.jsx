@@ -73,7 +73,12 @@ const FEATURE_STEPS_CONFIG = {
     steps: [
       { id: 1, component: Step1, name: "Upload Images", progressStep: 1 },
       { id: 2, component: Step2, name: "Room Type", progressStep: 2 },
-      { id: 3, component: Step3Farniturestyle, name: "Furniture Type", progressStep: 3 },
+      {
+        id: 3,
+        component: Step3Farniturestyle,
+        name: "Furniture Type",
+        progressStep: 3,
+      },
       { id: 4, component: Step3, name: "Edit Styles", progressStep: 4 },
       { id: 5, component: Step4, name: "Processing", progressStep: null },
       { id: 6, component: Step5, name: "Final Edit", progressStep: null },
