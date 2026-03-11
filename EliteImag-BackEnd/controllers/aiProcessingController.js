@@ -80,42 +80,25 @@ STRICT RULES:
 
 OUTPUT: A dramatically improved, magazine-quality real estate photograph that looks like it was shot by a top architectural photographer.`,
     // ==================== HDR ====================
-    HDR: `You are a professional HDR photographer and image compositor.
+    HDR: `You are a professional HDR photographer. Apply HDR processing to this real estate photo.
 
-YOUR TASK: ${
-      selectedFeature && selectedFeature.includes(",")
-        ? `Merge ALL of these ${selectedFeature.split(",").length} bracket-exposed images into ONE single perfectly blended HDR photograph.
-    
-BRACKET IMAGES PROVIDED:
-${selectedFeature
-  .split(",")
-  .map((url, i) => `Image ${i + 1}: ${url}`)
-  .join("\n")}
+      HDR TECHNIQUE: "${feature}"
+      STYLE: "${style}"
+      STYLE DETAILS: ${styleDetail}
 
-MERGE INSTRUCTIONS:
-- Analyze all bracket images (underexposed, correctly exposed, overexposed)
-- Extract shadow detail from brightest exposure
-- Extract highlight detail from darkest exposure  
-- Use middle exposure as the base tone
-- Blend all exposures seamlessly into ONE output image
-- Apply professional tone mapping for realistic HDR look
-- OUTPUT: Exactly ONE merged HDR image`
-        : `Apply HDR processing to this image.
-HDR TECHNIQUE: "${selectedFeature}"
-- If "Bracket Merge": Simulate multi-exposure bracket merge
-- If "Tone Mapping": Apply professional tone mapping
-- If "Highlight Fix": Recover blown-out highlights
-- If "Shadow Lift": Lift dark shadow areas`
-    }
+      WHAT TO DO based on technique "${feature}":
+      - If "Bracket Merge": Simulate multi-exposure bracket merge, balance highlights and shadows perfectly
+      - If "Tone Mapping": Apply professional tone mapping - compress dynamic range while keeping detail in both bright and dark areas
+      - If "Highlight Fix": Recover blown-out highlights (sky, windows, bright walls), bring back detail
+      - If "Shadow Lift": Lift dark shadow areas, reveal hidden details in dark zones while keeping highlights intact
 
-STYLE: "${style}"
-STYLE DETAILS: ${styleDetail}
+      STYLE APPLICATION: ${styleDetail}
 
-STRICT RULES:
-1. Output must be ONE single image
-2. Natural, photorealistic HDR result - not overdone
-3. Keep all architectural elements, furniture identical
-4. Professional real estate quality output`,
+      STRICT RULES:
+      1. Only change tonal values and HDR processing
+      2. Do NOT add, remove, or move any objects
+      3. Keep all furniture, architecture, landscaping identical
+      4. Result must look like professional HDR real e      state photo`,
 
     // ==================== GRASS REPLACEMENT ====================
     "Grass Replacement": `You are a professional real estate photo retoucher specializing in lawn and grass editing.
