@@ -8,6 +8,7 @@ const buildPrompt = (
   selectedFeature,
   selectedStyle,
   finalNotes,
+  selectedSky,
 ) => {
   const style = selectedStyle || "";
   const feature = selectedFeature || "";
@@ -264,39 +265,34 @@ FINAL OUTPUT: An absolutely photorealistic real estate listing photo with perfec
     // ==================== DAY TO DUSK ====================
     "Day to Dusk": `Day to Dusk: You are a world-class professional real estate twilight photographer and digital artist.
 DUSK TECHNIQUE: ${feature}
+SELECTED SKY: ${selectedSky || style} 
 SELECTED SKY STYLE: ${style}
 SKY DETAILS: ${styleDetail}
 MISSION:
 Transform this daytime photo into a stunning professional twilight real estate shot that looks like it was captured by a $500/hour architectural photographer at the perfect golden hour.
 
-SKY TRANSFORMATION — "${style}":
+SKY TRANSFORMATION — Apply based on SELECTED SKY: "${selectedSky || style}":
 
-If "Golden Sunset":
-Replace sky with rich golden-orange sunset — bright orange/amber at horizon fading to deep gold at mid-sky, soft peach/pink clouds, warm glow reflecting on building facade and landscape.
+If "Clear Sky":
+Replace sky with a vibrant, clear blue sky. Perfectly even tone, no clouds, bright and realistic daylight-to-dusk transition lighting.
 
-If "Purple Twilight":
-Deep magenta-purple near horizon transitioning to indigo/violet mid-sky, scattered wispy clouds catching pink light, dramatic rich moody atmosphere, luxury feel.
+If "Partly Cloudy Sky":
+Replace with natural photorealistic partly cloudy twilight sky. White and gray fluffy clouds, soft dusk shadows, natural depth with varied cloud sizes.
 
-If "Blue Hour":
-Classic blue hour — 20 minutes after sunset — deep cobalt blue sky, slight teal gradient, no visible sun, cool professional twilight, extremely popular for luxury real estate.
+If "Overcast Sky":
+Replace with soft diffuse overcast dusk sky. Even gray-blue tones, subtle light variations, moody and calm atmosphere.
 
-If "Dramatic Storm Dusk":
-Dark moody charcoal clouds with silver lining, deep orange glowing horizon behind clouds, dramatic ray of light breaking through, cinematic and powerful.
+If "Sunset Sky":
+Replace sky with dramatic warm sunset — rich orange/amber at horizon fading to deep gold, soft peach/pink clouds, warm glow reflecting on building facade and landscape.
 
-If "Pastel Sunset":
-Soft watercolor-like sky — peach, blush pink, lavender gradient, light feathery clouds, gentle romantic feel, perfect for homes targeting family buyers.
+If "Twilight / Dusk Sky":
+Replace with classic blue hour twilight — deep cobalt blue to purple gradient, slight teal at horizon, no visible sun, cool professional twilight feel.
 
-If "Starry Night Dusk":
-Deep navy/midnight blue sky with visible stars beginning to appear, crescent moon if space allows, serene and magical atmosphere, early evening feel.
+If "Dramatic Sky":
+Replace with epic moody sky — dark volumetric clouds, high contrast, dramatic light rays breaking through, cinematic and powerful atmosphere.
 
-If "Fire Horizon":
-Intense burning orange-red at horizon, dramatic fire-like cloud texture, deep crimson mid-sky, most dramatic twilight option, grabs maximum attention.
-
-If "Overcast Dusk":
-Soft diffused light through grey-blue cloud layer, no harsh gradients, even moody lighting, contemporary minimalist twilight feel.
-
-If "Custom":
-Apply the exact sky description provided in SKY DETAILS.
+If "Rainy Sky":
+Replace with stormy gray-blue sky. Dark textured clouds, slight rain haze effect, dramatic storm lighting on building.
 
 INTERIOR LIGHTS — MUST DO:
 Turn ON all interior room lights visible through windows:
@@ -335,7 +331,7 @@ Do NOT change driveway, paths, fences, trees or shrubs.
 ONLY change sky, lighting, color temperature and window illumination.
 
 OUTPUT:
-A breathtaking professional twilight real estate photo with a ${style} sky ready for MLS listing.`,
+A breathtaking professional twilight real estate photo with a ${selectedSky || style} sky ready for MLS listing.`,
 
     // ==================== STRAIGHTEN ====================
     Straighten: `You are a professional architectural photo correction expert.
@@ -470,6 +466,7 @@ export const processImageWithAI = async (req, res) => {
       selectedFeature,
       selectedStyle,
       finalNotes,
+      selectedSky,
     } = req.body;
 
     if (!imageUrl) {
@@ -492,6 +489,7 @@ export const processImageWithAI = async (req, res) => {
       selectedFeature,
       selectedStyle,
       finalNotes,
+      selectedSky,
     );
 
     console.log(`📝 Prompt: ${prompt}`);

@@ -592,6 +592,7 @@ const AppProvider = ({ children }) => {
     selectedFeature,
     selectedStyle,
     finalNotes,
+    selectedSky,
   ) => {
     try {
       const response = await fetch(`${API_URL}/api/process-image`, {
@@ -606,6 +607,7 @@ const AppProvider = ({ children }) => {
           selectedFeature: selectedFeature || "",
           selectedStyle: selectedStyle || "",
           finalNotes: finalNotes || "",
+          selectedSky: selectedSky || "",
         }),
       });
 

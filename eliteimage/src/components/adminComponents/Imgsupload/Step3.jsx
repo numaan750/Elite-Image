@@ -136,8 +136,12 @@ const Step3 = ({
             originalUrl,
             formData.featureType,
             formData.selectedFeature || formData.selectedFeatures?.[0] || "",
+            formData.featureType === "Day to Dusk"
+              ? formData.selectedSky
+              : selected,
             selected,
             formData.finalNotes,
+            formData.selectedSky || "",
           );
           toast.success(`Image ${i + 1} processed!`, { id: `ai-${i}` });
         } catch (aiError) {
