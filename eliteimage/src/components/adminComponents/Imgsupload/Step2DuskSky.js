@@ -8,13 +8,13 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 const SKY_OPTIONS = [
-  { name: "Clear Sky",           img: "/projects/SKY/sky-1.webp" },
-  { name: "Partly Cloudy Sky",   img: "/projects/SKY/sky-2.webp" },
-  { name: "Overcast Sky",        img: "/projects/SKY/sky-3.webp" },
-  { name: "Sunset Sky",          img: "/projects/SKY/sky-4.webp" },
+  { name: "Clear Sky", img: "/projects/SKY/sky-1.webp" },
+  { name: "Partly Cloudy Sky", img: "/projects/SKY/sky-2.webp" },
+  { name: "Overcast Sky", img: "/projects/SKY/sky-3.webp" },
+  { name: "Sunset Sky", img: "/projects/SKY/sky-4.webp" },
   { name: "Twilight / Dusk Sky", img: "/projects/SKY/sky-5.webp" },
-  { name: "Dramatic Sky",        img: "/projects/SKY/sky-6.webp" },
-  { name: "Rainy Sky",           img: "/projects/SKY/sky-7.webp" },
+  { name: "Dramatic Sky", img: "/projects/SKY/sky-6.webp" },
+  { name: "Rainy Sky", img: "/projects/SKY/sky-7.webp" },
 ];
 
 const Step2DuskSky = ({
@@ -67,7 +67,7 @@ const Step2DuskSky = ({
   return (
     <div className="w-full min-h-screen bg-white mt-10 sm:mt-8 lg:mt-3">
       <h2 className="mb-2 sm:mb-4 lg:mb-6 text-[18px] sm:text-[20px] lg:text-[28px] font-semibold text-gray-900">
-        Sky Replacement – Day to Dusk
+        Day to Dusk – Sky Replacement
       </h2>
 
       {formData.totalSteps > 0 && (
