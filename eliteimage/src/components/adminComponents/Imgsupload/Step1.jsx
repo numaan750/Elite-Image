@@ -73,10 +73,19 @@ const Step1 = ({ formData, setFormData, next }) => {
   ]);
 
   const handleGenerateAndSave = async () => {
-    const imageCount = formData.uploadedImages.filter(
+    const realImages = formData.uploadedImages.filter(
       (img) => !img.startsWith("loading-"),
-    ).length;
-    const creditsNeeded = imageCount * 5;
+    );
+
+    // HDR: minimum 3 images check
+    if (formData.featureType === "HDR" && realImages.length < 3) {
+      toast.error("HDR requires at least 3 bracket-exposed images!");
+      return;
+    }
+
+    // Credits: HDR = 5 credits (1 output), others = per image
+    const creditsNeeded =
+      formData.featureType === "HDR" ? 5 : realImages.length * 5;
     const canProceed = await deductUserCredits(creditsNeeded);
     if (!canProceed) return;
 
@@ -85,7 +94,7 @@ const Step1 = ({ formData, setFormData, next }) => {
       router.push("/admin/dashboard");
       return;
     }
-    if (!formData.uploadedImages || formData.uploadedImages.length === 0) {
+    if (realImages.length === 0) {
       toast.error("Please upload at least one image first!");
       return;
     }
@@ -97,14 +106,102 @@ const Step1 = ({ formData, setFormData, next }) => {
     setIsSaving(true);
 
     try {
+      // ============ HDR SPECIAL FLOW ============
+      if (formData.featureType === "HDR") {
+        toast.loading(
+          `Merging ${realImages.length} bracket images into 1 HDR...`,
+          { id: "ai-hdr" },
+        );
+
+        let processedImage = realImages[0]; // fallback
+        try {
+          processedImage = await processImageWithAI(
+            realImages[0], // primary image
+            "HDR", // featureType
+            realImages.join(","), // selectedFeature - saari images comma separated
+            "HDR Merge", // selectedStyle
+            `HDR_BRACKET_MERGE: You have ${realImages.length} bracket-exposed images. Blend ALL of them into ONE single perfectly merged HDR photograph. All bracket image URLs: ${realImages.join(" | ")}`,
+          );
+          toast.success("HDR merge complete!", { id: "ai-hdr" });
+        } catch (aiError) {
+          console.error("HDR AI failed:", aiError);
+          toast.error("HDR processing failed, using original", {
+            id: "ai-hdr",
+          });
+          processedImage = realImages[0];
+        }
+
+        // Sirf 1 before/after entry
+        const hdrProcessedData = [
+          {
+            originalImage: realImages[0], // before: pehli bracket image
+            processedImage: processedImage, // after: merged HDR
+            processedAt: new Date().toISOString(),
+            status: "completed",
+            userId: formData.userId,
+            featureType: "HDR",
+            allBracketImages: realImages,
+          },
+        ];
+
+        // formData update - uploadedImages sirf 1 rakho taake Step4 mein 1 hi card bane
+        setFormData((prev) => ({
+          ...prev,
+          beforeAfterData: hdrProcessedData,
+          uploadedImages: [realImages[0]],
+        }));
+
+        const hdrPayload = {
+          userid: formData.userId,
+          title: `HDR Merge - ${realImages.length} Brackets - ${new Date().toLocaleDateString()}`,
+          description: `${realImages.length} bracket images merged into 1 HDR output`,
+          featureType: "HDR",
+          uploadedImages: realImages, // DB mein saari save karo reference ke liye
+          selectedFeature: [`${realImages.length}-bracket-merge`],
+          selectedStyle: ["HDR Merge"],
+          beforeAfterData: hdrProcessedData,
+          finalNotes: formData.finalNotes || "",
+          image: processedImage,
+        };
+
+        if (formData.projectId) {
+          await saveGeneratedImage(hdrPayload, token, true, formData.projectId);
+        } else {
+          await saveGeneratedImage([hdrPayload], token);
+        }
+
+        // Draft cleanup
+        const urlParams = new URLSearchParams(window.location.search);
+        const draftId = urlParams.get("draftId") || formData.draftId;
+        if (draftId) {
+          const savedDrafts = localStorage.getItem("draftProjects");
+          if (savedDrafts) {
+            const drafts = JSON.parse(savedDrafts);
+            localStorage.setItem(
+              "draftProjects",
+              JSON.stringify(drafts.filter((d) => d.id !== draftId)),
+            );
+          }
+        }
+        localStorage.removeItem("currentDraft");
+
+        toast.success("HDR image generated successfully!", {
+          id: "saving",
+          duration: 2000,
+        });
+        next();
+        return; // HDR flow yahan khatam
+      }
+
+      // ============ NORMAL FLOW (Straighten, Watermark Remove) ============
       const allProcessedData = [];
       const allProcessedImages = [];
 
-      for (let i = 0; i < formData.uploadedImages.length; i++) {
-        const uploadedImage = formData.uploadedImages[i];
+      for (let i = 0; i < realImages.length; i++) {
+        const uploadedImage = realImages[i];
 
         toast.loading(
-          `AI processing image ${i + 1} of ${formData.uploadedImages.length}...`,
+          `AI processing image ${i + 1} of ${realImages.length}...`,
           { id: "ai-step1" },
         );
 
@@ -141,7 +238,6 @@ const Step1 = ({ formData, setFormData, next }) => {
       setFormData((prev) => ({
         ...prev,
         beforeAfterData: allProcessedData,
-        // uploadedImages: allProcessedImages,
       }));
 
       const singlePayload = {
@@ -156,6 +252,7 @@ const Step1 = ({ formData, setFormData, next }) => {
         finalNotes: formData.finalNotes || "",
         image: allProcessedImages[0],
       };
+
       if (formData.projectId) {
         await saveGeneratedImage(
           singlePayload,
@@ -166,6 +263,7 @@ const Step1 = ({ formData, setFormData, next }) => {
       } else {
         await saveGeneratedImage([singlePayload], token);
       }
+
       const urlParams = new URLSearchParams(window.location.search);
       const draftId = urlParams.get("draftId") || formData.draftId;
       if (draftId) {
@@ -366,6 +464,7 @@ const Step1 = ({ formData, setFormData, next }) => {
   const isSpecialFeature =
     formData.featureType === "Straighten" ||
     formData.featureType === "Watermark Remove";
+  formData.featureType === "HDR";
   const realImages = formData.uploadedImages.filter(
     (img) => !img.startsWith("loading-"),
   );
@@ -427,7 +526,9 @@ const Step1 = ({ formData, setFormData, next }) => {
                 {uploadingImage ? "Uploading..." : "Browse File"}
               </label>
               <p className="mt-3 sm:mt-4 text-[12px] sm:text-[16px] text-[#034F75] px-2">
-                Supports: JPG, PNG, HEIC • Max 5MB per file
+                {formData.featureType === "HDR"
+                  ? "Upload 3–5 bracket-exposed images • JPG, PNG • Max 5MB each"
+                  : "Supports: JPG, PNG, HEIC • Max 5MB per file"}
               </p>
             </>
           ) : (
