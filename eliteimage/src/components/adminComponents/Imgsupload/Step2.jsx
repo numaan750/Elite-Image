@@ -49,10 +49,10 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
 
   const handleContinue = () => {
     setFormData((prev) => ({
-  ...prev,
-  selectedFeatures: selected,
-  selectedFeature: featureType === "enhancement" ? selected : selected[0] || "",
-}));
+      ...prev,
+      selectedFeatures: selected,
+      selectedFeature: selected[0] || "",
+    }));
     next();
   };
 
@@ -73,16 +73,8 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
           <div
             key={item.name}
             onClick={() => {
-  if (featureType === "enhancement") {
-    setSelected((prev) =>
-      prev.includes(item.name)
-        ? prev.filter((i) => i !== item.name)
-        : [...prev, item.name]
-    );
-  } else {
-    setSelected([item.name]);
-  }
-}}
+              setSelected([item.name]);
+            }}
             className={`rounded-xl cursor-pointer border-2 overflow-hidden transition-all hover:shadow-lg ${
               selected.includes(item.name)
                 ? "border-[#034F75] shadow-md"
