@@ -48,10 +48,14 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
   }, [selected]);
 
   const handleContinue = () => {
+    const flatSelected = Array.isArray(selected)
+      ? selected.flat().filter((s) => typeof s === "string")
+      : [selected].filter(Boolean);
+
     setFormData((prev) => ({
       ...prev,
-      selectedFeatures: selected,
-      selectedFeature: featureType === "Enhance" ? selected : selected[0] || "",
+      selectedFeatures: flatSelected,
+      selectedFeature: flatSelected,
     }));
     next();
   };

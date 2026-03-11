@@ -170,11 +170,15 @@ const Step3 = ({
         description: `Project with ${allProcessedData.length} image(s)`,
         featureType: formData.featureType,
         uploadedImages: allProcessedData.map((d) => d.originalImage),
-        selectedFeature: formData.selectedFeature
-          ? [formData.selectedFeature]
-          : formData.selectedFeatures
-            ? [formData.selectedFeatures[0]]
-            : [],
+        selectedFeature: Array.isArray(formData.selectedFeature)
+          ? formData.selectedFeature.flat().filter((s) => typeof s === "string")
+          : formData.selectedFeature
+            ? [formData.selectedFeature]
+            : Array.isArray(formData.selectedFeatures)
+              ? formData.selectedFeatures
+                  .flat()
+                  .filter((s) => typeof s === "string")
+              : [],
         selectedStyle: [selected],
         beforeAfterData: allProcessedData,
         finalNotes: formData.finalNotes || "",
