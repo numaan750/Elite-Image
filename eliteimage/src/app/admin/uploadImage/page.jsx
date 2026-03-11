@@ -11,6 +11,7 @@ import Step4 from "@/components/adminComponents/Imgsupload/Step4";
 import Step5 from "@/components/adminComponents/Imgsupload/Step5";
 import Step2ObjectRemoval from "@/components/adminComponents/Imgsupload/Step2ObjectRemoval";
 import Step3Farniturestyle from "@/components/adminComponents/Imgsupload/Step3Farniturestyle";
+import Step2DuskSky from "@/components/adminComponents/Imgsupload/Step2DuskSky";
 import toast from "react-hot-toast";
 
 const FEATURE_STEPS_CONFIG = {
@@ -86,10 +87,11 @@ const FEATURE_STEPS_CONFIG = {
   },
 
   "Day to Dusk": {
-    totalSteps: 3,
+    totalSteps: 4,
     steps: [
       { id: 1, component: Step1, name: "Upload Images" },
       { id: 2, component: Step2, name: "Dusk Options" },
+      { id: 3, component: Step2DuskSky, name: "Sky Selection" },
       { id: 3, component: Step3, name: "Edit Styles" },
       { id: 4, component: Step4, name: "Processing" },
       { id: 5, component: Step5, name: "Final Edit" },
