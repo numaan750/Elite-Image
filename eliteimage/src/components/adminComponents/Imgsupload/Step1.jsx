@@ -32,8 +32,8 @@ const Step1 = ({ formData, setFormData, next }) => {
   const [loadingCount, setLoadingCount] = useState(0);
   const [allImagesLoaded, setAllImagesLoaded] = useState(false);
   const [uploadingUrls, setUploadingUrls] = useState(new Set());
-  const [hdrMaxImages, setHdrMaxImages] = useState(DEFAULT_HDR_MAX);
-  const [hdrMinImages, setHdrMinImages] = useState(DEFAULT_HDR_MIN);
+  const [hdrMaxImages, setHdrMaxImages] = useState(HDR_MAX_IMAGES);
+  const [hdrMinImages, setHdrMinImages] = useState(HDR_MIN_IMAGES);
   useEffect(() => {
     if (formData.featureType === "HDR") {
       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/hdr-config`)
@@ -47,8 +47,8 @@ const Step1 = ({ formData, setFormData, next }) => {
           }
         })
         .catch(() => {
-          setHdrMaxImages(DEFAULT_HDR_MAX);
-          setHdrMinImages(DEFAULT_HDR_MIN);
+          setHdrMaxImages(HDR_MAX_IMAGES);
+          setHdrMinImages(HDR_MIN_IMAGES);
         });
     }
   }, [formData.featureType]);
