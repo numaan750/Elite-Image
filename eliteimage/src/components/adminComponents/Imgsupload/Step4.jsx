@@ -642,6 +642,12 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                     <div className="absolute inset-0">
                       <Image
                         src={(() => {
+                          if (formData.featureType === "HDR") {
+                            return (
+                              formData.beforeAfterData?.[0]?.processedImage ||
+                              img
+                            );
+                          }
                           if (
                             Array.isArray(formData.beforeAfterData) &&
                             formData.beforeAfterData[index]?.processedImage
@@ -661,55 +667,67 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                       />
                     </div>
 
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        clipPath: `inset(0 ${
-                          100 - (sliderPositions[index] || 50)
-                        }% 0 0)`,
-                      }}
-                    >
-                      {(() => {
-                        if (!img) return null;
-                        return (
-                          <Image
-                            src={
-                              (Array.isArray(formData.beforeAfterData)
-                                ? formData.beforeAfterData[index]?.originalImage
-                                : formData.beforeAfterData?.originalImage) ||
-                              img
-                            }
-                            alt={`Before ${index + 1}`}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 800px"
-                            className="object-contain"
-                            priority
-                          />
-                        );
-                      })()}
-                    </div>
-
-                    <div
-                      className="absolute top-0 bottom-0 w-1 bg-white shadow-lg z-10"
-                      style={{ left: `${sliderPositions[index] || 50}%` }}
-                    >
+                    {formData.featureType !== "HDR" && (
                       <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                         w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
-                         cursor-ew-resize border-2 border-[#034F75]"
-                        onMouseDown={() => setIsDragging(index)}
-                        onTouchStart={() => setIsDragging(index)}
+                        className="absolute inset-0"
+                        style={{
+                          clipPath: `inset(0 ${
+                            100 - (sliderPositions[index] || 50)
+                          }% 0 0)`,
+                        }}
                       >
-                        <MoveHorizontal size={20} className="text-[#034F75]" />
+                        {(() => {
+                          if (!img) return null;
+                          return (
+                            <Image
+                              src={
+                                (Array.isArray(formData.beforeAfterData)
+                                  ? formData.beforeAfterData[index]
+                                      ?.originalImage
+                                  : formData.beforeAfterData?.originalImage) ||
+                                img
+                              }
+                              alt={`Before ${index + 1}`}
+                              fill
+                              sizes="(max-width: 768px) 100vw, 800px"
+                              className="object-contain"
+                              priority
+                            />
+                          );
+                        })()}
                       </div>
-                    </div>
+                    )}
 
-                    <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[10px] sm-text-[16px] px-3 py-1.5 rounded z-20">
-                      Before
-                    </div>
-                    <div className="absolute top-2 right-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
-                      After
-                    </div>
+                    {formData.featureType !== "HDR" && (
+                      <div
+                        className="absolute top-0 bottom-0 w-1 bg-white shadow-lg z-10"
+                        style={{ left: `${sliderPositions[index] || 50}%` }}
+                      >
+                        <div
+                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+                           w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center
+                           cursor-ew-resize border-2 border-[#034F75]"
+                          onMouseDown={() => setIsDragging(index)}
+                          onTouchStart={() => setIsDragging(index)}
+                        >
+                          <MoveHorizontal
+                            size={20}
+                            className="text-[#034F75]"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {formData.featureType !== "HDR" && (
+                      <>
+                        <div className="absolute top-2 left-2 bg-[#034F75] text-white text-[10px] sm-text-[16px] px-3 py-1.5 rounded z-20">
+                          Before
+                        </div>
+                        <div className="absolute top-2 right-2 bg-[#034F75] text-white text-[10px] sm-text-[14px] px-3 py-1.5 rounded z-20">
+                          After
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

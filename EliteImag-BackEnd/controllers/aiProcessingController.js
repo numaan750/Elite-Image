@@ -80,25 +80,48 @@ STRICT RULES:
 
 OUTPUT: A dramatically improved, magazine-quality real estate photograph that looks like it was shot by a top architectural photographer.`,
     // ==================== HDR ====================
-    HDR: `You are a professional HDR photographer. Apply HDR processing to this real estate photo.
+    // HDR: `You are a professional HDR photographer. Apply HDR processing to this real estate photo.
 
-      HDR TECHNIQUE: "${feature}"
-      STYLE: "${style}"
-      STYLE DETAILS: ${styleDetail}
+    //   HDR TECHNIQUE: "${feature}"
+    //   STYLE: "${style}"
+    //   STYLE DETAILS: ${styleDetail}
 
-      WHAT TO DO based on technique "${feature}":
-      - If "Bracket Merge": Simulate multi-exposure bracket merge, balance highlights and shadows perfectly
-      - If "Tone Mapping": Apply professional tone mapping - compress dynamic range while keeping detail in both bright and dark areas
-      - If "Highlight Fix": Recover blown-out highlights (sky, windows, bright walls), bring back detail
-      - If "Shadow Lift": Lift dark shadow areas, reveal hidden details in dark zones while keeping highlights intact
+    //   WHAT TO DO based on technique "${feature}":
+    //   - If "Bracket Merge": Simulate multi-exposure bracket merge, balance highlights and shadows perfectly
+    //   - If "Tone Mapping": Apply professional tone mapping - compress dynamic range while keeping detail in both bright and dark areas
+    //   - If "Highlight Fix": Recover blown-out highlights (sky, windows, bright walls), bring back detail
+    //   - If "Shadow Lift": Lift dark shadow areas, reveal hidden details in dark zones while keeping highlights intact
 
-      STYLE APPLICATION: ${styleDetail}
+    //   STYLE APPLICATION: ${styleDetail}
 
-      STRICT RULES:
-      1. Only change tonal values and HDR processing
-      2. Do NOT add, remove, or move any objects
-      3. Keep all furniture, architecture, landscaping identical
-      4. Result must look like professional HDR real e      state photo`,
+    //   STRICT RULES:
+    //   1. Only change tonal values and HDR processing
+    //   2. Do NOT add, remove, or move any objects
+    //   3. Keep all furniture, architecture, landscaping identical
+    //   4. Result must look like professional HDR real e      state photo`,
+
+    HDR: `You are a world-class professional real estate photographer and image compositor with 20+ years of experience.
+
+YOUR TASK: You are given multiple real estate photos (maximum 5 images). Combine ALL provided images into ONE single stunning composite image.
+
+COMBINATION RULES:
+1. Analyze ALL input images carefully
+2. Extract the best unique elements, lighting, angles, and details from each image
+3. Merge everything into ONE cohesive photorealistic real estate image
+4. Output must be exactly ONE single combined image
+5. Apply full professional HDR processing to the final composite:
+   - Simulate multi-exposure bracket merge — balance highlights and shadows perfectly
+   - Apply tone mapping — compress dynamic range while keeping detail everywhere
+   - Recover blown-out highlights (sky, windows, bright walls)
+   - Lift dark shadow areas — reveal hidden details
+   - Enhance color richness and depth naturally
+   - Boost micro-contrast and texture sharpness
+   - Correct white balance for a clean professional look
+
+STRICT RULES:
+1. Output must be ONE single image only
+2. Combine the strongest visual elements from all input images
+3. Result must look like a professional HDR real estate photo`,
 
     // ==================== GRASS REPLACEMENT ====================
     "Grass Replacement": `You are a professional real estate photo retoucher specializing in lawn and grass editing.
@@ -469,8 +492,16 @@ export const processImageWithAI = async (req, res) => {
       selectedSky,
     } = req.body;
 
-    if (!imageUrl) {
+    if (!imageUrl || (Array.isArray(imageUrl) && imageUrl.length === 0)) {
       return res.status(400).json({ message: "Image URL required" });
+    }
+
+    if (
+      featureType === "HDR" &&
+      Array.isArray(imageUrl) &&
+      imageUrl.length > 5
+    ) {
+      return res.status(400).json({ message: "HDR supports maximum 5 images" });
     }
 
     if (!featureType) {
@@ -493,6 +524,19 @@ export const processImageWithAI = async (req, res) => {
     );
 
     console.log(`📝 Prompt: ${prompt}`);
+    const isHDR = featureType === "HDR";
+
+    const buildContentArray = () => {
+      if (isHDR && Array.isArray(imageUrl)) {
+        const imageItems = imageUrl.map((url) => ({ image: url }));
+        return [...imageItems, { text: prompt }];
+      }
+      return [
+        { image: Array.isArray(imageUrl) ? imageUrl[0] : imageUrl },
+        { text: prompt },
+      ];
+    };
+
     const qwenResponse = await fetch(DASHSCOPE_API_URL, {
       method: "POST",
       headers: {
@@ -501,27 +545,29 @@ export const processImageWithAI = async (req, res) => {
         "X-DashScope-Async": "disable",
       },
       body: JSON.stringify({
-        model: process.env.DASHSCOPE_MODEL,
+        model: isHDR
+          ? process.env.DASHSCOPE_MODEL_HDR
+          : process.env.DASHSCOPE_MODEL,
         input: {
           messages: [
             {
               role: "user",
-              content: [
-                {
-                  image: imageUrl,
-                },
-                {
-                  text: prompt,
-                },
-              ],
+              content: buildContentArray(),
             },
           ],
         },
-        parameters: {
-          negative_prompt:
-            "watermark, text, logo, blurry, low quality, distorted",
-          watermark: false,
-        },
+        parameters: isHDR
+          ? {
+              negative_prompt:
+                "watermark, text, logo, blurry, low quality, distorted",
+              watermark: false,
+              prompt_extend: true,
+            }
+          : {
+              negative_prompt:
+                "watermark, text, logo, blurry, low quality, distorted",
+              watermark: false,
+            },
       }),
     });
 

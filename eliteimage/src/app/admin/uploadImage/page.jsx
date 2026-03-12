@@ -26,16 +26,27 @@ const FEATURE_STEPS_CONFIG = {
     ],
   },
 
+  // HDR: {
+  //   totalSteps: 3,
+  //   steps: [
+  //     { id: 1, component: Step1, name: "Upload Images" },
+  //     { id: 2, component: Step2, name: "Feature Options" },
+  //     { id: 3, component: Step3, name: "Edit Styles" },
+  //     { id: 4, component: Step4, name: "Processing" },
+  //     { id: 5, component: Step5, name: "Final Edit" },
+  //   ],
+  // },
+
+
   HDR: {
-    totalSteps: 3,
-    steps: [
-      { id: 1, component: Step1, name: "Upload Images" },
-      { id: 2, component: Step2, name: "Feature Options" },
-      { id: 3, component: Step3, name: "Edit Styles" },
-      { id: 4, component: Step4, name: "Processing" },
-      { id: 5, component: Step5, name: "Final Edit" },
-    ],
-  },
+  totalSteps: 0,
+  steps: [
+    { id: 1, component: Step1, name: "Upload Images" },
+    { id: 2, component: Step4, name: "Processing" },
+    { id: 3, component: Step5, name: "Final Edit" },
+  ],
+},
+
 
   "Grass Replacement": {
     totalSteps: 3,

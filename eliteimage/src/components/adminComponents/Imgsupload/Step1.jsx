@@ -100,48 +100,87 @@ const Step1 = ({ formData, setFormData, next }) => {
       const allProcessedData = [];
       const allProcessedImages = [];
 
-      for (let i = 0; i < formData.uploadedImages.length; i++) {
-        const uploadedImage = formData.uploadedImages[i];
-
+      if (formData.featureType === "HDR") {
+        const imagesToCombine = formData.uploadedImages.slice(0, 5);
         toast.loading(
-          `AI processing image ${i + 1} of ${formData.uploadedImages.length}...`,
+          `AI combining ${imagesToCombine.length} image(s) into 1 HDR image...`,
           { id: "ai-step1" },
         );
 
-        let processedImage = uploadedImage;
+        let combinedImage = imagesToCombine[0];
         try {
-          processedImage = await processImageWithAI(
-            uploadedImage,
+          combinedImage = await processImageWithAI(
+            imagesToCombine,
             formData.featureType,
-            formData.selectedFeature || null,
-            formData.selectedStyle || null,
+            null,
+            null,
             formData.finalNotes || null,
           );
-          toast.success(`Image ${i + 1} processed!`, { id: `ai-step1-${i}` });
+          toast.success("HDR combined image generated!", { id: "ai-step1" });
         } catch (aiError) {
-          console.error(`AI failed for image ${i + 1}:`, aiError);
-          toast.error(`AI failed for image ${i + 1}, using original`, {
-            id: `ai-step1-${i}`,
+          console.error("HDR AI failed:", aiError);
+          toast.error("HDR generation failed, using first image", {
+            id: "ai-step1",
           });
-          processedImage = uploadedImage;
+          combinedImage = imagesToCombine[0];
         }
 
         allProcessedData.push({
-          originalImage: uploadedImage,
-          processedImage: processedImage,
+          originalImage: imagesToCombine[0],
+          processedImage: combinedImage,
           processedAt: new Date().toISOString(),
           status: "completed",
           userId: formData.userId,
           featureType: formData.featureType,
         });
-        allProcessedImages.push(processedImage);
+        allProcessedImages.push(combinedImage);
+      } else {
+        for (let i = 0; i < formData.uploadedImages.length; i++) {
+          const uploadedImage = formData.uploadedImages[i];
+
+          toast.loading(
+            `AI processing image ${i + 1} of ${formData.uploadedImages.length}...`,
+            { id: "ai-step1" },
+          );
+
+          let processedImage = uploadedImage;
+          try {
+            processedImage = await processImageWithAI(
+              uploadedImage,
+              formData.featureType,
+              formData.selectedFeature || null,
+              formData.selectedStyle || null,
+              formData.finalNotes || null,
+            );
+            toast.success(`Image ${i + 1} processed!`, { id: `ai-step1-${i}` });
+          } catch (aiError) {
+            console.error(`AI failed for image ${i + 1}:`, aiError);
+            toast.error(`AI failed for image ${i + 1}, using original`, {
+              id: `ai-step1-${i}`,
+            });
+            processedImage = uploadedImage;
+          }
+
+          allProcessedData.push({
+            originalImage: uploadedImage,
+            processedImage: processedImage,
+            processedAt: new Date().toISOString(),
+            status: "completed",
+            userId: formData.userId,
+            featureType: formData.featureType,
+          });
+          allProcessedImages.push(processedImage);
+        }
       }
 
       toast.dismiss("ai-step1");
       setFormData((prev) => ({
         ...prev,
         beforeAfterData: allProcessedData,
-        // uploadedImages: allProcessedImages,
+        uploadedImages:
+          formData.featureType === "HDR"
+            ? [allProcessedImages[0]]
+            : prev.uploadedImages,
       }));
 
       const singlePayload = {
@@ -149,7 +188,10 @@ const Step1 = ({ formData, setFormData, next }) => {
         title: `${formData.featureType} - ${new Date().toLocaleDateString()}`,
         description: formData.finalNotes || `${formData.featureType} applied`,
         featureType: formData.featureType,
-        uploadedImages: allProcessedImages,
+        uploadedImages:
+          formData.featureType === "HDR"
+            ? [allProcessedImages[0]]
+            : allProcessedImages,
         selectedFeature: [],
         selectedStyle: [],
         beforeAfterData: allProcessedData,
@@ -208,6 +250,15 @@ const Step1 = ({ formData, setFormData, next }) => {
       if (file.size > 5 * 1024 * 1024) {
         toast.error(`${file.name}: Image must be under 5MB`);
         continue;
+      }
+      if (formData.featureType === "HDR") {
+        const currentRealImages = formData.uploadedImages.filter(
+          (img) => !img.startsWith("loading-"),
+        ).length;
+        if (currentRealImages + validFiles.length >= 5) {
+          toast.error("HDR supports maximum 5 images only");
+          break;
+        }
       }
       validFiles.push(file);
     }
@@ -365,7 +416,8 @@ const Step1 = ({ formData, setFormData, next }) => {
 
   const isSpecialFeature =
     formData.featureType === "Straighten" ||
-    formData.featureType === "Watermark Remove";
+    formData.featureType === "Watermark Remove" ||
+    formData.featureType === "HDR";
   const realImages = formData.uploadedImages.filter(
     (img) => !img.startsWith("loading-"),
   );
