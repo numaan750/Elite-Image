@@ -11,7 +11,8 @@ import { useRouter } from "next/navigation";
 
 const CLOUD_NAME = "drh7q62eh";
 const UPLOAD_PRESET = "unsigned_preset";
-const DEFAULT_HDR_MAX = 5;
+const HDR_MAX_IMAGES = 3;
+const HDR_MIN_IMAGES = 2;
 
 const Step1 = ({ formData, setFormData, next }) => {
   const router = useRouter();
@@ -32,7 +33,7 @@ const Step1 = ({ formData, setFormData, next }) => {
   const [allImagesLoaded, setAllImagesLoaded] = useState(false);
   const [uploadingUrls, setUploadingUrls] = useState(new Set());
   const [hdrMaxImages, setHdrMaxImages] = useState(DEFAULT_HDR_MAX);
-
+  const [hdrMinImages, setHdrMinImages] = useState(DEFAULT_HDR_MIN);
   useEffect(() => {
     if (formData.featureType === "HDR") {
       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/hdr-config`)
@@ -41,9 +42,13 @@ const Step1 = ({ formData, setFormData, next }) => {
           if (data.hdrMaxImages) {
             setHdrMaxImages(data.hdrMaxImages);
           }
+          if (data.hdrMinImages) {
+            setHdrMinImages(data.hdrMinImages);
+          }
         })
         .catch(() => {
           setHdrMaxImages(DEFAULT_HDR_MAX);
+          setHdrMinImages(DEFAULT_HDR_MIN);
         });
     }
   }, [formData.featureType]);
@@ -123,7 +128,7 @@ const Step1 = ({ formData, setFormData, next }) => {
         //   `AI combining ${imagesToCombine.length} image(s) into 1 HDR image...`,
         //   { id: "ai-step1" },
         // );
-         toast.loading("Combining images into HDR...", { id: "ai-step1" });
+        toast.loading("Combining images into HDR...", { id: "ai-step1" });
         let combinedImage = imagesToCombine[0];
         try {
           combinedImage = await processImageWithAI(
@@ -435,6 +440,8 @@ const Step1 = ({ formData, setFormData, next }) => {
     formData.featureType === "Straighten" ||
     formData.featureType === "Watermark Remove" ||
     formData.featureType === "HDR";
+  const hdrReadyToGenerate =
+    formData.featureType === "HDR" ? realImages.length >= hdrMinImages : true;
   const realImages = formData.uploadedImages.filter(
     (img) => !img.startsWith("loading-"),
   );
@@ -502,72 +509,88 @@ const Step1 = ({ formData, setFormData, next }) => {
               <p className="mt-3 sm:mt-4 text-[12px] sm:text-[16px] text-[#034F75] px-2">
                 Supports: JPG, PNG, HEIC • Max 5MB per file
               </p>
+              {formData.featureType === "HDR" && (
+                <p className="mt-2 text-[11px] sm:text-[13px] text-[#034F75] font-medium px-2">
+                  HDR: Upload {hdrMinImages}–{hdrMaxImages} images to combine
+                </p>
+              )}
             </>
           ) : (
-            <div className="w-full grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-              {formData.uploadedImages.map((img, idx) => {
-                const isPlaceholder = img.startsWith("loading-");
-                const uniqueKey = `${img}-${idx}`;
+            <>
+              {formData.featureType === "HDR" && (
+                <p className="w-full text-[11px] sm:text-[13px] text-[#034F75] font-medium mb-2 px-1">
+                  {realImages.length < hdrMinImages
+                    ? `Upload ${hdrMinImages - realImages.length} more image(s) to enable Generate`
+                    : realImages.length >= hdrMaxImages
+                      ? `Maximum ${hdrMaxImages} images reached`
+                      : `${realImages.length}/${hdrMaxImages} images — you can add ${hdrMaxImages - realImages.length} more`}
+                </p>
+              )}
+              <div className="w-full grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                {formData.uploadedImages.map((img, idx) => {
+                  const isPlaceholder = img.startsWith("loading-");
+                  const uniqueKey = `${img}-${idx}`;
 
-                return (
-                  <div
-                    key={uniqueKey}
-                    className="relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6]"
-                  >
-                    {isPlaceholder ? (
-                      <div className="w-full h-32 sm:h-36 lg:h-40 bg-gradient-to-r from-[#d3d3d3] via-[#e0e0e0] to-[#d3d3d3] bg-[length:200%_100%] animate-shimmer">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-[#034F75] text-sm font-medium">
-                            Uploading...
+                  return (
+                    <div
+                      key={uniqueKey}
+                      className="relative rounded-lg sm:rounded-xl overflow-hidden border border-[#6FB6D6]"
+                    >
+                      {isPlaceholder ? (
+                        <div className="w-full h-32 sm:h-36 lg:h-40 bg-gradient-to-r from-[#d3d3d3] via-[#e0e0e0] to-[#d3d3d3] bg-[length:200%_100%] animate-shimmer">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-[#034F75] text-sm font-medium">
+                              Uploading...
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      <>
-                        {!imageLoadedMap[img] && (
-                          <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#d3d3d3] via-[#e0e0e0] to-[#d3d3d3] bg-[length:200%_100%] animate-shimmer" />
-                        )}
+                      ) : (
+                        <>
+                          {!imageLoadedMap[img] && (
+                            <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#d3d3d3] via-[#e0e0e0] to-[#d3d3d3] bg-[length:200%_100%] animate-shimmer" />
+                          )}
 
-                        <Image
-                          src={img}
-                          alt={`Uploaded ${idx + 1}`}
-                          width={400}
-                          height={350}
-                          quality={60}
-                          loading="eager"
-                          priority={true}
-                          sizes="(max-width: 640px) 50vw, 25vw"
-                          className={`w-full h-32 sm:h-36 lg:h-40 object-contain transition-opacity duration-300 ${
-                            imageLoadedMap[img] ? "opacity-100" : "opacity-0"
-                          }`}
-                          onLoad={() => {
-                            setImageLoadedMap((prev) => ({
-                              ...prev,
-                              [img]: true,
-                            }));
-                          }}
-                        />
+                          <Image
+                            src={img}
+                            alt={`Uploaded ${idx + 1}`}
+                            width={400}
+                            height={350}
+                            quality={60}
+                            loading="eager"
+                            priority={true}
+                            sizes="(max-width: 640px) 50vw, 25vw"
+                            className={`w-full h-32 sm:h-36 lg:h-40 object-contain transition-opacity duration-300 ${
+                              imageLoadedMap[img] ? "opacity-100" : "opacity-0"
+                            }`}
+                            onLoad={() => {
+                              setImageLoadedMap((prev) => ({
+                                ...prev,
+                                [img]: true,
+                              }));
+                            }}
+                          />
 
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (!isSaving) handleRemoveImage(idx);
-                          }}
-                          disabled={isSaving}
-                          className={`absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 text-white rounded-full p-1 transition-colors ${
-                            isSaving
-                              ? "opacity-50 cursor-not-allowed"
-                              : "cursor-pointer hover:bg-black/70"
-                          }`}
-                        >
-                          <X size={14} />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!isSaving) handleRemoveImage(idx);
+                            }}
+                            disabled={isSaving}
+                            className={`absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 text-white rounded-full p-1 transition-colors ${
+                              isSaving
+                                ? "opacity-50 cursor-not-allowed"
+                                : "cursor-pointer hover:bg-black/70"
+                            }`}
+                          >
+                            <X size={14} />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
           <input
             id="file-input"
@@ -596,6 +619,7 @@ const Step1 = ({ formData, setFormData, next }) => {
             onClick={handleGenerateAndSave}
             disabled={
               realImages.length === 0 ||
+              !hdrReadyToGenerate ||
               isSaving ||
               uploadingImage ||
               isAnyImageUploading ||
@@ -603,6 +627,7 @@ const Step1 = ({ formData, setFormData, next }) => {
             }
             className={`flex items-center gap-2 rounded-lg px-5 sm:px-5 py-2 text-[16px] sm:text-[18px] text-white transition-colors min-w-[160px] justify-center ${
               realImages.length === 0 ||
+              !hdrReadyToGenerate ||
               isSaving ||
               uploadingImage ||
               isAnyImageUploading ||

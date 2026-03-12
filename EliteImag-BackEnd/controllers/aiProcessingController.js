@@ -3,7 +3,8 @@ import FormData from "form-data";
 
 const DASHSCOPE_API_URL =
   "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
-const HDR_MAX_IMAGES = 5;
+const HDR_MAX_IMAGES = 3;
+const HDR_MIN_IMAGES = 2;
 const buildPrompt = (
   featureType,
   selectedFeature,
@@ -585,6 +586,16 @@ export const processImageWithAI = async (req, res) => {
         .json({ message: `HDR supports maximum ${HDR_MAX_IMAGES} images` });
     }
 
+    if (
+      featureType === "HDR" &&
+      Array.isArray(imageUrl) &&
+      imageUrl.length < HDR_MIN_IMAGES
+    ) {
+      return res
+        .status(400)
+        .json({ message: `HDR requires minimum ${HDR_MIN_IMAGES} images` });
+    }
+
     if (!featureType) {
       return res.status(400).json({ message: "Feature type required" });
     }
@@ -750,5 +761,6 @@ export const processImageWithAI = async (req, res) => {
 export const getHDRConfig = async (req, res) => {
   res.status(200).json({
     hdrMaxImages: HDR_MAX_IMAGES,
+    hdrMinImages: HDR_MIN_IMAGES,
   });
 };
