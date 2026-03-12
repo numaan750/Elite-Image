@@ -3,7 +3,7 @@ import FormData from "form-data";
 
 const DASHSCOPE_API_URL =
   "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
-const HDR_MAX_IMAGES = 3;
+const HDR_MAX_IMAGES = 5;
 const buildPrompt = (
   featureType,
   selectedFeature,
