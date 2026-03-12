@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 
 const CLOUD_NAME = "drh7q62eh";
 const UPLOAD_PRESET = "unsigned_preset";
+const DEFAULT_HDR_MAX = 3;
 
 const Step1 = ({ formData, setFormData, next }) => {
   const router = useRouter();
@@ -30,6 +31,22 @@ const Step1 = ({ formData, setFormData, next }) => {
   const [loadingCount, setLoadingCount] = useState(0);
   const [allImagesLoaded, setAllImagesLoaded] = useState(false);
   const [uploadingUrls, setUploadingUrls] = useState(new Set());
+  const [hdrMaxImages, setHdrMaxImages] = useState(DEFAULT_HDR_MAX);
+
+  useEffect(() => {
+    if (formData.featureType === "HDR") {
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/hdr-config`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.hdrMaxImages) {
+            setHdrMaxImages(data.hdrMaxImages);
+          }
+        })
+        .catch(() => {
+          setHdrMaxImages(DEFAULT_HDR_MAX);
+        });
+    }
+  }, [formData.featureType]);
 
   useEffect(() => {
     const realImages = formData.uploadedImages.filter(
@@ -101,12 +118,12 @@ const Step1 = ({ formData, setFormData, next }) => {
       const allProcessedImages = [];
 
       if (formData.featureType === "HDR") {
-        const imagesToCombine = formData.uploadedImages.slice(0, 5);
-        toast.loading(
-          `AI combining ${imagesToCombine.length} image(s) into 1 HDR image...`,
-          { id: "ai-step1" },
-        );
-
+        const imagesToCombine = formData.uploadedImages.slice(0, hdrMaxImages);
+        // toast.loading(
+        //   `AI combining ${imagesToCombine.length} image(s) into 1 HDR image...`,
+        //   { id: "ai-step1" },
+        // );
+         toast.loading("Combining images into HDR...", { id: "ai-step1" });
         let combinedImage = imagesToCombine[0];
         try {
           combinedImage = await processImageWithAI(
@@ -255,8 +272,8 @@ const Step1 = ({ formData, setFormData, next }) => {
         const currentRealImages = formData.uploadedImages.filter(
           (img) => !img.startsWith("loading-"),
         ).length;
-        if (currentRealImages + validFiles.length >= 5) {
-          toast.error("HDR supports maximum 5 images only");
+        if (currentRealImages >= hdrMaxImages) {
+          toast.error(`HDR supports maximum ${hdrMaxImages} images only`);
           break;
         }
       }
@@ -452,15 +469,19 @@ const Step1 = ({ formData, setFormData, next }) => {
               : "items-start justify-start"
           } rounded-xl border-2 border-dashed border-[#034F75] px-3 sm:px-4 lg:px-6 ${
             !hasImages ? "py-8 sm:py-10 lg:py-16" : "py-3 sm:py-4"
-          } text-center cursor-pointer min-h-[250px] sm:min-h-[300px] lg:min-h-[350px] ${
-            isDragging ? "bg-blue-50 border-solid" : ""
-          }`}
+          } text-center min-h-[250px] sm:min-h-[300px] lg:min-h-[350px] ${
+            isSaving
+              ? "opacity-50 cursor-not-allowed pointer-events-none"
+              : "cursor-pointer"
+          } ${isDragging && !isSaving ? "bg-blue-50 border-solid" : ""}`}
           onDragEnter={handleDragEnter}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() =>
-            !uploadingImage && document.getElementById("file-input").click()
+            !uploadingImage &&
+            !isSaving &&
+            document.getElementById("file-input").click()
           }
         >
           {!hasImages ? (
@@ -530,9 +551,14 @@ const Step1 = ({ formData, setFormData, next }) => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRemoveImage(idx);
+                            if (!isSaving) handleRemoveImage(idx);
                           }}
-                          className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 cursor-pointer text-white rounded-full p-1 hover:bg-black/70 transition-colors"
+                          disabled={isSaving}
+                          className={`absolute top-1 right-1 sm:top-2 sm:right-2 bg-black/50 text-white rounded-full p-1 transition-colors ${
+                            isSaving
+                              ? "opacity-50 cursor-not-allowed"
+                              : "cursor-pointer hover:bg-black/70"
+                          }`}
                         >
                           <X size={14} />
                         </button>
@@ -550,7 +576,7 @@ const Step1 = ({ formData, setFormData, next }) => {
             accept="image/*"
             multiple
             onChange={handleFileUpload}
-            disabled={uploadingImage}
+            disabled={uploadingImage || isSaving}
           />
         </div>
       </div>

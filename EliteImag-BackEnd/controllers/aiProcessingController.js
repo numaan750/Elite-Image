@@ -3,6 +3,7 @@ import FormData from "form-data";
 
 const DASHSCOPE_API_URL =
   "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
+const HDR_MAX_IMAGES = 3;
 const buildPrompt = (
   featureType,
   selectedFeature,
@@ -100,28 +101,64 @@ OUTPUT: A dramatically improved, magazine-quality real estate photograph that lo
     //   3. Keep all furniture, architecture, landscaping identical
     //   4. Result must look like professional HDR real e      state photo`,
 
-    HDR: `You are a world-class professional real estate photographer and image compositor with 20+ years of experience.
+    HDR: `You are a world-class professional real estate photographer, architectural visualizer, and HDR image compositor with 20+ years of experience.
 
-YOUR TASK: You are given multiple real estate photos (maximum 5 images). Combine ALL provided images into ONE single stunning composite image.
+YOUR TASK:
+You will receive multiple real estate photos (maximum 5 images). Analyze ALL provided images and intelligently combine them into ONE single stunning photorealistic composite image.
 
-COMBINATION RULES:
-1. Analyze ALL input images carefully
-2. Extract the best unique elements, lighting, angles, and details from each image
-3. Merge everything into ONE cohesive photorealistic real estate image
-4. Output must be exactly ONE single combined image
-5. Apply full professional HDR processing to the final composite:
-   - Simulate multi-exposure bracket merge — balance highlights and shadows perfectly
-   - Apply tone mapping — compress dynamic range while keeping detail everywhere
-   - Recover blown-out highlights (sky, windows, bright walls)
-   - Lift dark shadow areas — reveal hidden details
-   - Enhance color richness and depth naturally
-   - Boost micro-contrast and texture sharpness
-   - Correct white balance for a clean professional look
+INTELLIGENT ELEMENT SELECTION:
+You must NOT randomly choose elements.
 
-STRICT RULES:
-1. Output must be ONE single image only
-2. Combine the strongest visual elements from all input images
-3. Result must look like a professional HDR real estate photo`,
+Instead, perform a professional visual analysis of every image and extract the BEST and MOST UNIQUE elements from each image, such as:
+
+- Humans or people present in a scene
+- Unique furniture pieces
+- Architectural highlights
+- Windows with better outside views
+- Sky or outdoor scenery
+- Lighting sources and natural sunlight
+- Decorative elements
+- Plants, art, and interior styling
+- Cleaner surfaces or better compositions
+- Better angles or perspective details
+
+If a unique element appears in ONLY ONE image (for example a human, pet, special decor, or architectural feature), you MUST preserve and include it in the final composition.
+
+Always prioritize:
+• uniqueness  
+• visual quality  
+• realism  
+• composition balance
+
+COMPOSITE CREATION:
+Merge the selected unique elements from ALL images into ONE cohesive, natural-looking scene.
+
+The final result must:
+- Look like it was captured in a single professional photo
+- Maintain correct perspective and lighting
+- Avoid duplicates of the same object
+- Maintain natural object placement
+- Preserve spatial realism and scale
+
+PROFESSIONAL HDR PROCESSING (MANDATORY):
+After composing the final image, apply full professional HDR processing as if merging a bracketed exposure set:
+
+• Simulate multi-exposure HDR merge
+• Recover blown highlights (sky, windows, lamps, white walls)
+• Lift deep shadow areas without introducing noise
+• Apply advanced tone mapping to balance dynamic range
+• Preserve natural contrast while increasing visible detail
+• Enhance micro-contrast for texture clarity
+• Improve color richness without oversaturation
+• Correct white balance for a clean real estate look
+• Ensure crisp sharpness and professional clarity
+
+STRICT OUTPUT RULES:
+1. Output must be exactly ONE single image
+2. All images must contribute meaningful unique elements
+3. Do NOT randomly select features
+4. Prioritize unique and visually superior elements from each image
+5. The final image must look like a high-end professional HDR real estate photograph`,
 
     // ==================== GRASS REPLACEMENT ====================
     "Grass Replacement": `You are a professional real estate photo retoucher specializing in lawn and grass editing.
@@ -450,6 +487,48 @@ TASK: Apply exactly what the user has described above to this image.
 
   return prompt;
 };
+
+const callQwenCombine = async (images, prompt, apiKey) => {
+  const content = [...images.map((url) => ({ image: url })), { text: prompt }];
+
+  const response = await fetch(DASHSCOPE_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "X-DashScope-Async": "disable",
+    },
+    body: JSON.stringify({
+      model: process.env.DASHSCOPE_MODEL_HDR,
+      input: {
+        messages: [
+          {
+            role: "user",
+            content,
+          },
+        ],
+      },
+      parameters: {
+        negative_prompt:
+          "watermark, text, logo, blurry, low quality, distorted",
+        watermark: false,
+        prompt_extend: true,
+      },
+    }),
+  });
+
+  const data = await response.json();
+
+  const outputContent = data?.output?.choices?.[0]?.message?.content;
+  const imageContent = outputContent?.find((item) => item.image);
+
+  if (!imageContent) {
+    throw new Error("AI did not return an image");
+  }
+
+  return imageContent.image;
+};
+
 const uploadBase64ToCloudinary = async (base64Data) => {
   const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || "drh7q62eh";
   const UPLOAD_PRESET =
@@ -499,9 +578,11 @@ export const processImageWithAI = async (req, res) => {
     if (
       featureType === "HDR" &&
       Array.isArray(imageUrl) &&
-      imageUrl.length > 5
+      imageUrl.length > HDR_MAX_IMAGES
     ) {
-      return res.status(400).json({ message: "HDR supports maximum 5 images" });
+      return res
+        .status(400)
+        .json({ message: `HDR supports maximum ${HDR_MAX_IMAGES} images` });
     }
 
     if (!featureType) {
@@ -525,10 +606,43 @@ export const processImageWithAI = async (req, res) => {
 
     console.log(`📝 Prompt: ${prompt}`);
     const isHDR = featureType === "HDR";
+    if (isHDR && Array.isArray(imageUrl) && imageUrl.length > 3) {
+      console.log("⚡ Using multi-step HDR combine");
 
+      const firstBatch = imageUrl.slice(0, 3);
+      const remaining = imageUrl.slice(3);
+
+      // STEP 1
+      const firstResult = await callQwenCombine(firstBatch, prompt, apiKey);
+
+      // STEP 2
+      const secondImages = [firstResult, ...remaining].slice(0, 3);
+      const finalResult = await callQwenCombine(secondImages, prompt, apiKey);
+
+      let processedImageUrl;
+
+      if (finalResult.startsWith("http")) {
+        const imgResponse = await fetch(finalResult);
+        const imgBuffer = await imgResponse.buffer();
+        const base64 = imgBuffer.toString("base64");
+        processedImageUrl = await uploadBase64ToCloudinary(base64);
+      } else {
+        processedImageUrl = await uploadBase64ToCloudinary(finalResult);
+      }
+
+      return res.status(200).json({
+        success: true,
+        processedImageUrl,
+        prompt,
+      });
+    }
+    const hdrImages =
+      isHDR && Array.isArray(imageUrl)
+        ? imageUrl.slice(0, HDR_MAX_IMAGES)
+        : imageUrl;
     const buildContentArray = () => {
-      if (isHDR && Array.isArray(imageUrl)) {
-        const imageItems = imageUrl.map((url) => ({ image: url }));
+      if (isHDR && Array.isArray(hdrImages)) {
+        const imageItems = hdrImages.map((url) => ({ image: url }));
         return [...imageItems, { text: prompt }];
       }
       return [
@@ -631,4 +745,10 @@ export const processImageWithAI = async (req, res) => {
       message: error.message || "AI processing failed",
     });
   }
+};
+
+export const getHDRConfig = async (req, res) => {
+  res.status(200).json({
+    hdrMaxImages: HDR_MAX_IMAGES,
+  });
 };
