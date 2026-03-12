@@ -440,11 +440,11 @@ const Step1 = ({ formData, setFormData, next }) => {
     formData.featureType === "Straighten" ||
     formData.featureType === "Watermark Remove" ||
     formData.featureType === "HDR";
-  const hdrReadyToGenerate =
-    formData.featureType === "HDR" ? realImages.length >= hdrMinImages : true;
   const realImages = formData.uploadedImages.filter(
     (img) => !img.startsWith("loading-"),
   );
+  const hdrReadyToGenerate =
+    formData.featureType === "HDR" ? realImages.length >= hdrMinImages : true;
   const hasImages = realImages.length > 0 || loadingCount > 0;
   const isAnyImageUploading = formData.uploadedImages.some((img) =>
     img.startsWith("loading-"),
