@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 const CLOUD_NAME = "drh7q62eh";
 const UPLOAD_PRESET = "unsigned_preset";
-const DEFAULT_HDR_MAX = 3;
+const DEFAULT_HDR_MAX = 5;
 
 const Step1 = ({ formData, setFormData, next }) => {
   const router = useRouter();
