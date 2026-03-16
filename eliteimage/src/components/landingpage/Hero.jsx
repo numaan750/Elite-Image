@@ -47,7 +47,7 @@ const Hero = memo(() => {
       <section id="home" className="relative flex items-center justify-center">
         <div className="mycontainer relative h-[91vh] flex flex-col justify-center text-center z-10 px-4">
           <Image
-            src="/LandingPage/LINES.webp"
+            src="/LandingPage/LINES-1.webp"
             alt="Background Lines"
             fill
             className="object-cover -z-10 opacity-50"
