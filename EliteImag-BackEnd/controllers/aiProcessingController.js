@@ -103,6 +103,23 @@ OUTPUT: A dramatically improved, magazine-quality real estate photograph that lo
     //   4. Result must look like professional HDR real e      state photo`,
 
     HDR: `You are a world-class professional real estate photographer, architectural visualizer, and HDR image compositor with 20+ years of experience.
+     HDR TECHNIQUE: "${feature}"
+     STYLE: "${style}"
+
+    FEATURE AND STYLE APPLICATION (MANDATORY):
+After creating the composite image, you MUST apply the selected feature and style to the final image.
+
+• Apply the selected HDR FEATURE: "${feature}" to control lighting, tone mapping, dynamic range, and detail enhancement.
+• Apply the selected VISUAL STYLE: "${style}" to control the artistic direction, mood, color grading, and atmosphere.
+
+Both the feature and style must work TOGETHER and be clearly visible in the final rendered image.
+
+The final image must reflect:
+- The technical HDR characteristics of the selected feature
+- The visual aesthetics of the selected style
+
+Do NOT ignore or override the selected feature or style.
+They must influence lighting, color, mood, contrast, and overall presentation of the final image.
 
 YOUR TASK:
 You will receive multiple real estate photos (maximum 5 images). Analyze ALL provided images and intelligently combine them into ONE single stunning photorealistic composite image.

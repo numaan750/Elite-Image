@@ -75,8 +75,19 @@ const Step2 = ({ formData, setFormData, next, back, featureType }) => {
         {featureData.options.map((item) => (
           <div
             key={item.name}
+            // onClick={() => {
+            //   if (featureType === "Enhance") {
+            //     setSelected((prev) =>
+            //       prev.includes(item.name)
+            //         ? prev.filter((i) => i !== item.name)
+            //         : [...prev, item.name],
+            //     );
+            //   } else {
+            //     setSelected([item.name]);
+            //   }
+            // }}
             onClick={() => {
-              if (featureType === "Enhance") {
+              if (featureType === "Enhance" || featureType === "HDR") {
                 setSelected((prev) =>
                   prev.includes(item.name)
                     ? prev.filter((i) => i !== item.name)

@@ -38,7 +38,7 @@ const Login = () => {
         setError(res.message || "Signup failed");
         toast.error(res.message || "Signup failed ❌");
       } else {
-        toast.success("Account created successfully 🎉");
+        // toast.success("Account created successfully 🎉");
         setIsSignup(false);
       }
     } else {

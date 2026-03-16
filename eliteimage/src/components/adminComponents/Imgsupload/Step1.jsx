@@ -438,8 +438,8 @@ const Step1 = ({ formData, setFormData, next }) => {
 
   const isSpecialFeature =
     formData.featureType === "Straighten" ||
-    formData.featureType === "Watermark Remove" ||
-    formData.featureType === "HDR";
+    formData.featureType === "Watermark Remove";
+    // formData.featureType === "HDR";
   const realImages = formData.uploadedImages.filter(
     (img) => !img.startsWith("loading-"),
   );

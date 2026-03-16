@@ -81,6 +81,10 @@ const Step3 = ({
     setIsSaving(true);
 
     try {
+      const imagesToProcess = formData.featureType === "HDR"
+  ? [formData.uploadedImages[0]]
+  : formData.uploadedImages;
+
       const CLOUD_NAME = "drh7q62eh";
       const UPLOAD_PRESET = "unsigned_preset";
 
@@ -120,8 +124,8 @@ const Step3 = ({
       };
 
       const allProcessedData = [];
-      for (let i = 0; i < formData.uploadedImages.length; i++) {
-        const uploadedImage = formData.uploadedImages[i];
+for (let i = 0; i < imagesToProcess.length; i++) {
+const uploadedImage = imagesToProcess[i];
 
         toast.loading(
           `Processing image ${i + 1} of ${formData.uploadedImages.length}...`,
@@ -132,10 +136,29 @@ const Step3 = ({
 
         let processedUrl;
         try {
+          // processedUrl = await processImageWithAI(
+          //   originalUrl,
+          //   formData.featureType,
+          //   formData.selectedFeature || formData.selectedFeatures?.[0] || "",
+          //   formData.featureType === "Day to Dusk"
+          //     ? formData.selectedSky
+          //     : selected,
+          //   selected,
+          //   formData.finalNotes,
+          //   formData.selectedSky || "",
+          // );
           processedUrl = await processImageWithAI(
-            originalUrl,
+            formData.featureType === "HDR"
+              ? formData.uploadedImages // HDR: saari images array mein
+              : originalUrl, // baaki: single image
             formData.featureType,
-            formData.selectedFeature || formData.selectedFeatures?.[0] || "",
+            formData.featureType === "HDR"
+              ? Array.isArray(formData.selectedFeatures)
+                ? formData.selectedFeatures.join(", ")
+                : formData.selectedFeature || ""
+              : formData.selectedFeature ||
+                  formData.selectedFeatures?.[0] ||
+                  "",
             formData.featureType === "Day to Dusk"
               ? formData.selectedSky
               : selected,
