@@ -81,9 +81,10 @@ const Step3 = ({
     setIsSaving(true);
 
     try {
-      const imagesToProcess = formData.featureType === "HDR"
-  ? [formData.uploadedImages[0]]
-  : formData.uploadedImages;
+      const imagesToProcess =
+        formData.featureType === "HDR"
+          ? [formData.uploadedImages[0]]
+          : formData.uploadedImages;
 
       const CLOUD_NAME = "drh7q62eh";
       const UPLOAD_PRESET = "unsigned_preset";
@@ -124,8 +125,8 @@ const Step3 = ({
       };
 
       const allProcessedData = [];
-for (let i = 0; i < imagesToProcess.length; i++) {
-const uploadedImage = imagesToProcess[i];
+      for (let i = 0; i < imagesToProcess.length; i++) {
+        const uploadedImage = imagesToProcess[i];
 
         toast.loading(
           `Processing image ${i + 1} of ${formData.uploadedImages.length}...`,
@@ -147,21 +148,49 @@ const uploadedImage = imagesToProcess[i];
           //   formData.finalNotes,
           //   formData.selectedSky || "",
           // );
-          processedUrl = await processImageWithAI(
-            formData.featureType === "HDR"
-              ? formData.uploadedImages // HDR: saari images array mein
-              : originalUrl, // baaki: single image
-            formData.featureType,
+          // processedUrl = await processImageWithAI(
+          //   formData.featureType === "HDR"
+          //     ? formData.uploadedImages // HDR: saari images array mein
+          //     : originalUrl, // baaki: single image
+          //   formData.featureType,
+          //   formData.featureType === "HDR"
+          //     ? Array.isArray(formData.selectedFeatures)
+          //       ? formData.selectedFeatures.join(", ")
+          //       : formData.selectedFeature || ""
+          //     : formData.selectedFeature ||
+          //         formData.selectedFeatures?.[0] ||
+          //         "",
+          //   formData.featureType === "Day to Dusk"
+          //     ? formData.selectedSky
+          //     : selected,
+          //   selected,
+          //   formData.finalNotes,
+          //   formData.selectedSky || "",
+          // );
+          // Virtual Staging ke liye furniture style alag se pass karo
+          const featureForAI =
             formData.featureType === "HDR"
               ? Array.isArray(formData.selectedFeatures)
                 ? formData.selectedFeatures.join(", ")
                 : formData.selectedFeature || ""
               : formData.selectedFeature ||
-                  formData.selectedFeatures?.[0] ||
-                  "",
-            formData.featureType === "Day to Dusk"
-              ? formData.selectedSky
-              : selected,
+                formData.selectedFeatures?.[0] ||
+                "";
+
+          const styleForAI =
+            formData.featureType === "Virtual Staging"
+              ? formData.selectedFurniture || formData.selectedStyle || selected
+              : formData.featureType === "Day to Dusk"
+                ? formData.selectedSky
+                : selected;
+
+          processedUrl = await processImageWithAI(
+            formData.featureType === "HDR"
+              ? formData.uploadedImages
+              : originalUrl,
+            formData.featureType,
+            featureForAI,
+            styleForAI,
             selected,
             formData.finalNotes,
             formData.selectedSky || "",
