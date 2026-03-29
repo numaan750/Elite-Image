@@ -216,8 +216,7 @@ const Step3 = ({
       }
       setFormData((prev) => ({
         ...prev,
-        selectedStyle: selected,
-        beforeAfterData: allProcessedData,
+        selectedFurniture: selectedFurniture,
       }));
 
       const backendPayload = {
