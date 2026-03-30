@@ -32,7 +32,7 @@ const buildPrompt = (
     // ==================== SKY REPLACEMENT ====================
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas; ${style === "Vibrant" ? "boost saturation/contrast" : style === "Soft" ? "soft tones, lower contrast" : "natural balanced look"}.`,
     // ==================== VIRTUAL STAGING ====================
-    "Virtual Staging": `Stage the uploaded ${feature} with ${furniture} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
+    "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     // ==================== DAY TO DUSK ====================
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
     // ==================== STRAIGHTEN ====================

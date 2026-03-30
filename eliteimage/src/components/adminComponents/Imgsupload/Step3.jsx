@@ -216,7 +216,7 @@ const Step3 = ({
       }
       setFormData((prev) => ({
         ...prev,
-        selectedFurniture: selectedFurniture,
+        selectedFurniture: selected,
       }));
 
       const backendPayload = {
