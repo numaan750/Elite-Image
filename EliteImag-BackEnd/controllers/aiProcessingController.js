@@ -22,8 +22,7 @@ const buildPrompt = (
   //     : "Use balanced natural tones with clean professional look.";
 
   const prompts = {
-    Enhance: `Enhance real estate image using feature="${feature}" & style="${style}": improve lighting, remove shadows, balance colors, increase sharpness, keep all objects unchanged & preserve quality; ${style === "Vibrant" ? "boost saturation & contrast" : "reduce contrast & soften tones"}.`,
-    // ==================== HDR ====================
+    Enhance: `Enhance real estate image (${feature}, ${style}): fix lighting, reduce harsh shadows, balance colors, keep image sharp and natural; no blur, no object changes. ${style === "Vibrant" ? "Slightly boost contrast and saturation." : "Use soft natural tones."}`, // ==================== HDR ====================
     HDR: `Create ONE photorealistic HDR image from input images using feature="${feature}" & style="${style}": intelligently merge best/unique elements from each image (people, furniture, views, lighting), keep natural perspective & placement, avoid duplicates; apply HDR (recover highlights, lift shadows, balanced tone mapping, sharp details); style rule → ${style === "Vibrant" ? "boost saturation/contrast" : style === "Soft" ? "soft tones, lower contrast" : "natural balanced look"}; no object distortion, no random additions.`,
     // ==================== GRASS REPLACEMENT ====================
     "Grass Replacement": `Edit grass only using feature="${feature}" & style="${style}": replace/improve lawn, match original lighting & texture, keep edges natural; do not change or touch any non-grass areas, no new objects, no blur, preserve original image quality.`,
