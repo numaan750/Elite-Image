@@ -217,6 +217,9 @@ const Step3 = ({
       setFormData((prev) => ({
         ...prev,
         selectedFurniture: selected,
+        selectedStyle: selected,
+        beforeAfterData: allProcessedData,
+        uploadedImages: allProcessedData.map((d) => d.originalImage),
       }));
 
       const backendPayload = {
