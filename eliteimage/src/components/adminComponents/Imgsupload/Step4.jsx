@@ -673,7 +673,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                           } else if (formData.beforeAfterData?.processedImage) {
                             return formData.beforeAfterData.processedImage;
                           }
-                          return img;
+                          return img?.processedImage || null;
                         })()}
                         alt={`After ${index + 1}`}
                         fill
@@ -700,7 +700,8 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   (Array.isArray(formData.beforeAfterData)
     ? formData.beforeAfterData[index]?.originalImage
     : formData.beforeAfterData?.originalImage) ||
-  img.originalImage
+  img?.originalImage ||
+  null
 }
                               alt={`Before ${index + 1}`}
                               fill
