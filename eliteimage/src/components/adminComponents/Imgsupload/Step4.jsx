@@ -515,20 +515,20 @@ const Step4 = ({ formData, setFormData, next, back }) => {
   };
 
   const imagesToShow =
-  formData.featureType === "HDR"
-    ? [
-        {
-          originalImage: formData.uploadedImages?.[0],
-          processedImage: formData.beforeAfterData?.[0]?.processedImage,
-        },
-      ]
-    : formData.uploadedImages.map((img, index) => ({
-        originalImage: img,
-        processedImage: Array.isArray(formData.beforeAfterData)
-          ? formData.beforeAfterData[index]?.processedImage
-          : formData.beforeAfterData?.processedImage,
-      }));
-      
+    formData.featureType === "HDR"
+      ? [
+          {
+            originalImage: formData.uploadedImages?.[0],
+            processedImage: formData.beforeAfterData?.[0]?.processedImage,
+          },
+        ]
+      : formData.uploadedImages.map((img, index) => ({
+          originalImage: img,
+          processedImage: Array.isArray(formData.beforeAfterData)
+            ? formData.beforeAfterData[index]?.processedImage
+            : formData.beforeAfterData?.processedImage,
+        }));
+
   const handleShare = async () => {
     const shareUrl =
       formData.beforeAfterData?.[0]?.processedImage ||
@@ -618,12 +618,12 @@ const Step4 = ({ formData, setFormData, next, back }) => {
           <div
             className={`w-full ${
               imagesToShow.length === 1
-  ? "flex flex-col gap-4 sm:gap-6"
-  : "grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6"
+                ? "flex flex-col gap-4 sm:gap-6"
+                : "grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6"
             }`}
           >
-{imagesToShow.map((img, index) => (
-                <div
+            {imagesToShow.map((img, index) => (
+              <div
                 key={index}
                 className="border border-[#6FB6D6] rounded-lg sm:rounded-xl p-3 sm:p-4 bg-[#d3e7f0]"
               >
@@ -658,12 +658,12 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                     <div className="absolute inset-0">
                       <Image
                         src={(() => {
-  if (formData.featureType === "HDR") {
-    return (
-      formData.beforeAfterData?.[0]?.processedImage ||
-      img.processedImage
-    );
-  }
+                          if (formData.featureType === "HDR") {
+                            return (
+                              formData.beforeAfterData?.[0]?.processedImage ||
+                              img.processedImage
+                            );
+                          }
                           if (
                             Array.isArray(formData.beforeAfterData) &&
                             formData.beforeAfterData[index]?.processedImage
@@ -673,7 +673,7 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                           } else if (formData.beforeAfterData?.processedImage) {
                             return formData.beforeAfterData.processedImage;
                           }
-                          return img;
+                          return img.processedImage || img.originalImage;
                         })()}
                         alt={`After ${index + 1}`}
                         fill
@@ -696,12 +696,13 @@ const Step4 = ({ formData, setFormData, next, back }) => {
                           if (!img) return null;
                           return (
                             <Image
-                             src={
-  (Array.isArray(formData.beforeAfterData)
-    ? formData.beforeAfterData[index]?.originalImage
-    : formData.beforeAfterData?.originalImage) ||
-  img.originalImage
-}
+                              src={
+                                (Array.isArray(formData.beforeAfterData)
+                                  ? formData.beforeAfterData[index]
+                                      ?.originalImage
+                                  : formData.beforeAfterData?.originalImage) ||
+                                img.originalImage
+                              }
                               alt={`Before ${index + 1}`}
                               fill
                               sizes="(max-width: 768px) 100vw, 800px"
