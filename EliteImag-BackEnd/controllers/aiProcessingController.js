@@ -22,24 +22,15 @@ const buildPrompt = (
   //     : "Use balanced natural tones with clean professional look.";
 
   const prompts = {
-    Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, soft natural light. Features: ${feature}. Style: ${style}.`,
-    // ==================== HDR ====================
+    Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, low natural light. Features: ${feature}. Style: ${style}.`,
     HDR: `Create ONE photorealistic HDR image by merging the input images using feature="${feature}". Intelligently combine the best unique elements (people, furniture, views, lighting), maintain natural perspective and correct placement, avoid duplicates. Apply HDR processing match professional real estate photography lighting, bright interior, soft natural light.`,
-    // ==================== GRASS REPLACEMENT ====================
     "Grass Replacement": `Edit grass only using feature="${feature}" & style="${style}": replace/improve lawn, match original lighting & texture, keep edges natural; do not change or touch any non-grass areas, no new objects, no blur, preserve original image quality.`,
-    // ==================== OBJECT REMOVAL ====================
     "Object Removal": `Remove objects using feature="${feature}": edit ONLY selected regions, remove all content inside them and fill naturally from surroundings; keep everything outside unchanged, no blur, no new objects, preserve original quality and lighting.`,
-    // ==================== SKY REPLACEMENT ====================
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas; ${style === "Vibrant" ? "boost saturation/contrast" : style === "Soft" ? "soft tones, lower contrast" : "natural balanced look"}.`,
-    // ==================== VIRTUAL STAGING ====================
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
-    // ==================== DAY TO DUSK ====================
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
-    // ==================== STRAIGHTEN ====================
     Straighten: `Correct camera tilt, perspective, and misaligned objects in this image; make verticals perfectly vertical and horizontals perfectly horizontal; fix lens distortion and keystone issues; do NOT change colors, lighting, objects, or textures; keep image realistic and original.`,
-    // ==================== WATERMARK REMOVE ====================
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image; reconstruct the background seamlessly to match original texture, color, and lighting; do NOT change any other part of the image or its quality.`,
-    // ==================== DIRECT EDIT ====================
     DirectEdit: `Apply only the user instruction: "${feature}" to this image. Do NOT change anything else; keep all objects, colors, lighting, and quality identical. Result must be realistic and professional.`,
   };
 
