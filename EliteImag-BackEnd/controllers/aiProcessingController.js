@@ -22,8 +22,9 @@ const buildPrompt = (
   //     : "Use balanced natural tones with clean professional look.";
 
   const prompts = {
-    Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, low natural light. Features: ${feature}. Style: ${style}.`,
-    HDR: `Create ONE photorealistic HDR image by merging the input images using feature="${feature}". Intelligently combine the best unique elements (people, furniture, views, lighting), maintain natural perspective and correct placement, avoid duplicates. Apply HDR processing match professional real estate photography lighting, bright interior, soft natural light.`,
+    Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, 0% shine natural light.`,
+    // Features: ${feature}. Style: ${style}.,
+    HDR: `Create ONE photorealistic HDR image by merging the input images using feature="${feature}". Intelligently combine the best unique elements (people, furniture, views, lighting), maintain natural perspective and correct placement, avoid duplicates. Apply HDR processing match professional real estate photography lighting, bright interior, 0% shine natural light.`,
     "Grass Replacement": `Edit grass only using feature="${feature}" & style="${style}": replace/improve lawn, match original lighting & texture, keep edges natural; do not change or touch any non-grass areas, no new objects, no blur, preserve original image quality.`,
     "Object Removal": `Remove objects using feature="${feature}": edit ONLY selected regions, remove all content inside them and fill naturally from surroundings; keep everything outside unchanged, no blur, no new objects, preserve original quality and lighting.`,
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas; ${style === "Vibrant" ? "boost saturation/contrast" : style === "Soft" ? "soft tones, lower contrast" : "natural balanced look"}.`,
