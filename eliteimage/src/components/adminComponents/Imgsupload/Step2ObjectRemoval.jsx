@@ -64,26 +64,13 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
 
   const handleMouseUp = () => {
     if (isDragging && dragStart && dragEnd) {
-      // const area = {
-      //   x: Math.min(dragStart.x, dragEnd.x),
-      //   y: Math.min(dragStart.y, dragEnd.y),
-      //   width: Math.abs(dragEnd.x - dragStart.x),
-      //   height: Math.abs(dragEnd.y - dragStart.y),
-      // };
-const rect = imageRef.current.getBoundingClientRect();
+      const area = {
+        x: Math.min(dragStart.x, dragEnd.x),
+        y: Math.min(dragStart.y, dragEnd.y),
+        width: Math.abs(dragEnd.x - dragStart.x),
+        height: Math.abs(dragEnd.y - dragStart.y),
+      };
 
-const naturalWidth = imageRef.current.naturalWidth;
-const naturalHeight = imageRef.current.naturalHeight;
-
-const scaleX = naturalWidth / rect.width;
-const scaleY = naturalHeight / rect.height;
-
-const area = {
-  x: Math.min(dragStart.x, dragEnd.x) * scaleX,
-  y: Math.min(dragStart.y, dragEnd.y) * scaleY,
-  width: Math.abs(dragEnd.x - dragStart.x) * scaleX,
-  height: Math.abs(dragEnd.y - dragStart.y) * scaleY,
-};
       setSelectedAreas((prev) => ({
         ...prev,
         [activeImageIndex]: [...(prev[activeImageIndex] || []), area],
@@ -196,66 +183,48 @@ const area = {
         return data.secure_url;
       };
 
-      // const buildSelectionPrompt = (areas) => {
-      //   if (!areas || areas.length === 0) {
-      //     return "Remove any unwanted objects or distracting elements from this photo.";
-      //   }
+      const buildSelectionPrompt = (areas) => {
+        if (!areas || areas.length === 0) {
+          return "Remove any unwanted objects or distracting elements from this photo.";
+        }
 
-      //   const containerEl = document.querySelector(".cursor-crosshair");
-      //   const displayWidth = containerEl?.offsetWidth || 800;
-      //   const displayHeight = containerEl?.offsetHeight || 600;
+        const containerEl = document.querySelector(".cursor-crosshair");
+        const displayWidth = containerEl?.offsetWidth || 800;
+        const displayHeight = containerEl?.offsetHeight || 600;
 
-      //   const areaDescriptions = areas.map((area, idx) => {
-      //     const xPct = Math.round((area.x / displayWidth) * 100);
-      //     const yPct = Math.round((area.y / displayHeight) * 100);
-      //     const wPct = Math.round((area.width / displayWidth) * 100);
-      //     const hPct = Math.round((area.height / displayHeight) * 100);
-      //     const centerXPct = Math.round(xPct + wPct / 2);
-      //     const centerYPct = Math.round(yPct + hPct / 2);
-      //     const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
-      //     const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
+        const areaDescriptions = areas.map((area, idx) => {
+          const xPct = Math.round((area.x / displayWidth) * 100);
+          const yPct = Math.round((area.y / displayHeight) * 100);
+          const wPct = Math.round((area.width / displayWidth) * 100);
+          const hPct = Math.round((area.height / displayHeight) * 100);
+          const centerXPct = Math.round(xPct + wPct / 2);
+          const centerYPct = Math.round(yPct + hPct / 2);
+          const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
+          const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
 
-      //     return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Coordinates: starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
-      //   });
+          return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Coordinates: starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
+        });
 
-      //   return `Selection-PRECISE OBJECT REMOVAL - ${areas.length} REGION(s) to remove:
+        return `Selection-PRECISE OBJECT REMOVAL - ${areas.length} REGION(s) to remove:
 
-      //    ${areaDescriptions.join("\n\n")}
+         ${areaDescriptions.join("\n\n")}
          
-      //    CRITICAL EXECUTION RULES:
-      //    1. Remove ONLY the content inside each described REGION above - nothing else
-      //    2. There are exactly ${areas.length} REGION(s) to remove - remove ALL of them, every single one
-      //    3. Fill each removed region with seamless background matching surrounding area exactly
-      //    4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
-      //    5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
-      //    6. DO NOT alter brightness, colors, or quality of any area outside the regions
-      //    7. Final result must look completely natural as if those objects were never there
-      //    8. This is SURGICAL removal - only the selected regions, nothing more`;
-      // };
-     const buildSelectionPrompt = () => {
-  return `
-STRICT OBJECT REMOVAL TASK.
-
-Remove ALL objects inside EVERY selected region.
-
-Rules:
-- Remove ALL selected objects completely
-- Process EVERY selected region
-- Do NOT skip any selected area
-- Do NOT remove anything outside selected regions
-- Do NOT add new objects
-- Preserve original lighting, shadows, texture, and quality
-- Fill removed regions naturally from surroundings
-- Keep entire image unchanged except selected regions
-- Ignore all unselected objects
-`;
-};
+         CRITICAL EXECUTION RULES:
+         1. Remove ONLY the content inside each described REGION above - nothing else
+         2. There are exactly ${areas.length} REGION(s) to remove - remove ALL of them, every single one
+         3. Fill each removed region with seamless background matching surrounding area exactly
+         4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
+         5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
+         6. DO NOT alter brightness, colors, or quality of any area outside the regions
+         7. Final result must look completely natural as if those objects were never there
+         8. This is SURGICAL removal - only the selected regions, nothing more`;
+      };
       const uploadPromises = formData.uploadedImages.map(async (img, i) => {
         const originalUrl = await uploadToCloudinary(img);
 
         const areas = selectedAreas[i] || [];
-        // const selectionPrompt = buildSelectionPrompt(areas);
-          const selectionPrompt = buildSelectionPrompt();
+        const selectionPrompt = buildSelectionPrompt(areas);
+
         let processedUrl;
         try {
           processedUrl = await processImageWithAI(
