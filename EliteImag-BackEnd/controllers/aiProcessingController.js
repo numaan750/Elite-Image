@@ -24,13 +24,14 @@ const buildPrompt = (
   const prompts = {
     Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, 0% shine natural light.`,
     // Features: ${feature}. Style: ${style}.,
-    HDR: `Create ONE photorealistic HDR image by merging the input images using feature="${feature}". Intelligently combine the best unique elements (people, furniture, views, lighting), maintain natural perspective and correct placement, avoid duplicates. Apply HDR processing match professional real estate photography lighting, bright interior, 0% shine natural light.`,
+    "HDR": `Create ONE photorealistic HDR image by merging input images. Combine best elements naturally, keep correct perspective, avoid duplicates, and match professional real estate photography lighting, bright interior, 0% shine natural light.`,
+    // using feature="${feature}"
     "Grass Replacement": `Edit grass only using feature="${feature}" & style="${style}": replace/improve lawn, match original lighting & texture, keep edges natural; do not change or touch any non-grass areas, no new objects, no blur, preserve original image quality.`,
     "Object Removal": `Remove objects using feature="${feature}": edit ONLY selected regions, remove all content inside them and fill naturally from surroundings; keep everything outside unchanged, no blur, no new objects, preserve original quality and lighting.`,
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas; ${style === "Vibrant" ? "boost saturation/contrast" : style === "Soft" ? "soft tones, lower contrast" : "natural balanced look"}.`,
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
-    Straighten: `Correct camera tilt, perspective, and misaligned objects in this image; make verticals perfectly vertical and horizontals perfectly horizontal; fix lens distortion and keystone issues; do NOT change colors, lighting, objects, or textures; keep image realistic and original.`,
+    Straighten: `Fix perspective, camera tilt, and lens distortion; straighten all vertical and horizontal lines; keep image realistic.`,
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image; reconstruct the background seamlessly to match original texture, color, and lighting; do NOT change any other part of the image or its quality.`,
     DirectEdit: `Apply only the user instruction: "${feature}" to this image. Do NOT change anything else; keep all objects, colors, lighting, and quality identical. Result must be realistic and professional.`,
   };
@@ -240,16 +241,16 @@ export const processImageWithAI = async (req, res) => {
         },
         parameters: isHDR
           ? {
-              negative_prompt:
-                "watermark, text, logo, blurry, low quality, distorted",
-              watermark: false,
-              prompt_extend: true,
-            }
+            negative_prompt:
+              "watermark, text, logo, blurry, low quality, distorted",
+            watermark: false,
+            prompt_extend: true,
+          }
           : {
-              negative_prompt:
-                "watermark, text, logo, blurry, low quality, distorted",
-              watermark: false,
-            },
+            negative_prompt:
+              "watermark, text, logo, blurry, low quality, distorted",
+            watermark: false,
+          },
       }),
     });
 
