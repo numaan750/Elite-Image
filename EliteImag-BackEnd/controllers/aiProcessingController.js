@@ -228,7 +228,7 @@ export const processImageWithAI = async (req, res) => {
         "X-DashScope-Async": "disable",
       },
       body: JSON.stringify({
-        model: (isHDR || featureType === "Straighten")
+        model: isHDR
           ? process.env.DASHSCOPE_MODEL_HDR
           : process.env.DASHSCOPE_MODEL,
         input: {
