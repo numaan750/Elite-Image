@@ -205,7 +205,19 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Coordinates: starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
         });
 
-        return `PRECISE OBJECT REMOVAL - remove ${areas.length} selected region(s) only, fill seamlessly, keep everything else unchanged, preserve original colors/lighting, and ensure natural invisible result`;
+        return `Selection-PRECISE OBJECT REMOVAL - ${areas.length} REGION(s) to remove:
+
+         ${areaDescriptions.join("\n\n")}
+         
+         CRITICAL EXECUTION RULES:
+         1. Remove ONLY the content inside each described REGION above - nothing else
+         2. There are exactly ${areas.length} REGION(s) to remove - remove ALL of them, every single one
+         3. Fill each removed region with seamless background matching surrounding area exactly
+         4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
+         5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
+         6. DO NOT alter brightness, colors, or quality of any area outside the regions
+         7. Final result must look completely natural as if those objects were never there
+         8. This is SURGICAL removal - only the selected regions, nothing more`;
       };
       const uploadPromises = formData.uploadedImages.map(async (img, i) => {
         const originalUrl = await uploadToCloudinary(img);
@@ -318,10 +330,11 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
                   if (!isProcessing) setActiveImageIndex(index);
                 }}
                 className={`h-20 w-28 object-cover rounded cursor-pointer border-2
-                ${activeImageIndex === index
+                ${
+                  activeImageIndex === index
                     ? "border-[#034F75]"
                     : "border-gray-300"
-                  }`}
+                }`}
               />
             ))}
           </div>
@@ -339,8 +352,8 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
                 typeof formData.uploadedImages[activeImageIndex] === "string"
                   ? formData.uploadedImages[activeImageIndex]
                   : URL.createObjectURL(
-                    formData.uploadedImages[activeImageIndex],
-                  )
+                      formData.uploadedImages[activeImageIndex],
+                    )
               }
               alt="Select object to remove"
               width={800}
@@ -438,10 +451,11 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
              text-[14px] sm:text-[16px] lg:text-[18px]
              rounded-lg 
              transition-colors
-             ${allImagesHaveSelection
-                ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }
+             ${
+               allImagesHaveSelection
+                 ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
+                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
+             }
            `}
           >
             {isProcessing ? (
