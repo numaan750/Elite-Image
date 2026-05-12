@@ -25,7 +25,7 @@ const buildPrompt = (
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas.`,
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
-    "Straighten": `Fix geometry: straighten all tilt/curves (even slight), level horizon, correct verticals & lens distortion; include minor bends; keep colors/brightness unchanged.`,
+    "Straighten": `Ultra-precise geometry correction. Detect and straighten EVERYTHING in the image automatically. All lines, edges, objects, buildings, surfaces, and structures must become perfectly straight, level, symmetrical, and distortion-free. Remove all tilt, warp, curve, bend, skew, perspective distortion, lens distortion, fisheye effect, and camera angle errors. Ensure perfect verticals and horizontals throughout the image while preserving original colors, lighting, textures, and details.`,
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image; reconstruct the background seamlessly to match original texture, color, and lighting; do NOT change any other part of the image or its quality.`,
     DirectEdit: `Apply only the user instruction: "${feature}" to this image. Do NOT change anything else; keep all objects, colors, lighting, and quality identical. Result must be realistic and professional.`,
   };
