@@ -45,15 +45,7 @@ const buildPrompt = (
     //   });
     //   return `PRECISE OBJECT REMOVAL - ${selectedAreas.length} REGION(s) to remove:\n\n${areaDescriptions.join("\n\n")}\n\nCRITICAL EXECUTION RULES:\n1. Remove ONLY the content inside each described REGION above - nothing else\n2. There are exactly ${selectedAreas.length} REGION(s) to remove - remove ALL of them\n3. Fill each removed region with seamless background matching surrounding area exactly\n4. Reconstruction must be completely invisible - match texture, color, lighting perfectly\n5. DO NOT remove, change, or affect ANYTHING outside the ${selectedAreas.length} specified region(s)\n6. Final result must look completely natural as if those objects were never there`;
     // })(),
-    "Object Removal": (() => {
-      if (!selectedAreas || selectedAreas.length === 0) {
-        return `Remove all selected objects from this image and fill seamlessly with background.`;
-      }
-      const regions = selectedAreas.map((a, i) =>
-        `Region ${i + 1}: starts ${a.xPct}% from left, ${a.yPct}% from top, covers ${a.wPct}% width and ${a.hPct}% height`
-      ).join("\n");
-      return `Remove ONLY these ${selectedAreas.length} exact region(s):\n${regions}\nFill each with seamless matching background. Do NOT remove or change anything outside these regions.`;
-    })(),
+    "Object Removal": `Remove ONLY selected region(s) and fill naturally with matching background; keep everything else unchanged.`,
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas; ${style === "Vibrant" ? "boost saturation/contrast" : style === "Soft" ? "soft tones, lower contrast" : "natural balanced look"}.`,
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
