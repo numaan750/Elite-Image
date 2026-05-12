@@ -224,9 +224,10 @@ export const processImageWithAI = async (req, res) => {
         "X-DashScope-Async": "disable",
       },
       body: JSON.stringify({
-        model: isHDR
-          ? process.env.DASHSCOPE_MODEL_HDR
-          : process.env.DASHSCOPE_MODEL,
+        // model: isHDR
+        //   ? process.env.DASHSCOPE_MODEL_HDR
+        //   : process.env.DASHSCOPE_MODEL,
+        model: process.env.DASHSCOPE_MODEL_HDR,
         input: {
           messages: [
             {
@@ -235,18 +236,23 @@ export const processImageWithAI = async (req, res) => {
             },
           ],
         },
-        parameters: isHDR
-          ? {
-            negative_prompt:
-              "watermark, text, logo, blurry, low quality, distorted",
-            watermark: false,
-            prompt_extend: true,
-          }
-          : {
-            negative_prompt:
-              "watermark, text, logo, blurry, low quality, distorted",
-            watermark: false,
-          },
+        // parameters: isHDR
+        //   ? {
+        //     negative_prompt:
+        //       "watermark, text, logo, blurry, low quality, distorted",
+        //     watermark: false,
+        //     prompt_extend: true,
+        //   }
+        //   : {
+        //     negative_prompt:
+        //       "watermark, text, logo, blurry, low quality, distorted",
+        //     watermark: false,
+        //   },
+        parameters: {
+          negative_prompt: "watermark, text, logo, blurry, low quality, distorted",
+          watermark: false,
+          prompt_extend: true,
+        },
       }),
     });
 
