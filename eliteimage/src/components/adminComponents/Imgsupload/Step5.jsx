@@ -83,7 +83,7 @@ const Step5 = ({ formData, setFormData, back }) => {
     }
 
     setIsGenerating(true);
-    setIsTyping(true); // shimmer on
+    setIsTyping(true);
 
     try {
       const allProcessedData = [];
@@ -104,9 +104,9 @@ const Step5 = ({ formData, setFormData, back }) => {
           processedUrl = await processImageWithAI(
             originalImage,
             "DirectEdit",
-            editDescription,   // selectedFeature — backend buildPrompt() ise use karega
+            editDescription,
             formData.selectedStyle || null,
-            null,              // finalNotes — DirectEdit mein extra notes ki zaroorat nahi
+            null,
           );
           toast.success(`Image ${i + 1} ready!`, { id: `gen-${i}` });
         } catch (aiError) {
@@ -133,7 +133,6 @@ const Step5 = ({ formData, setFormData, back }) => {
         ...prev,
         beforeAfterData: allProcessedData,
         finalNotes: editDescription,
-        // uploadedImages: allProcessedData.map((item) => item.processedImage),
       }));
       const backendPayload = {
         userid: formData.userId,

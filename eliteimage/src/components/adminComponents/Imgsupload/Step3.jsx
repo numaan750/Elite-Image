@@ -137,37 +137,6 @@ const Step3 = ({
 
         let processedUrl;
         try {
-          // processedUrl = await processImageWithAI(
-          //   originalUrl,
-          //   formData.featureType,
-          //   formData.selectedFeature || formData.selectedFeatures?.[0] || "",
-          //   formData.featureType === "Day to Dusk"
-          //     ? formData.selectedSky
-          //     : selected,
-          //   selected,
-          //   formData.finalNotes,
-          //   formData.selectedSky || "",
-          // );
-          // processedUrl = await processImageWithAI(
-          //   formData.featureType === "HDR"
-          //     ? formData.uploadedImages // HDR: saari images array mein
-          //     : originalUrl, // baaki: single image
-          //   formData.featureType,
-          //   formData.featureType === "HDR"
-          //     ? Array.isArray(formData.selectedFeatures)
-          //       ? formData.selectedFeatures.join(", ")
-          //       : formData.selectedFeature || ""
-          //     : formData.selectedFeature ||
-          //         formData.selectedFeatures?.[0] ||
-          //         "",
-          //   formData.featureType === "Day to Dusk"
-          //     ? formData.selectedSky
-          //     : selected,
-          //   selected,
-          //   formData.finalNotes,
-          //   formData.selectedSky || "",
-          // );
-          // Virtual Staging ke liye furniture style alag se pass karo
           const featureForAI =
             formData.featureType === "HDR"
               ? Array.isArray(formData.selectedFeatures)

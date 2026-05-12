@@ -115,7 +115,7 @@ const AppProvider = ({ children }) => {
           _id: data.user._id,
           name: data.user.username || data.user.name,
           email: data.user.email,
-          credits: Number(data.user.credits), // ✅ No fallback - trust backend
+          credits: Number(data.user.credits),
         };
         setUser(userToSave);
         setUserCredits(Number(data.user.credits));
@@ -402,8 +402,6 @@ const AppProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error(data.message || "Something went wrong");
       }
-
-      // ✅ Sirf ek baar setUser call karo
       const updatedUser = {
         _id: data.user._id || user._id,
         name: data.user.username || data.user.name,
@@ -585,7 +583,6 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  // ✅ Qwen AI se image process karo
   const processImageWithAI = async (
     imageUrl,
     featureType,
@@ -593,7 +590,7 @@ const AppProvider = ({ children }) => {
     selectedStyle,
     finalNotes,
     selectedSky,
-    selectedAreas,   // ← new param add karo
+    selectedAreas,
   ) => {
     try {
       const response = await fetch(`${API_URL}/api/process-image`, {

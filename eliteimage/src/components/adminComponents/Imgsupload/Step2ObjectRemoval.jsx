@@ -217,49 +217,11 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         if (!data.secure_url) throw new Error("No secure_url");
         return data.secure_url;
       };
-
-      // const buildSelectionPrompt = (areas) => {
-      //   if (!areas || areas.length === 0) {
-      //     return "Remove any unwanted objects or distracting elements from this photo.";
-      //   }
-
-      //   const containerEl = document.querySelector(".cursor-crosshair");
-      //   const displayWidth = containerEl?.offsetWidth || 800;
-      //   const displayHeight = containerEl?.offsetHeight || 600;
-
-      //   const areaDescriptions = areas.map((area, idx) => {
-      //     const xPct = Math.round((area.x / displayWidth) * 100);
-      //     const yPct = Math.round((area.y / displayHeight) * 100);
-      //     const wPct = Math.round((area.width / displayWidth) * 100);
-      //     const hPct = Math.round((area.height / displayHeight) * 100);
-      //     const centerXPct = Math.round(xPct + wPct / 2);
-      //     const centerYPct = Math.round(yPct + hPct / 2);
-      //     const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
-      //     const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
-
-      //     return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Coordinates: starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
-      //   });
-
-      //   return `Selection-PRECISE OBJECT REMOVAL - ${areas.length} REGION(s) to remove:
-
-      //    ${areaDescriptions.join("\n\n")}
-
-      //    CRITICAL EXECUTION RULES:
-      //    1. Remove ONLY the content inside each described REGION above - nothing else
-      //    2. There are exactly ${areas.length} REGION(s) to remove - remove ALL of them, every single one
-      //    3. Fill each removed region with seamless background matching surrounding area exactly
-      //    4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
-      //    5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
-      //    6. DO NOT alter brightness, colors, or quality of any area outside the regions
-      //    7. Final result must look completely natural as if those objects were never there
-      //    8. This is SURGICAL removal - only the selected regions, nothing more`;
-      // };
       const uploadPromises = formData.uploadedImages.map(async (img, i) => {
         const originalUrl = await uploadToCloudinary(img);
         const areas = selectedAreas[i] || [];
         let processedUrl;
         try {
-          // Masked image banao (red areas wali) — original save rehti hai
           const maskedBlob = await createMaskedImage(areas, originalUrl);
           const fd = new FormData();
           fd.append("file", maskedBlob);
@@ -270,7 +232,6 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           );
           const maskData = await maskRes.json();
           const maskedUrl = maskData.secure_url;
-          // AI ko masked image bhejo — selectedAreas [] empty bhejo
           const areasWithPct = areas.map(area => ({
             xPct: Math.round((area.x / mainImageRef.current.offsetWidth) * 100),
             yPct: Math.round((area.y / mainImageRef.current.offsetHeight) * 100),
@@ -282,7 +243,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
             maskedUrl,
             "Object Removal",
             null, null, null, null,
-            areasWithPct  // ← percentage wale areas bhejo
+            areasWithPct
           );
         } catch (aiError) {
           console.error(`AI failed for image ${i + 1}:`, aiError);
@@ -398,7 +359,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
           >
 
             <img
-              ref={mainImageRef}  // ← SIRF YEH LINE ADD KARO
+              ref={mainImageRef}
               src={
                 typeof formData.uploadedImages[activeImageIndex] === "string"
                   ? formData.uploadedImages[activeImageIndex]
