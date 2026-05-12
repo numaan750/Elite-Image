@@ -174,8 +174,8 @@ const Step3 = ({
                 ? formData.selectedFeatures.join(", ")
                 : formData.selectedFeature || ""
               : formData.selectedFeature ||
-                formData.selectedFeatures?.[0] ||
-                "";
+              formData.selectedFeatures?.[0] ||
+              "";
 
           const styleForAI =
             formData.featureType === "Virtual Staging"
@@ -185,13 +185,10 @@ const Step3 = ({
                 : selected;
 
           processedUrl = await processImageWithAI(
-            formData.featureType === "HDR"
-              ? formData.uploadedImages
-              : originalUrl,
+            formData.featureType === "HDR" ? formData.uploadedImages : originalUrl,
             formData.featureType,
             featureForAI,
             styleForAI,
-            selected,
             formData.finalNotes,
             formData.selectedSky || "",
           );
@@ -234,8 +231,8 @@ const Step3 = ({
             ? [formData.selectedFeature]
             : Array.isArray(formData.selectedFeatures)
               ? formData.selectedFeatures
-                  .flat()
-                  .filter((s) => typeof s === "string")
+                .flat()
+                .filter((s) => typeof s === "string")
               : [],
         selectedStyle: [selected],
         beforeAfterData: allProcessedData,
@@ -291,16 +288,14 @@ const Step3 = ({
               if (!isSaving) setSelected(item.name);
             }}
             className={`w-full rounded-xl sm:rounded-2xl border-2 overflow-hidden transition-all
-             ${
-               isSaving
-                 ? "cursor-not-allowed opacity-60"
-                 : "cursor-pointer hover:shadow-lg"
-             }
-             ${
-               selected === item.name
-                 ? "border-[#034F75] shadow-md"
-                 : "border-gray-200"
-             }`}
+             ${isSaving
+                ? "cursor-not-allowed opacity-60"
+                : "cursor-pointer hover:shadow-lg"
+              }
+             ${selected === item.name
+                ? "border-[#034F75] shadow-md"
+                : "border-gray-200"
+              }`}
           >
             <Image
               src={item.img}
@@ -338,9 +333,8 @@ const Step3 = ({
         <button
           onClick={handleGenerate}
           disabled={!selected || isSaving}
-          className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg hover:bg-[#023d5c] transition-colors min-w-[160px] ${
-            !selected || isSaving ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg hover:bg-[#023d5c] transition-colors min-w-[160px] ${!selected || isSaving ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
           {isSaving ? (
             <>

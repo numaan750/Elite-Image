@@ -361,7 +361,7 @@ const AppProvider = ({ children }) => {
                 draft.userId === imageData.userid &&
                 draft.featureType === imageData.featureType &&
                 Math.abs(new Date(draft.lastEdited).getTime() - Date.now()) <
-                  300000
+                300000
               ),
           );
 
@@ -593,6 +593,7 @@ const AppProvider = ({ children }) => {
     selectedStyle,
     finalNotes,
     selectedSky,
+    selectedAreas,   // ← new param add karo
   ) => {
     try {
       const response = await fetch(`${API_URL}/api/process-image`, {
@@ -608,6 +609,7 @@ const AppProvider = ({ children }) => {
           selectedStyle: selectedStyle || "",
           finalNotes: finalNotes || "",
           selectedSky: selectedSky || "",
+          selectedAreas: selectedAreas || [],
         }),
       });
 

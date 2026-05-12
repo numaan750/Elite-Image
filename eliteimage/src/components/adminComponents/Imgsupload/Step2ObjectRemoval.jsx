@@ -30,6 +30,7 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedAreas, setSelectedAreas] = useState({});
   const imageRef = useRef(null);
+  const mainImageRef = useRef(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const totalSelectedObjects = Object.values(selectedAreas).reduce(
@@ -40,10 +41,45 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   const allImagesHaveSelection = formData.uploadedImages.every(
     (img, index) => selectedAreas[index] && selectedAreas[index].length > 0,
   );
-  const handleMouseDown = (e) => {
-    if (!imageRef.current) return;
 
-    const rect = imageRef.current.getBoundingClientRect();
+  // YEH NAYA FUNCTION ADD KARO — kuch delete nahi karna:
+  const createMaskedImage = async (areas, imageUrl) => {
+    const img = await new Promise((resolve, reject) => {
+      const image = new window.Image();
+      image.crossOrigin = "anonymous";
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = imageUrl + "?t=" + Date.now();
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+
+    // ↓ YAHAN FIX HAI — mainImageRef directly use karo, querySelector nahi
+    const rect = mainImageRef.current.getBoundingClientRect();
+    const scaleX = img.naturalWidth / rect.width;
+    const scaleY = img.naturalHeight / rect.height;
+
+    ctx.fillStyle = "rgba(255, 0, 0, 1)";
+    areas.forEach((area) => {
+      ctx.fillRect(
+        area.x * scaleX,
+        area.y * scaleY,
+        area.width * scaleX,
+        area.height * scaleY
+      );
+    });
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), "image/png");
+    });
+  };
+  const handleMouseDown = (e) => {
+    if (!mainImageRef.current) return;
+    const rect = mainImageRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
@@ -53,9 +89,8 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
   };
 
   const handleMouseMove = (e) => {
-    if (!isDragging || !imageRef.current) return;
-
-    const rect = imageRef.current.getBoundingClientRect();
+    if (!isDragging || !mainImageRef.current) return;
+    const rect = mainImageRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
@@ -183,56 +218,71 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
         return data.secure_url;
       };
 
-      const buildSelectionPrompt = (areas) => {
-        if (!areas || areas.length === 0) {
-          return "Remove any unwanted objects or distracting elements from this photo.";
-        }
+      // const buildSelectionPrompt = (areas) => {
+      //   if (!areas || areas.length === 0) {
+      //     return "Remove any unwanted objects or distracting elements from this photo.";
+      //   }
 
-        const containerEl = document.querySelector(".cursor-crosshair");
-        const displayWidth = containerEl?.offsetWidth || 800;
-        const displayHeight = containerEl?.offsetHeight || 600;
+      //   const containerEl = document.querySelector(".cursor-crosshair");
+      //   const displayWidth = containerEl?.offsetWidth || 800;
+      //   const displayHeight = containerEl?.offsetHeight || 600;
 
-        const areaDescriptions = areas.map((area, idx) => {
-          const xPct = Math.round((area.x / displayWidth) * 100);
-          const yPct = Math.round((area.y / displayHeight) * 100);
-          const wPct = Math.round((area.width / displayWidth) * 100);
-          const hPct = Math.round((area.height / displayHeight) * 100);
-          const centerXPct = Math.round(xPct + wPct / 2);
-          const centerYPct = Math.round(yPct + hPct / 2);
-          const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
-          const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
+      //   const areaDescriptions = areas.map((area, idx) => {
+      //     const xPct = Math.round((area.x / displayWidth) * 100);
+      //     const yPct = Math.round((area.y / displayHeight) * 100);
+      //     const wPct = Math.round((area.width / displayWidth) * 100);
+      //     const hPct = Math.round((area.height / displayHeight) * 100);
+      //     const centerXPct = Math.round(xPct + wPct / 2);
+      //     const centerYPct = Math.round(yPct + hPct / 2);
+      //     const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
+      //     const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
 
-          return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Coordinates: starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
-        });
+      //     return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Coordinates: starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
+      //   });
 
-        return `Selection-PRECISE OBJECT REMOVAL - ${areas.length} REGION(s) to remove:
+      //   return `Selection-PRECISE OBJECT REMOVAL - ${areas.length} REGION(s) to remove:
 
-         ${areaDescriptions.join("\n\n")}
-         
-         CRITICAL EXECUTION RULES:
-         1. Remove ONLY the content inside each described REGION above - nothing else
-         2. There are exactly ${areas.length} REGION(s) to remove - remove ALL of them, every single one
-         3. Fill each removed region with seamless background matching surrounding area exactly
-         4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
-         5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
-         6. DO NOT alter brightness, colors, or quality of any area outside the regions
-         7. Final result must look completely natural as if those objects were never there
-         8. This is SURGICAL removal - only the selected regions, nothing more`;
-      };
+      //    ${areaDescriptions.join("\n\n")}
+
+      //    CRITICAL EXECUTION RULES:
+      //    1. Remove ONLY the content inside each described REGION above - nothing else
+      //    2. There are exactly ${areas.length} REGION(s) to remove - remove ALL of them, every single one
+      //    3. Fill each removed region with seamless background matching surrounding area exactly
+      //    4. Reconstruction must be completely invisible - match texture, color, lighting perfectly
+      //    5. DO NOT remove, change, or affect ANYTHING outside the ${areas.length} specified region(s)
+      //    6. DO NOT alter brightness, colors, or quality of any area outside the regions
+      //    7. Final result must look completely natural as if those objects were never there
+      //    8. This is SURGICAL removal - only the selected regions, nothing more`;
+      // };
       const uploadPromises = formData.uploadedImages.map(async (img, i) => {
         const originalUrl = await uploadToCloudinary(img);
-
         const areas = selectedAreas[i] || [];
-        const selectionPrompt = buildSelectionPrompt(areas);
-
         let processedUrl;
         try {
+          // Masked image banao (red areas wali) — original save rehti hai
+          const maskedBlob = await createMaskedImage(areas, originalUrl);
+          const fd = new FormData();
+          fd.append("file", maskedBlob);
+          fd.append("upload_preset", UPLOAD_PRESET);
+          const maskRes = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+            { method: "POST", body: fd }
+          );
+          const maskData = await maskRes.json();
+          const maskedUrl = maskData.secure_url;
+          // AI ko masked image bhejo — selectedAreas [] empty bhejo
+          const areasWithPct = areas.map(area => ({
+            xPct: Math.round((area.x / mainImageRef.current.offsetWidth) * 100),
+            yPct: Math.round((area.y / mainImageRef.current.offsetHeight) * 100),
+            wPct: Math.round((area.width / mainImageRef.current.offsetWidth) * 100),
+            hPct: Math.round((area.height / mainImageRef.current.offsetHeight) * 100),
+          }));
+
           processedUrl = await processImageWithAI(
-            originalUrl,
+            maskedUrl,
             "Object Removal",
-            selectionPrompt,
-            null,
-            null,
+            null, null, null, null,
+            areasWithPct  // ← percentage wale areas bhejo
           );
         } catch (aiError) {
           console.error(`AI failed for image ${i + 1}:`, aiError);
@@ -330,39 +380,35 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
                   if (!isProcessing) setActiveImageIndex(index);
                 }}
                 className={`h-20 w-28 object-cover rounded cursor-pointer border-2
-                ${
-                  activeImageIndex === index
+                ${activeImageIndex === index
                     ? "border-[#034F75]"
                     : "border-gray-300"
-                }`}
+                  }`}
               />
             ))}
           </div>
 
           <div
             className="relative w-full bg-white rounded-[40px] overflow-hidden cursor-crosshair"
+            ref={imageRef}
             onMouseDown={isProcessing ? undefined : handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
           >
-            <Image
-              ref={imageRef}
+
+            <img
+              ref={mainImageRef}  // ← SIRF YEH LINE ADD KARO
               src={
                 typeof formData.uploadedImages[activeImageIndex] === "string"
                   ? formData.uploadedImages[activeImageIndex]
-                  : URL.createObjectURL(
-                      formData.uploadedImages[activeImageIndex],
-                    )
+                  : URL.createObjectURL(formData.uploadedImages[activeImageIndex])
               }
               alt="Select object to remove"
-              width={800}
-              height={600}
-              sizes="(max-width: 768px) 100vw, 800px"
               className="w-full h-auto select-none"
               draggable={false}
-              priority
             />
+
             {isDragging && dragStart && dragEnd && (
               <div
                 className="absolute border-2 border-dashed border-[#034F75] bg-[#034F75]/10"
@@ -451,11 +497,10 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
              text-[14px] sm:text-[16px] lg:text-[18px]
              rounded-lg 
              transition-colors
-             ${
-               allImagesHaveSelection
-                 ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
-                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
-             }
+             ${allImagesHaveSelection
+                ? "bg-[#034F75] hover:bg-[#023a5c] text-white"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }
            `}
           >
             {isProcessing ? (

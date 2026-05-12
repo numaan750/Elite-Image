@@ -11,6 +11,7 @@ const buildPrompt = (
   selectedStyle,
   finalNotes,
   selectedSky,
+  selectedAreas,
 ) => {
   const style = selectedStyle || "";
   const feature = selectedFeature || "";
@@ -27,7 +28,32 @@ const buildPrompt = (
     "HDR": `Create ONE photorealistic HDR image by merging input images. Combine best elements naturally, keep correct perspective, avoid duplicates, and match professional real estate photography lighting, bright interior, 0% shine natural light.`,
     // using feature="${feature}"
     "Grass Replacement": `Edit grass only using feature="${feature}" & style="${style}": replace/improve lawn, match original lighting & texture, keep edges natural; do not change or touch any non-grass areas, no new objects, no blur, preserve original image quality.`,
-    "Object Removal": `Remove objects using feature="${feature}": edit ONLY selected regions, remove all content inside them and fill naturally from surroundings; keep everything outside unchanged, no blur, no new objects, preserve original quality and lighting.`,
+    // "Object Removal": (() => {
+    //   if (!selectedAreas || selectedAreas.length === 0) {
+    //     return `Remove unwanted objects: only edit selected regions. Erase everything inside them and seamlessly fill with matching surrounding background. Preserve original image quality, lighting, and details. No blur or new objects.`;
+    //   }
+    //   const areaDescriptions = selectedAreas.map((area, idx) => {
+    //     const xPct = Math.round(area.xPct || 0);
+    //     const yPct = Math.round(area.yPct || 0);
+    //     const wPct = Math.round(area.wPct || 0);
+    //     const hPct = Math.round(area.hPct || 0);
+    //     const centerXPct = Math.round(xPct + wPct / 2);
+    //     const centerYPct = Math.round(yPct + hPct / 2);
+    //     const vertPos = yPct < 33 ? "upper" : yPct > 66 ? "lower" : "middle";
+    //     const horizPos = xPct < 33 ? "left" : xPct > 66 ? "right" : "center";
+    //     return `REGION ${idx + 1}: Remove object at ${vertPos}-${horizPos} area. Starts ${xPct}% from left, ${yPct}% from top, covers ${wPct}% width and ${hPct}% height. Center: ${centerXPct}% from left, ${centerYPct}% from top.`;
+    //   });
+    //   return `PRECISE OBJECT REMOVAL - ${selectedAreas.length} REGION(s) to remove:\n\n${areaDescriptions.join("\n\n")}\n\nCRITICAL EXECUTION RULES:\n1. Remove ONLY the content inside each described REGION above - nothing else\n2. There are exactly ${selectedAreas.length} REGION(s) to remove - remove ALL of them\n3. Fill each removed region with seamless background matching surrounding area exactly\n4. Reconstruction must be completely invisible - match texture, color, lighting perfectly\n5. DO NOT remove, change, or affect ANYTHING outside the ${selectedAreas.length} specified region(s)\n6. Final result must look completely natural as if those objects were never there`;
+    // })(),
+    "Object Removal": (() => {
+      if (!selectedAreas || selectedAreas.length === 0) {
+        return `Remove all selected objects from this image and fill seamlessly with background.`;
+      }
+      const regions = selectedAreas.map((a, i) =>
+        `Region ${i + 1}: starts ${a.xPct}% from left, ${a.yPct}% from top, covers ${a.wPct}% width and ${a.hPct}% height`
+      ).join("\n");
+      return `Remove ONLY these ${selectedAreas.length} exact region(s):\n${regions}\nFill each with seamless matching background. Do NOT remove or change anything outside these regions.`;
+    })(),
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas; ${style === "Vibrant" ? "boost saturation/contrast" : style === "Soft" ? "soft tones, lower contrast" : "natural balanced look"}.`,
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
@@ -128,6 +154,7 @@ export const processImageWithAI = async (req, res) => {
       selectedStyle,
       finalNotes,
       selectedSky,
+      selectedAreas,
     } = req.body;
 
     if (!imageUrl || (Array.isArray(imageUrl) && imageUrl.length === 0)) {
@@ -171,6 +198,7 @@ export const processImageWithAI = async (req, res) => {
       selectedStyle,
       finalNotes,
       selectedSky,
+      selectedAreas,
     );
 
     console.log(`📝 Prompt: ${prompt}`);

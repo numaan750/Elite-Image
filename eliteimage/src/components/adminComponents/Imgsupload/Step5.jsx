@@ -27,14 +27,14 @@ const Step5 = ({ formData, setFormData, back }) => {
   const typingTimerRef = React.useRef(null);
 
   useEffect(() => {
-  const timer = setTimeout(() => {
-    if (!formData.featureType) {
-      toast.error("Please select a feature first");
-      router.push("/admin/dashboard");
-    }
-  }, 300);
-  return () => clearTimeout(timer);
-}, [formData.featureType, router]);
+    const timer = setTimeout(() => {
+      if (!formData.featureType) {
+        toast.error("Please select a feature first");
+        router.push("/admin/dashboard");
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [formData.featureType, router]);
   useEffect(() => {
     const initialPositions = {};
     formData.uploadedImages.forEach((_, index) => {
@@ -91,7 +91,7 @@ const Step5 = ({ formData, setFormData, back }) => {
       for (let i = 0; i < formData.uploadedImages.length; i++) {
         const originalImage =
           Array.isArray(formData.beforeAfterData) &&
-          formData.beforeAfterData[i]?.processedImage
+            formData.beforeAfterData[i]?.processedImage
             ? formData.beforeAfterData[i].processedImage
             : formData.uploadedImages[i];
         toast.loading(
@@ -103,10 +103,10 @@ const Step5 = ({ formData, setFormData, back }) => {
         try {
           processedUrl = await processImageWithAI(
             originalImage,
-            "DirectEdit", // special featureType
-            editDescription, // selectedFeature mein user instruction
+            "DirectEdit",
+            editDescription,   // selectedFeature — backend buildPrompt() ise use karega
             formData.selectedStyle || null,
-            editDescription,
+            null,              // finalNotes — DirectEdit mein extra notes ki zaroorat nahi
           );
           toast.success(`Image ${i + 1} ready!`, { id: `gen-${i}` });
         } catch (aiError) {
@@ -117,7 +117,7 @@ const Step5 = ({ formData, setFormData, back }) => {
 
         const previousProcessedImage =
           Array.isArray(formData.beforeAfterData) &&
-          formData.beforeAfterData[i]?.processedImage
+            formData.beforeAfterData[i]?.processedImage
             ? formData.beforeAfterData[i].processedImage
             : originalImage;
 
@@ -212,11 +212,10 @@ const Step5 = ({ formData, setFormData, back }) => {
 
         <div className="relative w-full rounded-xl overflow-hidden flex items-center justify-center ">
           <div
-            className={`w-full ${
-              formData.uploadedImages.length === 1
+            className={`w-full ${formData.uploadedImages.length === 1
                 ? "flex flex-col gap-4 sm:gap-6"
                 : "grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 gap-4 sm:gap-6"
-            }`}
+              }`}
           >
             {formData.uploadedImages.map((img, index) => (
               <div
@@ -256,7 +255,7 @@ const Step5 = ({ formData, setFormData, back }) => {
                       <Image
                         src={
                           Array.isArray(formData.beforeAfterData) &&
-                          formData.beforeAfterData[index]?.processedImage
+                            formData.beforeAfterData[index]?.processedImage
                             ? formData.beforeAfterData[index].processedImage
                             : formData.beforeAfterData?.processedImage || img
                         }
@@ -328,11 +327,10 @@ const Step5 = ({ formData, setFormData, back }) => {
             onClick={handleGenerate}
             disabled={isSaving || isGenerating}
             className={`flex items-center justify-center gap-2 bg-[#034F75] text-white text-[16px] sm:text-[18px] px-5 sm:px-7 py-2 rounded-lg transition-colors min-w-[160px]
-               ${
-                 isSaving || isGenerating
-                   ? "opacity-50 cursor-not-allowed"
-                   : "hover:bg-[#023d5c]"
-               }
+               ${isSaving || isGenerating
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-[#023d5c]"
+              }
              `}
           >
             {isGenerating ? (
