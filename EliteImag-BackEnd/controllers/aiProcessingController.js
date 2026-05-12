@@ -25,7 +25,7 @@ const buildPrompt = (
   const prompts = {
     Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, 0% shine natural light.`,
     // Features: ${feature}. Style: ${style}.,
-    "HDR": `Create ONE ultra-clear photorealistic HDR image with sharp details, natural colors, balanced bright lighting, and full hd resolution; no blur, fade, haze, shine, distortion, or duplicate objects.`,    // using feature="${feature}"
+    "HDR": `Create ONE ultra-clear photorealistic HDR image with balanced lighting and clear window views; reduce glow/overexposure, keep original details, no blur, fade, or unnecessary changes.`,
     "Grass Replacement": `Edit grass only using feature="${feature}" & style="${style}": replace/improve lawn, match original lighting & texture, keep edges natural; do not change or touch any non-grass areas, no new objects, no blur, preserve original image quality.`,
     // "Object Removal": (() => {
     //   if (!selectedAreas || selectedAreas.length === 0) {
