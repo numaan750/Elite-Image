@@ -57,14 +57,13 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     canvas.height = img.naturalHeight;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+   
 
     const rect = mainImageRef.current.getBoundingClientRect();
     const scaleX = img.naturalWidth / rect.width;
     const scaleY = img.naturalHeight / rect.height;
 
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
     areas.forEach((area) => {
       ctx.fillRect(
         area.x * scaleX,
