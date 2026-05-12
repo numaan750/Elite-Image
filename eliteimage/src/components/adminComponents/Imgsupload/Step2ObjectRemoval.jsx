@@ -57,13 +57,13 @@ const Step2ObjectRemoval = ({ formData, setFormData, next, back }) => {
     canvas.height = img.naturalHeight;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
-   
 
+    // ↓ YAHAN FIX HAI — mainImageRef directly use karo, querySelector nahi
     const rect = mainImageRef.current.getBoundingClientRect();
     const scaleX = img.naturalWidth / rect.width;
     const scaleY = img.naturalHeight / rect.height;
 
-    ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+    ctx.fillStyle = "rgba(255, 0, 0, 1)";
     areas.forEach((area) => {
       ctx.fillRect(
         area.x * scaleX,
