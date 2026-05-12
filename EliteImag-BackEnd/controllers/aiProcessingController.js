@@ -21,7 +21,7 @@ const buildPrompt = (
     // Features: ${feature}. Style: ${style}.,
     "HDR": `Create ONE ultra-clear photorealistic HDR image with balanced lighting and clear window views; reduce glow/overexposure, keep original details, no blur, fade, or unnecessary changes.`,
     "Grass Replacement": `Replace grass using feature="${feature}" & style="${style}": ultra-realistic natural lawn with variation, soil detail, imperfections; match lighting & grain; no CGI look; keep rest unchanged, no blur, no new objects.`,
-    "Object Removal": `Remove ONLY selected area(s); keep everything else unchanged, enhance clarity and quality, no blur or fade.`,
+    "Object Removal": `Remove ONLY the selected object(s); DO NOT replace with anything. Keep background natural and unchanged, enhance clarity and quality.`,
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas.`,
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
