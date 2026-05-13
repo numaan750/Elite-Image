@@ -20,14 +20,18 @@ const buildPrompt = (
     Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, 0% shine natural light.`,
     // Features: ${feature}. Style: ${style}.,
     "HDR": `Create ONE realistic HDR photo: balanced exposure, sharp details, 0% shine natural light, no fade, glow, or blur.`,
-    "Grass Replacement": `Replace grass using feature="${feature}" & style="${style}": with ultra-realistic natural lawn, match lighting/grain, preserve all original details, no CGI, blur, or new objects.`,
-    "Object Removal": `Remove objects using feature="${feature}": only edit the selected regions. Erase everything inside them and seamlessly fill with matching surrounding background. Do not change anything outside the regions. Preserve original image quality, lighting, and details. No blur or new objects.`,
-    "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas.`,
-    "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
+    "Grass Replacement": `Replace grass using feature="${feature}" & style="${style}": 
+    with ultra-realistic natural lawn, match lighting/grain, preserve all original details, no CGI, blur, or new objects.`,
+    "Object Removal": `Remove objects using feature="${feature}": 
+    only edit the selected regions. Erase everything inside them and seamlessly fill with matching surrounding background. Do not change anything outside the regions. Preserve original image quality, lighting, and details. No blur or new objects.`,
+    "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": 
+    match lighting & color with scene, keep edges natural; do not change any non-sky areas.`,
+    "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); 
+    keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
     // "Straighten": `True architectural straighten: 0% fisheye/perspective distortion every where, make all walls, doors, frames, paintings, and edges perfectly straight, preserve exact objects and layout.`,     ya wala saii tha 
-    "Straighten": `True architectural straighten: correct perspective so all vertical lines are parallel and horizontal lines are level. Keep all furniture, people, objects, decorations, reflections, and textures unchanged. Do not remove, add, or alter any object; only fix camera distortion, tilt, and perspective so the room appears straight and natural. Preserve the original layout, lighting, and details exactly.`,
-    // "Straighten": `0% fisheye/perspective distortion, perfectly straighten all architecture, objects, and people, preserve everything exactly, no removals or changes.`,
+    // "Straighten": `True architectural straighten: correct perspective so all vertical lines are parallel and horizontal lines are level. Keep all furniture, people, objects, decorations, reflections, and textures unchanged. Do not remove, add, or alter any object; only fix camera distortion, tilt, and perspective so the room appears straight and natural. Preserve the original layout, lighting, and details exactly.`,
+    "Straighten": `0% fisheye/perspective distortion, perfectly straighten all architecture, objects, and people, preserve everything exactly, no removals or changes.`,
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image; reconstruct the background seamlessly to match original texture, color, and lighting; do NOT change any other part of the image or its quality.`,
     DirectEdit: `Apply only the user instruction: "${feature}" to this image. Do NOT change anything else; keep all objects, colors, lighting, and quality identical. Result must be realistic and professional.`,
   };
