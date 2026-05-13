@@ -17,7 +17,7 @@ const buildPrompt = (
   const feature = selectedFeature || "";
 
   const prompts = {
-    Enhance: `Enhance as premium real estate photography: clean lighting, bright space, natural tones, zero glare.`,
+    Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, 0% shine natural light.`,
     // Features: ${feature}. Style: ${style}.,
     "HDR": `Create ONE realistic HDR photo: balanced exposure, sharp details, clear windows, no fade, glow, or blur.`,
     "Grass Replacement": `Replace grass using feature="${feature}" & style="${style}": ultra-realistic natural lawn with variation, soil detail, imperfections; match lighting & grain; no CGI look; keep rest unchanged, no blur, no new objects.`,
