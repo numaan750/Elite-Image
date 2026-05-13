@@ -226,7 +226,9 @@ export const processImageWithAI = async (req, res) => {
       body: JSON.stringify({
         model: isHDR
           ? process.env.DASHSCOPE_MODEL_HDR
-          : process.env.DASHSCOPE_MODEL,
+          : featureType === "Straighten"
+            ? process.env.DASHSCOPE_MODEL_STRAIGTEN
+            : process.env.DASHSCOPE_MODEL,
         // model: process.env.DASHSCOPE_MODEL_HDR,
         input: {
           messages: [
@@ -243,11 +245,17 @@ export const processImageWithAI = async (req, res) => {
             watermark: false,
             prompt_extend: true,
           }
-          : {
-            negative_prompt:
-              "watermark, text, logo, blurry, low quality, distorted",
-            watermark: false,
-          },
+          : featureType === "Straighten"
+            ? {
+              negative_prompt:
+                "watermark, text, logo, blurry, low quality, distorted",
+              watermark: false,
+            }
+            : {
+              negative_prompt:
+                "watermark, text, logo, blurry, low quality, distorted",
+              watermark: false,
+            },
         // parameters: {
         //   negative_prompt: "watermark, text, logo, blurry, low quality, distorted",
         //   watermark: false,
