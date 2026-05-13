@@ -25,7 +25,7 @@ const buildPrompt = (
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas.`,
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
-    "Straighten": `True architectural straighten: 0% fisheye/perspective distortion every where, make all walls, doors, frames, paintings, and edges perfectly straight, preserve exact objects and layout.`,
+    "Straighten": `True architectural straighten: correct perspective so all vertical lines are parallel and horizontal lines are level. Keep all furniture, people, objects, decorations, reflections, and textures unchanged. Do not remove, add, or alter any object; only fix camera distortion, tilt, and perspective so the room appears straight and natural. Preserve the original layout, lighting, and details exactly.`,
     // "Straighten": `0% fisheye/perspective distortion, perfectly straighten all architecture, objects, and people, preserve everything exactly, no removals or changes.`,
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image; reconstruct the background seamlessly to match original texture, color, and lighting; do NOT change any other part of the image or its quality.`,
     DirectEdit: `Apply only the user instruction: "${feature}" to this image. Do NOT change anything else; keep all objects, colors, lighting, and quality identical. Result must be realistic and professional.`,
@@ -228,7 +228,7 @@ export const processImageWithAI = async (req, res) => {
         model: isHDR
           ? process.env.DASHSCOPE_MODEL_HDR
           : featureType === "Straighten"
-            ? process.env.DASHSCOPE_MODEL_STRAIGTEN
+            ? process.env.DASHSCOPE_MODEL_STRAIGTEN || process.env.DASHSCOPE_MODEL
             : process.env.DASHSCOPE_MODEL,
         // model: process.env.DASHSCOPE_MODEL_HDR,
         input: {
@@ -249,8 +249,9 @@ export const processImageWithAI = async (req, res) => {
           : featureType === "Straighten"
             ? {
               negative_prompt:
-                "watermark, text, logo, blurry, low quality, distorted",
+                "remove, erase, delete, missing, distorted, blurry, low quality, watermark, text, logo",
               watermark: false,
+              prompt_extend: true,
             }
             : {
               negative_prompt:
