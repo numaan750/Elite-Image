@@ -25,7 +25,7 @@ const buildPrompt = (
     "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas.`,
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
-    Straighten: `Fix geometry and perspective: straight verticals, level horizon, no color edits.`,
+    "Straighten": `Correct the image geometry: level the horizon, make vertical lines perfectly straight, fix lens distortion. No color or brightness changes.`,
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image; reconstruct the background seamlessly to match original texture, color, and lighting; do NOT change any other part of the image or its quality.`,
     DirectEdit: `Apply only the user instruction: "${feature}" to this image. Do NOT change anything else; keep all objects, colors, lighting, and quality identical. Result must be realistic and professional.`,
   };
@@ -224,10 +224,10 @@ export const processImageWithAI = async (req, res) => {
         "X-DashScope-Async": "disable",
       },
       body: JSON.stringify({
-        // model: isHDR
-        //   ? process.env.DASHSCOPE_MODEL_HDR
-        //   : process.env.DASHSCOPE_MODEL,
-        model: process.env.DASHSCOPE_MODEL_HDR,
+        model: isHDR
+          ? process.env.DASHSCOPE_MODEL_HDR
+          : process.env.DASHSCOPE_MODEL,
+        // model: process.env.DASHSCOPE_MODEL_HDR,
         input: {
           messages: [
             {
@@ -236,23 +236,23 @@ export const processImageWithAI = async (req, res) => {
             },
           ],
         },
-        // parameters: isHDR
-        //   ? {
-        //     negative_prompt:
-        //       "watermark, text, logo, blurry, low quality, distorted",
-        //     watermark: false,
-        //     prompt_extend: true,
-        //   }
-        //   : {
-        //     negative_prompt:
-        //       "watermark, text, logo, blurry, low quality, distorted",
-        //     watermark: false,
-        //   },
-        parameters: {
-          negative_prompt: "watermark, text, logo, blurry, low quality, distorted",
-          watermark: false,
-          prompt_extend: true,
-        },
+        parameters: isHDR
+          ? {
+            negative_prompt:
+              "watermark, text, logo, blurry, low quality, distorted",
+            watermark: false,
+            prompt_extend: true,
+          }
+          : {
+            negative_prompt:
+              "watermark, text, logo, blurry, low quality, distorted",
+            watermark: false,
+          },
+        // parameters: {
+        //   negative_prompt: "watermark, text, logo, blurry, low quality, distorted",
+        //   watermark: false,
+        //   prompt_extend: true,
+        // },
       }),
     });
 
