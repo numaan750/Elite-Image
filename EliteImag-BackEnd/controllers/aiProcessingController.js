@@ -27,6 +27,7 @@ const buildPrompt = (
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
     // "Straighten": `True architectural straighten: 0% fisheye/perspective distortion every where, make all walls, doors, frames, paintings, and edges perfectly straight, preserve exact objects and layout.`,     ya wala saii tha 
     "Straighten": `Intelligent straighten: perfectly align all walls, furniture, objects, people, frames, doors, and room elements; fix all tilt and perspective distortion while keeping everything unchanged and natural.`,
+
     // "Straighten": `0% fisheye/perspective distortion, perfectly straighten all architecture, objects, and people, preserve everything exactly, no removals or changes.`,
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image; reconstruct the background seamlessly to match original texture, color, and lighting; do NOT change any other part of the image or its quality.`,
     DirectEdit: `Apply only the user instruction: "${feature}" to this image. Do NOT change anything else; keep all objects, colors, lighting, and quality identical. Result must be realistic and professional.`,
