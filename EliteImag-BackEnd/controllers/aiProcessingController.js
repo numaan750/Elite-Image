@@ -231,7 +231,7 @@ export const processImageWithAI = async (req, res) => {
         model: isHDR
           ? process.env.DASHSCOPE_MODEL_HDR
           : featureType === "Straighten"
-            ? process.env.DASHSCOPE_MODEL_STRAIGTEN
+            ? process.env.DASHSCOPE_MODEL_HDR
             : process.env.DASHSCOPE_MODEL,
         // model: process.env.DASHSCOPE_MODEL_HDR,
         input: {
