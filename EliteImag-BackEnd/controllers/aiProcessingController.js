@@ -26,6 +26,7 @@ const buildPrompt = (
     "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
     "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
     "Straighten": `Correct ultra-wide 0.5x lens distortion, make all lines perfectly straight and natural, preserve exact scene and objects.`,
+    //  "Straighten": `Straighten image perspective, fix vertical and horizontal lines, remove lens distortion, keep all objects unchanged, realistic architectural interior photo, natural alignment, ultra realistic.`,
     //  "Straighten": `Professional lens correction: remove 0.5x ultra-wide distortion, perfectly straighten all verticals/horizontals, keep every object and detail unchanged.`,
     // "Straighten": `True architectural straighten: 0% fisheye/perspective distortion, make all walls, doors, frames, paintings, and edges perfectly straight, preserve exact objects and layout.`, 
     // "Straighten": `True architectural straighten: correct perspective so all vertical lines are parallel and horizontal lines are level. Keep all furniture, people, objects, decorations, reflections, and textures unchanged. Do not remove, add, or alter any object; only fix camera distortion, tilt, and perspective so the room appears straight and natural. Preserve the original layout, lighting, and details exactly.`,
