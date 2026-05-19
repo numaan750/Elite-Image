@@ -17,30 +17,24 @@ const buildPrompt = (
   const feature = selectedFeature || "";
 
   const prompts = {
-    Enhance: `Enhance real estate image: match professional real estate photography lighting, bright interior, 0% shine natural light.`,
-    // Features: ${feature}. Style: ${style}.,
-    "HDR": `Create ONE realistic HDR photo: balanced exposure, sharp details, 0% shine natural light, no fade, glow, or blur.`,
-    "Grass Replacement": `Replace grass using feature="${feature}" & style="${style}": with ultra-realistic natural lawn, match lighting/grain, preserve all original details, no CGI, blur, or new objects.`,
+    Enhance: `Enhance this real estate photo to professional HD quality. Produce a sharp, crystal-clear, high-resolution result. Apply natural, balanced lighting throughout the interior — no overexposed windows, no glare, no blown-out highlights, no haze. Make the image bright and inviting but realistic. Preserve every object, texture, furniture piece, and architectural detail exactly as in the original. Do not add, remove, or alter any element. Output must be ultra-sharp, vibrant, and photo-realistic with zero blur or fading.`,
+    "HDR": `Merge the provided exposures into one professional HDR real estate photo. The final image must be ultra-sharp, crystal-clear, and high-resolution. Balance interior and exterior exposure so both are simultaneously visible and correctly exposed — no blown-out windows, no dark interiors, no haze or glow. Preserve all original objects, textures, and architectural details with maximum sharpness. Output must look like a professional real estate HDR photograph, zero blur or fade.`,
+    "Grass Replacement": `Replace the grass area with ultra-realistic natural ${feature} lawn in ${style} style. The new grass must be perfectly sharp, lush, and photo-realistic — matching the original scene's lighting, color temperature, and grain exactly. Seamlessly blend edges. Preserve every other part of the image — buildings, pathways, sky, objects — completely unchanged and in full original HD quality. No blur, no CGI look, no new objects, no artifacts.`,
     "Object Removal": `Remove objects using feature="${feature}": only edit the selected regions. Erase everything inside them and seamlessly fill with matching surrounding background. Do not change anything outside the regions. Preserve original image quality, lighting, and details. No blur or new objects.`,
-    "Sky Replacement": `Replace ONLY sky with "${feature}" using style="${style}": match lighting & color with scene, keep edges natural; do not change any non-sky areas.`,
-    "Virtual Staging": `Stage the uploaded ${feature} with ${selectedStyle} (${style} style); keep the original room unchanged, realistic lighting & shadows, maintain scale.`,
-    "Day to Dusk": `Convert daytime photo to ${feature} dusk; use ${selectedSky || style} sky and ${style} style; keep original building, surroundings, and objects unchanged; adjust lighting realistically.`,
-    "Straighten": `Correct ultra-wide 0.5x lens distortion, make all lines perfectly straight and natural, preserve exact scene and objects.`,
-    //  "Straighten": `Straighten image perspective, fix vertical and horizontal lines, remove lens distortion, keep all objects unchanged, realistic architectural interior photo, natural alignment, ultra realistic.`,
-    //  "Straighten": `Professional lens correction: remove 0.5x ultra-wide distortion, perfectly straighten all verticals/horizontals, keep every object and detail unchanged.`,
-    // "Straighten": `True architectural straighten: 0% fisheye/perspective distortion, make all walls, doors, frames, paintings, and edges perfectly straight, preserve exact objects and layout.`, 
-    // "Straighten": `True architectural straighten: correct perspective so all vertical lines are parallel and horizontal lines are level. Keep all furniture, people, objects, decorations, reflections, and textures unchanged. Do not remove, add, or alter any object; only fix camera distortion, tilt, and perspective so the room appears straight and natural. Preserve the original layout, lighting, and details exactly.`,
-    // "Straighten": `0% fisheye/perspective distortion, perfectly straighten all architecture, objects, and people, preserve everything exactly, no removals or changes.`,
-    "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image; reconstruct the background seamlessly to match original texture, color, and lighting; do NOT change any other part of the image or its quality.`,
-    DirectEdit: `Apply only the user instruction: "${feature}" to this image. Do NOT change anything else; keep all objects, colors, lighting, and quality identical. Result must be realistic and professional.`,
+    "Sky Replacement": `Replace ONLY the sky area with "${feature}" sky in ${style} style. The replacement sky must be ultra-realistic, sharp, and seamlessly blended with the horizon and building edges. Match the sky's color temperature and lighting direction to the rest of the scene. Do not alter any non-sky area — all buildings, trees, ground, and objects must remain in full original HD quality, perfectly sharp and unchanged.`,
+    "Virtual Staging": `Virtually stage this empty ${feature} room with ${style} style furniture and decor. Place realistic, proportionally correct furniture that matches the room's scale and architecture. Lighting, shadows, and reflections must be physically accurate and consistent with the existing room lighting. Keep all walls, floors, ceilings, windows, and architectural elements completely unchanged. The result must look like a professional real estate photograph — ultra-sharp, HD, and photo-realistic.`,
+    "Day to Dusk": `Convert this daytime real estate photo to a stunning ${feature} dusk scene using ${selectedSky || style} sky. The sky must transition beautifully with warm golden and blue-hour tones. Interior lights should appear naturally lit and glowing. Keep the original building, landscaping, driveway, and all surrounding objects completely unchanged in structure and placement. Adjust only lighting and sky. The output must be ultra-sharp, HD, and photo-realistic — no blur, no haze, no artifacts.`,
+    "Straighten": `Correct ultra-wide 0.5x lens distortion. Make all vertical and horizontal architectural lines perfectly straight and natural. Fix barrel distortion, fisheye effect, and perspective tilt so walls, doors, windows, and furniture edges appear perfectly aligned. Preserve every object, person, texture, and detail in the scene exactly as-is — do not remove or add anything. Output must be HD sharp with zero blur or quality loss.`,
+    "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image. Reconstruct the background seamlessly to match the original texture, color, lighting, and pattern underneath. The result must be completely clean and invisible — no ghost marks, no smearing, no blur. Do NOT change any other part of the image. Preserve full original HD quality everywhere outside the removed watermarks.`,
+    DirectEdit: `Apply only this user instruction to the image: "${feature}". Do NOT change anything else in the image — keep all objects, colors, lighting, textures, and quality identical to the original. The result must be photo-realistic, ultra-sharp, and professional HD quality.`,
   };
 
   let prompt =
     prompts[featureType] ||
-    `Enhance this real estate photo professionally. Style: ${style}. Focus: ${feature}. Keep all original content intact.`;
+    `Enhance this real estate photo to professional HD quality. Style: ${style}. Focus: ${feature}. Keep all original content intact. Output must be ultra-sharp, clear, and photo-realistic.`;
 
   if (finalNotes && finalNotes.trim()) {
-    prompt += `\n\nADDITIONAL USER INSTRUCTIONS (apply these on top of above): ${finalNotes}`;
+    prompt += ` ADDITIONAL USER INSTRUCTIONS (apply these exactly, do not change anything else): ${finalNotes}`;
   }
 
   return prompt;
@@ -67,11 +61,11 @@ const callQwenCombine = async (images, prompt, apiKey) => {
         ],
       },
       parameters: {
-        negative_prompt:
-          "watermark, text, logo, blurry, low quality, distorted",
-        watermark: false,
-        prompt_extend: true,
-      },
+          negative_prompt:
+            "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution",
+          watermark: false,
+          prompt_extend: true,
+        },
     }),
   });
 
@@ -243,24 +237,12 @@ export const processImageWithAI = async (req, res) => {
             },
           ],
         },
-        parameters: isHDR
-          ? {
-            negative_prompt:
-              "watermark, text, logo, blurry, low quality, distorted",
-            watermark: false,
-            prompt_extend: true,
-          }
-          : featureType === "Straighten"
-            ? {
-              negative_prompt:
-                "watermark, text, logo, blurry, low quality, distorted",
-              watermark: false,
-            }
-            : {
-              negative_prompt:
-                "watermark, text, logo, blurry, low quality, distorted",
-              watermark: false,
-            },
+        parameters: {
+          negative_prompt:
+            "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, window glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus, chromatic aberration",
+          watermark: false,
+          prompt_extend: true,
+        },
         // parameters: {
         //   negative_prompt: "watermark, text, logo, blurry, low quality, distorted",
         //   watermark: false,
