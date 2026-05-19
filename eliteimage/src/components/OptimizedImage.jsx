@@ -18,7 +18,7 @@ export default function OptimizedImage({
   height = 600,
   priority = false,
   className = "",
-  quality = 75,
+  // quality = 75,
   objectFit = "cover",
   ...props
 }) {
@@ -32,7 +32,7 @@ export default function OptimizedImage({
         width={width}
         height={height}
         priority={priority}
-        quality={quality}
+        // quality={quality}
         loading={priority ? "eager" : "lazy"}
         placeholder="blur"
         blurDataURL="data:image/svg+xml;base64,CiAgICA8c3ZnIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogICAgICA8cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZSIvPgogICAgPC9zdmc+"

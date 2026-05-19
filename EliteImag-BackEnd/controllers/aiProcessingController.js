@@ -27,6 +27,16 @@ const buildPrompt = (
     "Straighten": `Correct ultra-wide 0.5x lens distortion. Make all vertical and horizontal architectural lines perfectly straight and natural. Fix barrel distortion, fisheye effect, and perspective tilt so walls, doors, windows, and furniture edges appear perfectly aligned. Preserve every object, person, texture, and detail in the scene exactly as-is — do not remove or add anything. Output must be HD sharp with zero blur or quality loss.`,
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image. Reconstruct the background seamlessly to match the original texture, color, lighting, and pattern underneath. The result must be completely clean and invisible — no ghost marks, no smearing, no blur. Do NOT change any other part of the image. Preserve full original HD quality everywhere outside the removed watermarks.`,
     DirectEdit: `Apply only this user instruction to the image: "${feature}". Do NOT change anything else in the image — keep all objects, colors, lighting, textures, and quality identical to the original. The result must be photo-realistic, ultra-sharp, and professional HD quality.`,
+  //   Enhance: `Enhance to professional HD. Natural balanced lighting, no overexposure/glare/haze. Bright, realistic. Preserve all objects and details exactly. Sharp, vibrant, zero blur.`,
+  //   "HDR": `Create ONE realistic HDR photo: balanced exposure, sharp details, natural light, no fade/glow/blur.`,
+  //   "Grass Replacement": `Replace grass with realistic ${feature} lawn, ${style} style. Match scene lighting and color. Blend edges seamlessly. Keep everything else unchanged. No blur or artifacts.`,
+  //   "Object Removal": `Remove objects in selected regions (feature="${feature}"). Fill with matching background. Keep everything outside regions unchanged. Preserve quality, no blur.`,
+  //   "Sky Replacement": `Replace only sky with "${feature}" sky, ${style} style. Blend seamlessly with horizon/buildings. Match lighting direction. Keep all non-sky areas unchanged and sharp.`,
+  //   "Virtual Staging": `Stage this empty ${feature} room with ${style} furniture. Proportional, realistic placement matching room scale. Accurate lighting/shadows. Keep all architecture unchanged. Photo-realistic HD result.`,
+  //   "Day to Dusk": `Convert to ${feature} dusk scene, ${selectedSky || style} sky. Warm golden/blue-hour tones. Natural interior glow. Keep building/landscape unchanged. Adjust only lighting and sky. Sharp, no artifacts.`,
+  //   "Straighten": `Fix 0.5x ultra-wide lens distortion. Straighten all vertical/horizontal lines. Correct barrel/fisheye/perspective tilt. Preserve all content exactly. HD sharp, no quality loss.`,
+  //   "Watermark Remove": `Remove all watermarks/logos/text overlays. Reconstruct background seamlessly matching original texture/color. Clean result, no ghost marks. Keep rest of image unchanged, HD quality.`,
+  //   DirectEdit: `Apply this instruction: "${feature}". Change nothing else. Keep all objects, colors, lighting identical. Photo-realistic HD output.`,
   };
 
   let prompt =
@@ -65,6 +75,8 @@ const callQwenCombine = async (images, prompt, apiKey) => {
           "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution",
         watermark: false,
         prompt_extend: true,
+        size:"2048*2048",
+        quality:"hd"
       },
     }),
   });
@@ -118,8 +130,8 @@ const uploadBase64ToCloudinary = async (base64Data) => {
 // it only sharpens, removes blur/fade, and boosts to HD.
 const enhanceImageHD = async (imageUrlOrBase64, apiKey) => {
   console.log("🔬 Step 2: Enhancing image to HD quality...");
-
   const enhancePrompt = `Enhance this image to ultra-sharp HD quality. Make every detail crystal-clear and high-resolution. Remove any blur, softness, haze, or fading. Make colors vibrant and natural. Do NOT add, remove, or change any object, furniture, wall, floor, sky, or element in the image — keep everything exactly the same. Only improve sharpness, clarity, and resolution. Output must be photo-realistic, ultra-sharp, and HD.`;
+  // const enhancePrompt = `Enhance to ultra-sharp HD. Remove blur/softness/haze. Vibrant natural colors. Do NOT add/remove/change any element — only improve sharpness, clarity, resolution. Photo-realistic output.`;
 
   const imageEntry = imageUrlOrBase64.startsWith("http")
     ? { image: imageUrlOrBase64 }
@@ -146,6 +158,8 @@ const enhanceImageHD = async (imageUrlOrBase64, apiKey) => {
         negative_prompt:
           "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus",
         watermark: false,
+        size:"2048*2048",
+        quality:"hd"
       },
     }),
   });
@@ -308,6 +322,8 @@ export const processImageWithAI = async (req, res) => {
             "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, window glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus, chromatic aberration",
           watermark: false,
           prompt_extend: true,
+          size: "2048*2048",
+          quality: "hd"
         },
         // parameters: {
         //   negative_prompt: "watermark, text, logo, blurry, low quality, distorted",
