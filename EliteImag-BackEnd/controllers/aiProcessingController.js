@@ -18,7 +18,7 @@ const buildPrompt = (
 
   const prompts = {
     Enhance: `Enhance this real estate photo to professional HD quality. Produce a sharp, crystal-clear, high-resolution result. Apply natural, balanced lighting throughout the interior — no overexposed windows, no glare, no blown-out highlights, no haze. Make the image bright and inviting but realistic. Preserve every object, texture, furniture piece, and architectural detail exactly as in the original. Do not add, remove, or alter any element. Output must be ultra-sharp, vibrant, and photo-realistic with zero blur or fading.`,
-    "HDR": `Combine ALL the provided images into ONE single HDR photo. Merge the best exposed areas from each image — use bright areas from one and dark areas from another to create perfectly balanced exposure throughout. Sharp details, natural light, 0% shine, no fade, glow, or blur.`,
+    "HDR": `Create ONE realistic HDR photo: balanced exposure, sharp details, 0% shine natural light, no fade, glow, or blur.`,
     "Grass Replacement": `Replace the grass area with ultra-realistic natural ${feature} lawn in ${style} style. The new grass must be perfectly sharp, lush, and photo-realistic — matching the original scene's lighting, color temperature, and grain exactly. Seamlessly blend edges. Preserve every other part of the image — buildings, pathways, sky, objects — completely unchanged and in full original HD quality. No blur, no CGI look, no new objects, no artifacts.`,
     "Object Removal": `Remove objects using feature="${feature}": only edit the selected regions. Erase everything inside them and seamlessly fill with matching surrounding background. Do not change anything outside the regions. Preserve original image quality, lighting, and details. No blur or new objects.`,
     "Sky Replacement": `Replace ONLY the sky area with "${feature}" sky in ${style} style. The replacement sky must be ultra-realistic, sharp, and seamlessly blended with the horizon and building edges. Match the sky's color temperature and lighting direction to the rest of the scene. Do not alter any non-sky area — all buildings, trees, ground, and objects must remain in full original HD quality, perfectly sharp and unchanged.`,
@@ -62,7 +62,7 @@ const callQwenCombine = async (images, prompt, apiKey) => {
       },
       parameters: {
           negative_prompt:
-            "watermark, text, logo, blurry, low quality, distorted",
+            "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution",
           watermark: false,
           prompt_extend: true,
         },
@@ -116,15 +116,10 @@ const uploadBase64ToCloudinary = async (base64Data) => {
 // Step 2 helper: Enhance any AI-generated image to HD quality
 // This is a SEPARATE call — it does NOT change what the image contains,
 // it only sharpens, removes blur/fade, and boosts to HD.
-const enhanceImageHD = async (imageUrlOrBase64, apiKey, featureType) => {
-  console.log(`🔬 Step 2: Enhancing ${featureType} image to HD quality...`);
+const enhanceImageHD = async (imageUrlOrBase64, apiKey) => {
+  console.log("🔬 Step 2: Enhancing image to HD quality...");
 
-  // HDR needs a conservative prompt — only sharpen, do NOT touch lighting/brightness
-  const hdrEnhancePrompt = `Increase only the sharpness, clarity, and resolution of this image. Make all details crisp and high-definition. Do NOT change brightness, lighting, exposure, colors, or any visual element. Do NOT add glow, shine, or light effects. Keep everything exactly the same — only make it sharper and clearer. Output must be HD quality.`;
-
-  const defaultEnhancePrompt = `Enhance this image to ultra-sharp HD quality. Make every detail crystal-clear and high-resolution. Remove any blur, softness, haze, or fading. Make colors vibrant and natural. Do NOT add, remove, or change any object, furniture, wall, floor, sky, or element in the image — keep everything exactly the same. Only improve sharpness, clarity, and resolution. Output must be photo-realistic, ultra-sharp, and HD.`;
-
-  const enhancePrompt = featureType === "HDR" ? hdrEnhancePrompt : defaultEnhancePrompt;
+  const enhancePrompt = `Enhance this image to ultra-sharp HD quality. Make every detail crystal-clear and high-resolution. Remove any blur, softness, haze, or fading. Make colors vibrant and natural. Do NOT add, remove, or change any object, furniture, wall, floor, sky, or element in the image — keep everything exactly the same. Only improve sharpness, clarity, and resolution. Output must be photo-realistic, ultra-sharp, and HD.`;
 
   const imageEntry = imageUrlOrBase64.startsWith("http")
     ? { image: imageUrlOrBase64 }
@@ -250,7 +245,6 @@ export const processImageWithAI = async (req, res) => {
         const hdImage = await enhanceImageHD(
           finalResult.startsWith("http") ? finalResult : finalResult,
           apiKey,
-          featureType,
         );
         if (hdImage) imageToUpload = hdImage;
       }
@@ -309,19 +303,12 @@ export const processImageWithAI = async (req, res) => {
             },
           ],
         },
-        parameters: isHDR
-          ? {
-              negative_prompt:
-                "watermark, text, logo, blurry, low quality, distorted",
-              watermark: false,
-              prompt_extend: true,
-            }
-          : {
-              negative_prompt:
-                "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, window glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus, chromatic aberration",
-              watermark: false,
-              prompt_extend: true,
-            },
+        parameters: {
+          negative_prompt:
+            "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, window glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus, chromatic aberration",
+          watermark: false,
+          prompt_extend: true,
+        },
         // parameters: {
         //   negative_prompt: "watermark, text, logo, blurry, low quality, distorted",
         //   watermark: false,
@@ -368,7 +355,7 @@ export const processImageWithAI = async (req, res) => {
     let finalImage = imageContent.image;
     if (needsHDEnhance) {
       console.log(`🔬 ${featureType}: Running HD enhancement step...`);
-      const hdImage = await enhanceImageHD(finalImage, apiKey, featureType);
+      const hdImage = await enhanceImageHD(finalImage, apiKey);
       if (hdImage) finalImage = hdImage;
     }
 
