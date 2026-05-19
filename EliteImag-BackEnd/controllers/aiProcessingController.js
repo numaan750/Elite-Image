@@ -1,50 +1,6 @@
 import fetch from "node-fetch";
 import FormData from "form-data";
 
-const getImageSize = async (imageUrl) => {
-  try {
-    const sizeMap = [
-      { ratio: 16 / 9, size: "2048*1152" },
-      { ratio: 4 / 3, size: "2048*1536" },
-      { ratio: 3 / 2, size: "2048*1365" },
-      { ratio: 1 / 1, size: "2048*2048" },
-      { ratio: 3 / 4, size: "1536*2048" },
-      { ratio: 9 / 16, size: "1152*2048" },
-      { ratio: 2 / 3, size: "1365*2048" },
-    ];
-    const response = await fetch(imageUrl, { method: "GET" });
-    const buffer = await response.buffer();
-    let width = 0, height = 0;
-    if (buffer[0] === 0x89 && buffer[1] === 0x50) {
-      width = buffer.readUInt32BE(16);
-      height = buffer.readUInt32BE(20);
-    } else if (buffer[0] === 0xff && buffer[1] === 0xd8) {
-      let i = 2;
-      while (i < buffer.length - 8) {
-        if (buffer[i] === 0xff && [0xc0, 0xc1, 0xc2].includes(buffer[i + 1])) {
-          height = buffer.readUInt16BE(i + 5);
-          width = buffer.readUInt16BE(i + 7);
-          break;
-        }
-        const segLen = buffer.readUInt16BE(i + 2);
-        i += 2 + segLen;
-      }
-    }
-    if (!width || !height) return "2048*2048";
-    const ratio = width / height;
-    let best = sizeMap[0];
-    let minDiff = Math.abs(ratio - best.ratio);
-    for (const entry of sizeMap) {
-      const diff = Math.abs(ratio - entry.ratio);
-      if (diff < minDiff) { minDiff = diff; best = entry; }
-    }
-    console.log(`📐 Image: ${width}x${height} → size: ${best.size}`);
-    return best.size;
-  } catch (e) {
-    return "2048*2048";
-  }
-};
-
 const DASHSCOPE_API_URL =
   "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation";
 const HDR_MAX_IMAGES = 3;
@@ -94,7 +50,7 @@ const buildPrompt = (
   return prompt;
 };
 
-const callQwenCombine = async (images, prompt, apiKey, size = "2048*2048") => {
+const callQwenCombine = async (images, prompt, apiKey) => {
   const content = [...images.map((url) => ({ image: url })), { text: prompt }];
 
   const response = await fetch(DASHSCOPE_API_URL, {
@@ -120,7 +76,6 @@ const callQwenCombine = async (images, prompt, apiKey, size = "2048*2048") => {
         watermark: false,
         prompt_extend: true,
         // size:"2048*2048",
-        size: size,
         quality: "hd"
       },
     }),
@@ -173,7 +128,7 @@ const uploadBase64ToCloudinary = async (base64Data) => {
 // Step 2 helper: Enhance any AI-generated image to HD quality
 // This is a SEPARATE call — it does NOT change what the image contains,
 // it only sharpens, removes blur/fade, and boosts to HD.
-const enhanceImageHD = async (imageUrlOrBase64, apiKey, size = "2048*2048") => {
+const enhanceImageHD = async (imageUrlOrBase64, apiKey) => {
   console.log("🔬 Step 2: Enhancing image to HD quality...");
   const enhancePrompt = `Enhance this image to ultra-sharp HD quality. Make every detail crystal-clear and high-resolution. Remove any blur, softness, haze, or fading. Make colors vibrant and natural. Do NOT add, remove, or change any object, furniture, wall, floor, sky, or element in the image — keep everything exactly the same. Only improve sharpness, clarity, and resolution. Output must be photo-realistic, ultra-sharp, and HD.`;
   // const enhancePrompt = `Enhance to ultra-sharp HD. Remove blur/softness/haze. Vibrant natural colors. Do NOT add/remove/change any element — only improve sharpness, clarity, resolution. Photo-realistic output.`;
@@ -204,7 +159,6 @@ const enhanceImageHD = async (imageUrlOrBase64, apiKey, size = "2048*2048") => {
           "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus",
         watermark: false,
         // size:"2048*2048",
-        size: size,
         quality: "hd"
       },
     }),
@@ -273,9 +227,6 @@ export const processImageWithAI = async (req, res) => {
 
     console.log(`🤖 AI Processing: ${featureType} for image: ${imageUrl}`);
 
-    const firstImageUrl = Array.isArray(imageUrl) ? imageUrl[0] : imageUrl;
-    const detectedSize = await getImageSize(firstImageUrl);
-
     const prompt = buildPrompt(
       featureType,
       selectedFeature,
@@ -296,11 +247,11 @@ export const processImageWithAI = async (req, res) => {
       const remaining = imageUrl.slice(3);
 
       // STEP 1
-      const firstResult = await callQwenCombine(firstBatch, prompt, apiKey, detectedSize);
+      const firstResult = await callQwenCombine(firstBatch, prompt, apiKey);
 
       // STEP 2
       const secondImages = [firstResult, ...remaining].slice(0, 3);
-      const finalResult = await callQwenCombine(secondImages, prompt, apiKey, detectedSize);
+      const finalResult = await callQwenCombine(secondImages, prompt, apiKey);
 
       // STEP 3: HD Enhancement
       let imageToUpload = finalResult;
@@ -308,7 +259,6 @@ export const processImageWithAI = async (req, res) => {
         const hdImage = await enhanceImageHD(
           finalResult.startsWith("http") ? finalResult : finalResult,
           apiKey,
-          detectedSize,
         );
         if (hdImage) imageToUpload = hdImage;
       }
@@ -373,7 +323,6 @@ export const processImageWithAI = async (req, res) => {
           watermark: false,
           prompt_extend: true,
           // size:"2048*2048",
-          size: detectedSize,
           quality: "hd"
         },
         // parameters: {
@@ -422,7 +371,7 @@ export const processImageWithAI = async (req, res) => {
     let finalImage = imageContent.image;
     if (needsHDEnhance) {
       console.log(`🔬 ${featureType}: Running HD enhancement step...`);
-      const hdImage = await enhanceImageHD(finalImage, apiKey, detectedSize);
+      const hdImage = await enhanceImageHD(finalImage, apiKey);
       if (hdImage) finalImage = hdImage;
     }
 
