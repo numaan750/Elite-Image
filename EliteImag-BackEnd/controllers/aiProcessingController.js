@@ -112,6 +112,60 @@ const uploadBase64ToCloudinary = async (base64Data) => {
 
   return data.secure_url;
 };
+
+// Step 2 helper: Enhance any AI-generated image to HD quality
+// This is a SEPARATE call — it does NOT change what the image contains,
+// it only sharpens, removes blur/fade, and boosts to HD.
+const enhanceImageHD = async (imageUrlOrBase64, apiKey) => {
+  console.log("🔬 Step 2: Enhancing image to HD quality...");
+
+  const enhancePrompt = `Enhance this image to ultra-sharp HD quality. Make every detail crystal-clear and high-resolution. Remove any blur, softness, haze, or fading. Make colors vibrant and natural. Do NOT add, remove, or change any object, furniture, wall, floor, sky, or element in the image — keep everything exactly the same. Only improve sharpness, clarity, and resolution. Output must be photo-realistic, ultra-sharp, and HD.`;
+
+  const imageEntry = imageUrlOrBase64.startsWith("http")
+    ? { image: imageUrlOrBase64 }
+    : { image: `data:image/png;base64,${imageUrlOrBase64}` };
+
+  const response = await fetch(DASHSCOPE_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "X-DashScope-Async": "disable",
+    },
+    body: JSON.stringify({
+      model: process.env.DASHSCOPE_MODEL,
+      input: {
+        messages: [
+          {
+            role: "user",
+            content: [imageEntry, { text: enhancePrompt }],
+          },
+        ],
+      },
+      parameters: {
+        negative_prompt:
+          "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus",
+        watermark: false,
+      },
+    }),
+  });
+
+  const data = await response.json();
+  const outputContent = data?.output?.choices?.[0]?.message?.content;
+  const imageContent = outputContent?.find((item) => item.image);
+
+  if (!imageContent || !imageContent.image) {
+    console.warn("⚠️ HD enhance step did not return image, using original");
+    return null; // Return null so caller can fall back to original
+  }
+
+  console.log("✅ HD enhancement complete");
+  return imageContent.image;
+};
+
+// Features that need HD enhancement as a second step
+const NEEDS_HD_ENHANCE = ["HDR", "Object Removal"];
+
 export const processImageWithAI = async (req, res) => {
   try {
     const {
@@ -170,6 +224,8 @@ export const processImageWithAI = async (req, res) => {
 
     console.log(`📝 Prompt: ${prompt}`);
     const isHDR = featureType === "HDR";
+    const needsHDEnhance = NEEDS_HD_ENHANCE.includes(featureType);
+
     if (isHDR && Array.isArray(imageUrl) && imageUrl.length > 3) {
       console.log("⚡ Using multi-step HDR combine");
 
@@ -183,15 +239,25 @@ export const processImageWithAI = async (req, res) => {
       const secondImages = [firstResult, ...remaining].slice(0, 3);
       const finalResult = await callQwenCombine(secondImages, prompt, apiKey);
 
+      // STEP 3: HD Enhancement
+      let imageToUpload = finalResult;
+      if (needsHDEnhance) {
+        const hdImage = await enhanceImageHD(
+          finalResult.startsWith("http") ? finalResult : finalResult,
+          apiKey,
+        );
+        if (hdImage) imageToUpload = hdImage;
+      }
+
       let processedImageUrl;
 
-      if (finalResult.startsWith("http")) {
-        const imgResponse = await fetch(finalResult);
+      if (imageToUpload.startsWith("http")) {
+        const imgResponse = await fetch(imageToUpload);
         const imgBuffer = await imgResponse.buffer();
         const base64 = imgBuffer.toString("base64");
         processedImageUrl = await uploadBase64ToCloudinary(base64);
       } else {
-        processedImageUrl = await uploadBase64ToCloudinary(finalResult);
+        processedImageUrl = await uploadBase64ToCloudinary(imageToUpload);
       }
 
       return res.status(200).json({
@@ -285,17 +351,25 @@ export const processImageWithAI = async (req, res) => {
       });
     }
 
-    let processedImageUrl;
-    if (imageContent.image.startsWith("http")) {
-      console.log("📎 Got image URL from Qwen, uploading to Cloudinary...");
+    // For HDR and Object Removal: run a second AI call to enhance to HD
+    let finalImage = imageContent.image;
+    if (needsHDEnhance) {
+      console.log(`🔬 ${featureType}: Running HD enhancement step...`);
+      const hdImage = await enhanceImageHD(finalImage, apiKey);
+      if (hdImage) finalImage = hdImage;
+    }
 
-      const imgResponse = await fetch(imageContent.image);
+    let processedImageUrl;
+    if (finalImage.startsWith("http")) {
+      console.log("📎 Got image URL, uploading to Cloudinary...");
+
+      const imgResponse = await fetch(finalImage);
       const imgBuffer = await imgResponse.buffer();
       const base64 = imgBuffer.toString("base64");
       processedImageUrl = await uploadBase64ToCloudinary(base64);
     } else {
-      console.log("📎 Got base64 from Qwen, uploading to Cloudinary...");
-      processedImageUrl = await uploadBase64ToCloudinary(imageContent.image);
+      console.log("📎 Got base64, uploading to Cloudinary...");
+      processedImageUrl = await uploadBase64ToCloudinary(finalImage);
     }
 
     console.log("✅ Final processed image URL:", processedImageUrl);
