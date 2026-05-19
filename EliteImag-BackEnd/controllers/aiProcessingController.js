@@ -75,8 +75,8 @@ const callQwenCombine = async (images, prompt, apiKey) => {
           "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution",
         watermark: false,
         prompt_extend: true,
-        size:"2048*2048",
-        quality:"hd"
+        size:"4096*4096",
+        quality:"4K"
       },
     }),
   });
@@ -158,8 +158,8 @@ const enhanceImageHD = async (imageUrlOrBase64, apiKey) => {
         negative_prompt:
           "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus",
         watermark: false,
-        size:"2048*2048",
-        quality:"hd"
+        size:"4096*4096",
+        quality:"4K"
       },
     }),
   });
@@ -322,8 +322,8 @@ export const processImageWithAI = async (req, res) => {
             "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, window glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus, chromatic aberration",
           watermark: false,
           prompt_extend: true,
-          size: "2048*2048",
-          quality: "hd"
+          size:"4096*4096",
+          quality: "4K"
         },
         // parameters: {
         //   negative_prompt: "watermark, text, logo, blurry, low quality, distorted",
