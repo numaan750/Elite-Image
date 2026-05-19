@@ -20,7 +20,7 @@ const buildPrompt = (
     Enhance: `Enhance this real estate photo to professional HD quality. Produce a sharp, crystal-clear, high-resolution result. Apply natural, balanced lighting throughout the interior — no overexposed windows, no glare, no blown-out highlights, no haze. Make the image bright and inviting but realistic. Preserve every object, texture, furniture piece, and architectural detail exactly as in the original. Do not add, remove, or alter any element. Output must be ultra-sharp, vibrant, and photo-realistic with zero blur or fading.`,
     "HDR": `Merge the provided exposures into one professional HDR real estate photo. The final image must be ultra-sharp, crystal-clear, and high-resolution. Balance interior and exterior exposure so both are simultaneously visible and correctly exposed — no blown-out windows, no dark interiors, no haze or glow. Preserve all original objects, textures, and architectural details with maximum sharpness. Output must look like a professional real estate HDR photograph, zero blur or fade.`,
     "Grass Replacement": `Replace the grass area with ultra-realistic natural ${feature} lawn in ${style} style. The new grass must be perfectly sharp, lush, and photo-realistic — matching the original scene's lighting, color temperature, and grain exactly. Seamlessly blend edges. Preserve every other part of the image — buildings, pathways, sky, objects — completely unchanged and in full original HD quality. No blur, no CGI look, no new objects, no artifacts.`,
-    "Object Removal": `Remove objects using feature="${feature}": only edit the selected regions. Erase everything inside them and seamlessly fill with matching surrounding background — matching the exact surrounding texture, color, and lighting. Do not change ANYTHING outside the selected regions. Preserve 100% of the original image quality, sharpness, resolution, and details everywhere. The final result must be ultra-sharp, crystal-clear, and HD quality — no blur, no softening, no quality loss anywhere in the image. No new objects added.`,
+    "Object Removal": `Remove objects using feature="${feature}": only edit the selected regions. Erase everything inside them and seamlessly fill with matching surrounding background. Do not change anything outside the regions. Preserve original image quality, lighting, and details. No blur or new objects.`,
     "Sky Replacement": `Replace ONLY the sky area with "${feature}" sky in ${style} style. The replacement sky must be ultra-realistic, sharp, and seamlessly blended with the horizon and building edges. Match the sky's color temperature and lighting direction to the rest of the scene. Do not alter any non-sky area — all buildings, trees, ground, and objects must remain in full original HD quality, perfectly sharp and unchanged.`,
     "Virtual Staging": `Virtually stage this empty ${feature} room with ${style} style furniture and decor. Place realistic, proportionally correct furniture that matches the room's scale and architecture. Lighting, shadows, and reflections must be physically accurate and consistent with the existing room lighting. Keep all walls, floors, ceilings, windows, and architectural elements completely unchanged. The result must look like a professional real estate photograph — ultra-sharp, HD, and photo-realistic.`,
     "Day to Dusk": `Convert this daytime real estate photo to a stunning ${feature} dusk scene using ${selectedSky || style} sky. The sky must transition beautifully with warm golden and blue-hour tones. Interior lights should appear naturally lit and glowing. Keep the original building, landscaping, driveway, and all surrounding objects completely unchanged in structure and placement. Adjust only lighting and sky. The output must be ultra-sharp, HD, and photo-realistic — no blur, no haze, no artifacts.`,
@@ -90,9 +90,6 @@ const uploadBase64ToCloudinary = async (base64Data) => {
   const formData = new FormData();
   formData.append("file", base64WithPrefix);
   formData.append("upload_preset", UPLOAD_PRESET);
-  // Force maximum quality on upload — prevents Cloudinary from auto-compressing
-  formData.append("quality", "100");
-  formData.append("format", "png");
 
   const response = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
@@ -113,10 +110,7 @@ const uploadBase64ToCloudinary = async (base64Data) => {
     throw new Error("Cloudinary did not return secure_url");
   }
 
-  // Return URL with lossless quality transformation to ensure HD delivery
-  const url = data.secure_url;
-  const hdUrl = url.replace("/upload/", "/upload/fl_lossless,q_100/");
-  return hdUrl;
+  return data.secure_url;
 };
 export const processImageWithAI = async (req, res) => {
   try {
