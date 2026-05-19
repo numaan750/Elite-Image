@@ -17,7 +17,7 @@ const buildPrompt = (
   const feature = selectedFeature || "";
 
   const prompts = {
-    // Enhance: `Enhance this real estate photo to professional HD quality. Produce a sharp, crystal-clear, high-resolution result. Apply natural, balanced lighting throughout the interior — no overexposed windows, no glare, no blown-out highlights, no haze. Make the image bright and inviting but realistic. Preserve every object, texture, furniture piece, and architectural detail exactly as in the original. Do not add, remove, or alter any element. Output must be ultra-sharp, vibrant, and photo-realistic with zero blur or fading.`,
+    Enhance: `Enhance this real estate photo to professional HD quality. Produce a sharp, crystal-clear, high-resolution result. Apply natural, balanced lighting throughout the interior — no overexposed windows, no glare, no blown-out highlights, no haze. Make the image bright and inviting but realistic. Preserve every object, texture, furniture piece, and architectural detail exactly as in the original. Do not add, remove, or alter any element. Output must be ultra-sharp, vibrant, and photo-realistic with zero blur or fading.`,
     "HDR": `Create ONE realistic HDR photo: balanced exposure, sharp details, 0% shine natural light, no fade, glow, or blur.`,
     "Grass Replacement": `Replace the grass area with ultra-realistic natural ${feature} lawn in ${style} style. The new grass must be perfectly sharp, lush, and photo-realistic — matching the original scene's lighting, color temperature, and grain exactly. Seamlessly blend edges. Preserve every other part of the image — buildings, pathways, sky, objects — completely unchanged and in full original HD quality. No blur, no CGI look, no new objects, no artifacts.`,
     "Object Removal": `Remove objects using feature="${feature}": only edit the selected regions. Erase everything inside them and seamlessly fill with matching surrounding background. Do not change anything outside the regions. Preserve original image quality, lighting, and details. No blur or new objects.`,
@@ -27,7 +27,7 @@ const buildPrompt = (
     "Straighten": `Correct ultra-wide 0.5x lens distortion. Make all vertical and horizontal architectural lines perfectly straight and natural. Fix barrel distortion, fisheye effect, and perspective tilt so walls, doors, windows, and furniture edges appear perfectly aligned. Preserve every object, person, texture, and detail in the scene exactly as-is — do not remove or add anything. Output must be HD sharp with zero blur or quality loss.`,
     "Watermark Remove": `Remove all watermarks, logos, text overlays, and copyright marks from this image. Reconstruct the background seamlessly to match the original texture, color, lighting, and pattern underneath. The result must be completely clean and invisible — no ghost marks, no smearing, no blur. Do NOT change any other part of the image. Preserve full original HD quality everywhere outside the removed watermarks.`,
     DirectEdit: `Apply only this user instruction to the image: "${feature}". Do NOT change anything else in the image — keep all objects, colors, lighting, textures, and quality identical to the original. The result must be photo-realistic, ultra-sharp, and professional HD quality.`,
-    Enhance: `Enhance to professional HD. Natural balanced lighting, no overexposure/glare/haze. Bright, realistic. Preserve all objects and details exactly. Sharp, vibrant, zero blur.`,
+    // Enhance: `Enhance to professional HD. Natural balanced lighting, no overexposure/glare/haze. Bright, realistic. Preserve all objects and details exactly. Sharp, vibrant, zero blur.`,
   //   "HDR": `Create ONE realistic HDR photo: balanced exposure, sharp details, natural light, no fade/glow/blur.`,
   //   "Grass Replacement": `Replace grass with realistic ${feature} lawn, ${style} style. Match scene lighting and color. Blend edges seamlessly. Keep everything else unchanged. No blur or artifacts.`,
   //   "Object Removal": `Remove objects in selected regions (feature="${feature}"). Fill with matching background. Keep everything outside regions unchanged. Preserve quality, no blur.`,
@@ -75,7 +75,7 @@ const callQwenCombine = async (images, prompt, apiKey) => {
           "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution",
         watermark: false,
         prompt_extend: true,
-        // size:"2048*2048",
+        size:"2048*2048",
         quality:"hd"
       },
     }),
@@ -158,7 +158,7 @@ const enhanceImageHD = async (imageUrlOrBase64, apiKey) => {
         negative_prompt:
           "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus",
         watermark: false,
-        // size:"2048*2048",
+        size:"2048*2048",
         quality:"hd"
       },
     }),
@@ -322,7 +322,7 @@ export const processImageWithAI = async (req, res) => {
             "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, window glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution, out of focus, chromatic aberration",
           watermark: false,
           prompt_extend: true,
-          // size:"2048*2048",
+          size:"2048*2048",
           quality: "hd"
         },
         // parameters: {
