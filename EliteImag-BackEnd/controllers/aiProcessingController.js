@@ -61,11 +61,11 @@ const callQwenCombine = async (images, prompt, apiKey) => {
         ],
       },
       parameters: {
-          negative_prompt:
-            "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution",
-          watermark: false,
-          prompt_extend: true,
-        },
+        negative_prompt:
+          "watermark, text, logo, blurry, low quality, distorted, overexposed, blown highlights, glare, haze, fog, washed out, faded, dull, flat, grainy, noisy, pixelated, artifacts, low resolution",
+        watermark: false,
+        prompt_extend: true,
+      },
     }),
   });
 
